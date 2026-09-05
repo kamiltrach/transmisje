@@ -44,6 +44,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
   cursor:default;
 }
 
+
 .video.player-fs:fullscreen{
   width:100vw!important;
   height:100vh!important;
@@ -144,6 +145,7 @@ body.player-fullscreen{
   .stream-title{max-width:125px;font-size:.68rem}
   .status{display:none}
 }
+
 
 @media (max-width:700px){
   .video.player-fs{
@@ -464,7 +466,7 @@ function createPlayer(id){
       videoId:id,
       playerVars:{
         autoplay:1,
-        mute:0, // <--- ZMIANA ZGODNIE Z PROŚBĄ: Dźwięk domyślnie włączony
+        mute:1, // <--- ZMIANA: Wymuszenie wyciszenia dla telefonów, by zniknął czerwony przycisk
         controls:0,
         rel:0,
         modestbranding:1,
@@ -477,6 +479,8 @@ function createPlayer(id){
           console.log('[YT] Player ready');
           window.__ytPlayer = e.target;
           
+          // Wymuszamy start w trybie wyciszonym
+          try{ e.target.mute(); }catch(x){}
           try{ e.target.playVideo(); }catch(x){}
           
           // Automatyczne pauzowanie i wznawianie (wymuszenie wczytania bufora)
@@ -487,9 +491,9 @@ function createPlayer(id){
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1700);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2200);
 
-          // ZMIANA ZGODNIE Z PROŚBĄ: Ikona głośności ustawiona domyślnie na włączoną
+          // Ikona głośności ustawiona domyślnie na 'X' z uwagi na niezbędne wyciszenie startowe
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-          $('muteIcon').className='fa-solid fa-volume-high';
+          $('muteIcon').className='fa-solid fa-volume-xmark';
           reveal();
           
           // Automatyczne wznawianie co 3 sekundy
