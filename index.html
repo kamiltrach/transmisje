@@ -153,49 +153,42 @@ body.player-fullscreen{
 }
 
 
-/* === PLAYER FIX — only player/fullscreen behavior === */
+/* PLAYER FIX */
 .video { overflow:hidden; }
+.video .controls { z-index:50 !important; pointer-events:auto !important; }
 .video .yt-wrap { z-index:2; }
-.video .yt-shield { z-index:3; }
-.video .controls { z-index:10 !important; }
-.video.player-fs {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  height: 100dvh !important;
-  max-width: none !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  aspect-ratio: auto !important;
-  z-index: 2147483647 !important;
+.video .yt-shield { z-index:3; pointer-events:auto; }
+.video.player-fs{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  max-width:none!important;
+  min-height:0!important;
+  margin:0!important;
+  border-radius:0!important;
+  aspect-ratio:auto!important;
+  z-index:2147483647!important;
+  overflow:hidden!important;
 }
 .video.player-fs .yt-wrap,
-.video.player-fs .yt-wrap iframe {
-  position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
+.video.player-fs .yt-wrap iframe{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
 }
-.video.player-fs .controls {
-  position:absolute !important;
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-  z-index:20 !important;
+.video.player-fs .controls{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  z-index:60!important;
+  pointer-events:auto!important;
 }
-.video.player-fs .yt-shield { z-index:5 !important; }
-.video.player-fs .watermark { z-index:21 !important; }
-body.player-fullscreen {
-  overflow:hidden !important;
-}
-@media (min-width:701px) {
-  .video {
-    aspect-ratio:16/9;
-    min-height:0;
-  }
-}
+.video.player-fs .yt-shield{z-index:5!important}
+.video.player-fs .watermark{z-index:61!important}
+body.player-fullscreen{overflow:hidden!important}
 
 </style>
 </head>
@@ -333,7 +326,11 @@ function createPlayer(id){
   wrap.className='yt-wrap';
 
   const iframe=document.createElement('iframe');
-  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
+  const origin = location.origin && location.origin !== 'null' ? location.origin : '';
+  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)
+    +'?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1'
+    +'&iv_load_policy=3&disablekb=1&fs=1&enablejsapi=1'
+    +(origin ? '&origin='+encodeURIComponent(origin) : '');
   iframe.title='Transmisja';
   iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
   iframe.setAttribute('allowfullscreen','');
@@ -341,12 +338,12 @@ function createPlayer(id){
 
   const shield=document.createElement('div');
   shield.className='yt-shield';
+
   wrap.appendChild(iframe);
   wrap.appendChild(shield);
   $('video').appendChild(wrap);
   player=iframe;
 
-  // Long branded loader on desktop and mobile. It hides YouTube's initial UI.
   const started=Date.now();
   let done=false;
   const reveal=()=>{
@@ -359,14 +356,18 @@ function createPlayer(id){
       if(l){l.classList.add('hide');setTimeout(()=>l.remove(),350);}
     },remaining);
   };
+
   iframe.addEventListener('load',()=>{
+    // API potrzebuje chwili po loadzie, szczególnie przy YouTube nocookie.
     setTimeout(()=>{
       youtubeCommand('playVideo');
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      const mi=$('muteIcon'); if(mi)mi.className='fa-solid fa-volume-xmark';
-    },150);
+      const mi=$('muteIcon');
+      if(mi)mi.className='fa-solid fa-volume-xmark';
+    },500);
     reveal();
   });
+
   setTimeout(reveal,7000);
 }
 
@@ -427,7 +428,6 @@ function setFullscreenIcon(active){
   b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
 }
 
-
 function setFullscreenIcon(active){
   const b=$('fullscreenBtn');
   if(!b)return;
@@ -439,34 +439,25 @@ function setFullscreenIcon(active){
 
 async function fullscreen(){
   const v=$('video');
-  if(!v)return;
+  if(!v || !player)return;
 
-  // Jeżeli player jest już w natywnym fullscreenie, wyjdź.
-  if(document.fullscreenElement===v || document.webkitFullscreenElement===v){
+  if(document.fullscreenElement===v){
     await exitPlayerFullscreen();
     return;
   }
 
-  // Natywny fullscreen działa poprawniej na komputerach (Esc, pasek systemowy,
-  // prawidłowe skalowanie). Klasa player-fs jest fallbackiem dla przeglądarek,
-  // które nie pozwalają na Fullscreen API.
   try{
     if(v.requestFullscreen){
-      await v.requestFullscreen({navigationUI:'hide'});
-      document.body.classList.add('player-fullscreen');
-      setFullscreenIcon(true);
-      return;
-    }
-    if(v.webkitRequestFullscreen){
-      v.webkitRequestFullscreen();
+      await v.requestFullscreen();
       document.body.classList.add('player-fullscreen');
       setFullscreenIcon(true);
       return;
     }
   }catch(e){
-    console.warn('Fullscreen API unavailable:',e);
+    console.warn('Fullscreen API:',e);
   }
 
+  // Fallback dla przeglądarek bez Fullscreen API.
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   document.body.style.overflow='hidden';
@@ -480,8 +471,6 @@ async function exitPlayerFullscreen(){
   try{
     if(document.fullscreenElement && document.exitFullscreen){
       await document.exitFullscreen();
-    }else if(document.webkitFullscreenElement && document.webkitExitFullscreen){
-      document.webkitExitFullscreen();
     }
   }catch(e){}
 
@@ -494,17 +483,13 @@ async function exitPlayerFullscreen(){
 function syncFullscreenState(){
   const v=$('video');
   if(!v)return;
-
-  const nativeFs=!!(document.fullscreenElement || document.webkitFullscreenElement);
-  const fallback=v.classList.contains('player-fs');
-
-  document.body.classList.toggle('player-fullscreen',nativeFs || fallback);
-  if(!nativeFs && !fallback) document.body.style.overflow='';
-  setFullscreenIcon(nativeFs || fallback);
+  const active=!!document.fullscreenElement || v.classList.contains('player-fs');
+  document.body.classList.toggle('player-fullscreen',active);
+  if(!active)document.body.style.overflow='';
+  setFullscreenIcon(active);
 }
 
 document.addEventListener('fullscreenchange',syncFullscreenState);
-document.addEventListener('webkitfullscreenchange',syncFullscreenState);
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
@@ -634,16 +619,6 @@ mobileTrigger.addEventListener('click',()=>{
 
 activeLeague=Object.keys(L)[0];
 setupYouTubeLikeControls();
-
-/* Keep the custom controls clickable above the YouTube interaction shield. */
-(function(){
-  const v=$('video');
-  if(!v)return;
-  v.addEventListener('click',function(e){
-    if(e.target.closest('.controls')) e.stopPropagation();
-  },true);
-})();
-
 loadStreams().then(()=>{
   const s=streams[activeLeague];
   if(s?.active && s.videoId){
