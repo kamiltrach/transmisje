@@ -481,39 +481,18 @@ function setFullscreenIcon(active){
 }
 
 async function fullscreen(){
-  const v=$('video');
-  if(!v || !player)return;
-
-  const active=v.classList.contains('player-fs') || !!document.fullscreenElement;
-  if(active){
-    await exitPlayerFullscreen();
-    return;
-  }
-
-  /* Najpierw prawdziwy fullscreen przeglądarki. Dzięki temu na telefonie
-     znika pasek Safari, jeśli dana wersja iOS go obsługuje. */
+  const el=$('video');
+  if(!el)return;
   try{
-    if(v.requestFullscreen){
-      await v.requestFullscreen();
-      v.classList.add('player-fs');
-      document.body.classList.add('player-fullscreen');
-      document.body.style.overflow='hidden';
-      setFullscreenIcon(true);
-      return;
+    if(document.fullscreenElement){
+      await document.exitFullscreen();
+    }else if(el.requestFullscreen){
+      await el.requestFullscreen();
+    }else if(el.webkitRequestFullscreen){
+      el.webkitRequestFullscreen();
     }
-  }catch(e){}
-
-  /* Fallback dla przeglądarek bez Fullscreen API. */
-  v.classList.add('player-fs');
-  document.body.classList.add('player-fullscreen');
-  document.body.style.overflow='hidden';
-  setFullscreenIcon(true);
-
-  try{
-    if(screen.orientation && screen.orientation.lock){
-      await screen.orientation.lock('landscape');
-    }
-  }catch(e){}
+    setTimeout(syncFullscreenState,150);
+  }catch(e){console.error(e);}
 }
 
 async function exitPlayerFullscreen(){
