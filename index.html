@@ -112,10 +112,41 @@ function closeAdmin(){
   if(panel)panel.classList.remove('open');
   document.body.style.overflow='';
 }
-function login(){
-  const e=$('email').value.trim(),p=$('password').value;
-  if(!window.auth){$('loginMsg').innerText='Firebase nie został załadowany. Sprawdź, czy firebase-config.js jest obok transmisje.html.';return}
-  window.auth.signInWithEmailAndPassword(e,p).then(showAdmin).catch(()=>{$('loginMsg').innerText='Błędne dane logowania'});
+async function login(){
+  const e=$('email').value.trim();
+  const p=$('password').value;
+  const msg=$('loginMsg');
+  msg.style.color='#ff6b6b';
+  msg.textContent='';
+
+  if(!e || !p){
+    msg.textContent='Wpisz email i hasło.';
+    return;
+  }
+  if(!window.firebase || !window.auth){
+    msg.textContent='Firebase nie został załadowany. Sprawdź firebase-config.js.';
+    return;
+  }
+
+  try{
+    await window.auth.signInWithEmailAndPassword(e,p);
+    msg.textContent='';
+    showAdmin();
+  }catch(err){
+    console.error('Firebase login error:',err);
+    const code=err && err.code ? err.code : '';
+    const messages={
+      'auth/invalid-credential':'Nieprawidłowy email lub hasło.',
+      'auth/invalid-email':'Podany email ma nieprawidłowy format.',
+      'auth/user-not-found':'Takie konto nie istnieje w Firebase Authentication.',
+      'auth/wrong-password':'Nieprawidłowe hasło.',
+      'auth/user-disabled':'To konto zostało wyłączone w Firebase.',
+      'auth/operation-not-allowed':'Logowanie Email/Hasło nie jest włączone w Firebase Authentication.',
+      'auth/too-many-requests':'Za dużo prób logowania. Spróbuj ponownie później.',
+      'auth/network-request-failed':'Błąd połączenia z Firebase.'
+    };
+    msg.textContent=messages[code] || ('Błąd logowania: '+(code || 'nieznany błąd'));
+  }
 }
 function showAdmin(){
   $('loginBox').style.display='none';
@@ -153,6 +184,12 @@ function handleAdminShortcut(e){
   }
 }
 document.addEventListener('keydown',handleAdminShortcut,true);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && document.activeElement && (document.activeElement.id==='email'||document.activeElement.id==='password')){
+    e.preventDefault();
+    login();
+  }
+});
 
 let mobileAdminTaps=0,mobileAdminTimer=null;
 const mobileTrigger=document.createElement('button');
