@@ -22,7 +22,6 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
 
-/* IFRAME DOMYŚLNIE UKRYTY (OPACITY 0) ABY UNIKNĄĆ BŁYSKU UI YOUTUBE */
 .yt-wrap iframe{
   position: absolute;
   top: 0;
@@ -38,12 +37,10 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   user-select: none;
 }
 
-/* KLASA POJAWIAJĄCA WIDEO PO ZAŁADOWANIU STREAMU */
 .yt-wrap.ready iframe{
   opacity: 1;
 }
 
-/* GRADIENTOWE MASKI DLA ZAKRYCIA PASKÓW YT BEZ PRZYCIĘCIA */
 .yt-mask-top{
   position: absolute;
   top: 0;
@@ -68,15 +65,17 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 
 .yt-shield{position:absolute;inset:0;z-index:7;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
-/* OVERLAY PRZYCISKU PLAY */
+/* PEŁNY OVERLAY PAUZY */
 .custom-overlay{
   position: absolute;
   inset: 0;
-  z-index: 8;
-  background: #000;
+  z-index: 12;
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 14px;
   cursor: pointer;
   transition: opacity .2s ease;
   -webkit-tap-highlight-color: transparent;
@@ -96,6 +95,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   pointer-events: none;
 }
 .custom-overlay:active .custom-play-btn{ transform: scale(0.95); }
+.custom-overlay-text{ font-size: 0.85rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
 
 .watermark{position:absolute;right:20px;top:18px;z-index:10;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
 .watermark img{height:34px;width:auto;display:block}
@@ -107,14 +107,12 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
 .stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 
-/* LOADER PRZESŁANIAJĄCY YT W TRAKCIE STARTU */
 .stream-loader{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:#000;transition:opacity .4s ease}
 .stream-loader.hide{opacity:0;pointer-events:none}
 .stream-loader img{width:88px;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
 .stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
 @keyframes sgSpin{to{transform:rotate(360deg)}}
 
-/* PEŁNY EKRAN */
 .video:fullscreen,
 .video:-webkit-full-screen,
 .video.player-fs {
@@ -147,7 +145,6 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 
 body.player-fullscreen { overflow: hidden !important; width: 100% !important; height: 100% !important; }
 
-/* MINIMALIZACJA */
 .video.player-minimized {
   position: fixed !important; bottom: 20px !important; right: 20px !important; width: 320px !important; height: 180px !important; z-index: 999999 !important; border-radius: 12px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; aspect-ratio: 16/9 !important; border: 1px solid var(--border) !important; background: #000 !important; overflow: hidden !important;
 }
@@ -199,7 +196,6 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
       <div id="placeholder" class="video-placeholder"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><h2>Wybierz ligę</h2><p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p></div>
       <div class="watermark"><img src="logo.png" alt="Strefa Gola"></div>
       
-      <!-- PASEK STEROWANIA -->
       <div class="controls" id="playerControls">
         <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
         <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
@@ -330,7 +326,6 @@ function createPlayer(id){
   innerDiv.id='ytframe';
   wrap.appendChild(innerDiv);
 
-  // MASKI GRADIENTOWE
   const maskTop=document.createElement('div');
   maskTop.className='yt-mask-top';
   wrap.appendChild(maskTop);
@@ -339,12 +334,12 @@ function createPlayer(id){
   maskBottom.className='yt-mask-bottom';
   wrap.appendChild(maskBottom);
 
-  // OVERLAY PAUZY DLA 1 KLIKNIĘCIA
+  // OVERLAY PRZYCISKU PLAY (ZAKRYWA CAŁE WIDEO GDY TRANSMISJA STOI)
   const overlay=document.createElement('div');
   overlay.id='customOverlay';
   overlay.className='custom-overlay';
   overlay.style.display='none';
-  overlay.innerHTML='<div class="custom-play-btn"><i class="fa-solid fa-play"></i></div>';
+  overlay.innerHTML='<div class="custom-play-btn"><i class="fa-solid fa-play"></i></div><div class="custom-overlay-text">Kliknij, aby odtworzyć transmisję</div>';
   
   const triggerPlay = function(e){
     e.preventDefault();
@@ -388,14 +383,15 @@ function createPlayer(id){
           }catch(x){}
         },
         onStateChange:function(e){
-          if(e.data === 1){ // PLAYING - Dopiero tutaj odsłaniamy wideo i usuwamy loader!
+          if(e.data === 1){ // PLAYING
             wrap.classList.add('ready');
             $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
             if($('customOverlay')) $('customOverlay').style.display='none';
             hideLoader();
-          } else if(e.data === 2) { // PAUSED
+          } else if(e.data === 2 || e.data === -1 || e.data === 0) { // PAUSED / UNSTARTED / ENDED
             $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
             if($('customOverlay')) $('customOverlay').style.display='flex';
+            wrap.classList.add('ready');
             hideLoader();
           }
         },
@@ -444,7 +440,7 @@ function handleShieldClick(){
     try{
       const state = window.__ytPlayer.getPlayerState();
       if(state !== 1){
-        window.__ytPlayer.playVideo();
+        startStreamExplicitly();
       }
     }catch(e){}
   }
@@ -478,7 +474,7 @@ function togglePlay(){
     if(state === 1) {
       window.__ytPlayer.pauseVideo();
     } else {
-      window.__ytPlayer.playVideo();
+      startStreamExplicitly();
     }
   }catch(e){}
 }
@@ -637,7 +633,7 @@ async function save(k){
     if(active){ activeLeague = k; renderLeagues(); renderStream(); }
   }catch(e){toast('Błąd zapisu.')}
 }
-function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[m]))}
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&quot;","\'":"&#39;"}[m]))}
 function getId(url) {
   if (!url) return '';
   const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})/);
