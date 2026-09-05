@@ -369,15 +369,13 @@ function createPlayer(id){
   iframe.addEventListener('load',()=>{
     // API potrzebuje chwili po loadzie, szczególnie przy YouTube nocookie.
     const forcePlay=()=>{
-      youtubeCommand('unMute');
       youtubeCommand('playVideo');
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      const mi=$('muteIcon');
-      if(mi)mi.className='fa-solid fa-volume-high';
     };
-    setTimeout(forcePlay,500);
-    setTimeout(forcePlay,1200);
-    setTimeout(forcePlay,2200);
+    setTimeout(forcePlay,250);
+    setTimeout(forcePlay,700);
+    setTimeout(forcePlay,1400);
+    setTimeout(forcePlay,2500);
     reveal();
   });
 
@@ -477,15 +475,14 @@ async function exitPlayerFullscreen(){
   const v=$('video');
   if(!v)return;
 
-  try{
-    if(screen.orientation && screen.orientation.unlock){
-      screen.orientation.unlock();
-    }
-  }catch(e){}
-
-  v.classList.remove('player-fs');
+  v.classList.remove('player-fs','landscape-player','show-controls','controls-hidden');
   document.body.classList.remove('player-fullscreen');
   document.body.style.overflow='';
+
+  try{
+    if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  }catch(e){}
+
   setFullscreenIcon(false);
 }
 
