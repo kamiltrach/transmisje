@@ -15,15 +15,27 @@
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
 .leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
 
-/* ODTWARZACZ I WARSTWY */
+/* ODTWARZACZ I MASKOWANIE GUI YOUTUBE */
 .player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
-.yt-wrap iframe{width:100%;height:100%;border:0;display:block;pointer-events:none!important;-webkit-user-select:none;user-select:none;}
 
-/* Tarcza zasłaniająca iframe - przechwytuje dotyk i kliknięcia */
-.yt-shield{position:absolute;inset:0;z-index:5;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+/* SKALOWANIE WIDEO - ODCINA TYTUŁ I LOGO YT ZE WSZYSTKICH KRAWĘDZI */
+.yt-wrap iframe{
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  pointer-events: none!important;
+  -webkit-user-select: none;
+  user-select: none;
+  transform: scale(1.32);
+  transform-origin: center center;
+}
+
+/* PRZEZROCZYSTA TARCZA - PRZECHWYTUJE DOTYK ZAMIAST YT */
+.yt-shield{position:absolute;inset:0;z-index:5;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
 .watermark{position:absolute;right:20px;top:18px;z-index:10;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
 .watermark img{height:34px;width:auto;display:block}
@@ -142,7 +154,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
       <div id="placeholder" class="video-placeholder"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><h2>Wybierz ligę</h2><p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p></div>
       <div class="watermark"><img src="logo.png" alt="Strefa Gola"></div>
       
-      <!-- PASEK PASEK STEROWANIA WEWNĄTRZ VIDEO -->
+      <!-- PASEK STEROWANIA WEWNĄTRZ VIDEO -->
       <div class="controls" id="playerControls">
         <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
         <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
@@ -284,11 +296,10 @@ function createPlayer(id){
   const started = Date.now();
   let revealed = false;
 
-  // Wymuszone przetrzymanie loadera, by YouTube zdążył schować swoje nagłówki
   const revealWhenReady = () => {
     if(revealed) return;
     const elapsed = Date.now() - started;
-    const delay = Math.max(0, 3500 - elapsed);
+    const delay = Math.max(0, 3000 - elapsed);
     setTimeout(() => {
       if(revealed) return;
       revealed = true;
