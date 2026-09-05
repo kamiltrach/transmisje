@@ -459,18 +459,25 @@ function startStreamFromTap(e){
   if(!player || playBusy)return;
   if(e.target && e.target.closest && e.target.closest('.control'))return;
   try{
-    if(!streamPlaying){
-      playBusy=true;
+    playBusy=true;
+    // First tap is a real user gesture: enable audio and keep the stream playing.
+    if(player.getMuted && player.getMuted()){
       player.setVolume(1);
       player.setMuted(false);
       player.play();
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       $('muteIcon').className='fa-solid fa-volume-high';
-      setTimeout(()=>playBusy=false,500);
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+    }else if(!streamPlaying){
+      player.setVolume(1);
+      player.setMuted(false);
+      player.play();
+      $('muteIcon').className='fa-solid fa-volume-high';
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
     }
   }catch(err){
     console.error(err);
-    playBusy=false;
+  }finally{
+    setTimeout(()=>playBusy=false,350);
   }
 }
 
