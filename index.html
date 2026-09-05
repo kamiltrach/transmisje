@@ -16,19 +16,19 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
 
 /* ODTWARZACZ */
-.player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
+.player-card{position:relative;background:#000;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .video.hide-cursor, .video.hide-cursor * { cursor: none !important; }
 
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
 
-/* CROP IFRAME - PUSHES YT TITLE & LOGO OUTSIDE VIEWPORT */
+/* CROP IFRAME + CZARNE MASKI PRZYCIEMNIAJĄCE GÓRĘ I DÓŁ */
 .yt-wrap iframe{
   position: absolute;
-  top: -10%;
+  top: -15%;
   left: 0;
   width: 100%;
-  height: 120%;
+  height: 130%;
   border: 0;
   display: block;
   pointer-events: none !important;
@@ -36,14 +36,36 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   user-select: none;
 }
 
+.yt-mask-top{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 75px;
+  background: #000;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.yt-mask-bottom{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  background: #000;
+  z-index: 6;
+  pointer-events: none;
+}
+
 .yt-shield{position:absolute;inset:0;z-index:7;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
-/* CUSTOM OVERLAY PLAY BUTTON */
+/* SOLIDNE CZARNE TŁO PRZY PAUZIE */
 .custom-overlay{
   position: absolute;
   inset: 0;
   z-index: 8;
-  background: rgba(7, 16, 31, 0.6);
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,15 +73,15 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   transition: opacity .3s ease;
 }
 .custom-play-btn{
-  width: 72px;
-  height: 72px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   background: var(--green);
   color: var(--navy);
   display: grid;
   place-items: center;
-  font-size: 1.8rem;
-  box-shadow: 0 0 30px rgba(126,211,33,0.5);
+  font-size: 2rem;
+  box-shadow: 0 0 35px rgba(126,211,33,0.6);
   padding-left: 5px;
   transition: transform .2s ease;
 }
@@ -75,7 +97,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
 .stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 
-.stream-loader{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:#07101f;transition:opacity .4s ease}
+.stream-loader{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:#000;transition:opacity .4s ease}
 .stream-loader.hide{opacity:0;pointer-events:none}
 .stream-loader img{width:88px;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
 .stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
@@ -297,7 +319,16 @@ function createPlayer(id){
   innerDiv.id='ytframe';
   wrap.appendChild(innerDiv);
 
-  // WŁASNY NAKŁADANY PRZYCISK PLAY DLA SYSTEMÓW Z BLOKADĄ AUTOPLAY (iOS)
+  // CZARNE MASKI PRZYCIEMNIAJĄCE GÓRĘ I DÓŁ YOUTUBE'A
+  const maskTop=document.createElement('div');
+  maskTop.className='yt-mask-top';
+  wrap.appendChild(maskTop);
+
+  const maskBottom=document.createElement('div');
+  maskBottom.className='yt-mask-bottom';
+  wrap.appendChild(maskBottom);
+
+  // CZARNY OVERLAY DLA SYSTEMÓW Z BLOKADĄ AUTOPLAY
   const overlay=document.createElement('div');
   overlay.id='customOverlay';
   overlay.className='custom-overlay';
