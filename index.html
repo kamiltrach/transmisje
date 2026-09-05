@@ -488,24 +488,17 @@ async function fullscreen(){
       await document.exitFullscreen();
       return;
     }
-
-    // Keep the SAME Twitch player in the DOM. Only change the container size.
-    el.classList.add('player-fs');
-    document.body.classList.add('player-fullscreen');
-    document.body.style.overflow='hidden';
-
     if(el.requestFullscreen){
       await el.requestFullscreen();
     }else if(el.webkitRequestFullscreen){
       el.webkitRequestFullscreen();
+    }else{
+      // Fallback for browsers that do not expose the Fullscreen API.
+      el.classList.add('player-fs');
+      document.body.classList.add('player-fullscreen');
+      document.body.style.overflow='hidden';
     }
-
-    syncFullscreenState();
   }catch(e){
-    el.classList.remove('player-fs');
-    document.body.classList.remove('player-fullscreen');
-    document.body.style.overflow='';
-    setFullscreenIcon(false);
     console.error(e);
   }
 }
@@ -534,8 +527,7 @@ async function exitPlayerFullscreen(){
 function syncFullscreenState(){
   const v=$('video');
   if(!v)return;
-
-  const active=document.fullscreenElement===v;
+  const active=!!document.fullscreenElement;
   v.classList.toggle('player-fs',active);
   document.body.classList.toggle('player-fullscreen',active);
   document.body.style.overflow=active?'hidden':'';
