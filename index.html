@@ -22,13 +22,13 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
 
-/* CROP IFRAME + MASKI */
+/* BEZ PRZYCIĘCIA - PEŁNY KADR */
 .yt-wrap iframe{
   position: absolute;
-  top: -15%;
+  top: 0;
   left: 0;
   width: 100%;
-  height: 130%;
+  height: 100%;
   border: 0;
   display: block;
   pointer-events: none !important;
@@ -36,8 +36,28 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   user-select: none;
 }
 
-.yt-mask-top{ position: absolute; top: 0; left: 0; right: 0; height: 75px; background: #000; z-index: 6; pointer-events: none; }
-.yt-mask-bottom{ position: absolute; bottom: 0; left: 0; right: 0; height: 55px; background: #000; z-index: 6; pointer-events: none; }
+/* GRADIENTOWE MASKI DLA MASKOWANIA ELEMENTÓW YT BEZ PRZYCINANIA OBRAZU */
+.yt-mask-top{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.yt-mask-bottom{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+  z-index: 6;
+  pointer-events: none;
+}
 
 .yt-shield{position:absolute;inset:0;z-index:7;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
@@ -302,7 +322,7 @@ function createPlayer(id){
   innerDiv.id='ytframe';
   wrap.appendChild(innerDiv);
 
-  // CZARNE MASKI
+  // MASKI GRADIENTOWE (BEZ PRZYCIĘCIA KADRU)
   const maskTop=document.createElement('div');
   maskTop.className='yt-mask-top';
   wrap.appendChild(maskTop);
@@ -311,14 +331,13 @@ function createPlayer(id){
   maskBottom.className='yt-mask-bottom';
   wrap.appendChild(maskBottom);
 
-  // OVERLAY PAUZY I JEDNOKLIKNIĘCIOWY AUTOPLAY
+  // OVERLAY PAUZY DLA 1 KLIKNIĘCIA
   const overlay=document.createElement('div');
   overlay.id='customOverlay';
   overlay.className='custom-overlay';
   overlay.style.display='none';
   overlay.innerHTML='<div class="custom-play-btn"><i class="fa-solid fa-play"></i></div>';
   
-  // BEZPOŚREDNIA OBSŁUGA TOUCH/CLICK DLA 1-KLIKNIĘCIA
   const triggerPlay = function(e){
     e.preventDefault();
     e.stopPropagation();
