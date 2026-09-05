@@ -271,7 +271,7 @@ body.player-fullscreen{
         <h3>Zarządzanie transmisjami</h3>
         <button class="control" onclick="closeAdmin()" title="Zamknij"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1.2rem">Ustaw link Twitch dla każdej ligi. Zmiany są zapisywane w Firebase.</p>
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1.2rem">Ustaw link transmisji dla każdej ligi. Zmiany są zapisywane w Firebase.</p>
       <div id="adminGrid" class="admin-grid"></div>
     </div>
   </section>
@@ -306,7 +306,7 @@ function removePlayer(){
   player=null;
 }
 
-function getTwitchChannel(url){
+function getChannel(url){
   try{
     const u=new URL(url);
     if(!/twitch\.tv$/i.test(u.hostname) && !/\.twitch\.tv$/i.test(u.hostname))return '';
@@ -348,7 +348,7 @@ function createPlayer(channel){
 
   const iframe=document.createElement('iframe');
   iframe.id='twitchframe';
-  iframe.title='Transmisja Twitch';
+  iframe.title='Transmisja';
   const parent=location.hostname||'localhost';
   iframe.src='https://player.twitch.tv/?channel='+encodeURIComponent(channel)+'&parent='+encodeURIComponent(parent)+'&autoplay=true';
   iframe.allow='autoplay; fullscreen; picture-in-picture';
@@ -398,11 +398,11 @@ function setupYouTubeLikeControls(){
 
 function togglePlay(){
   if(!player)return;
-  toast('Sterowanie odtwarzaniem jest dostępne w odtwarzaczu Twitch.');
+  toast('Sterowanie odtwarzaniem jest dostępne w odtwarzaczu.');
 }
 function toggleMute(){
   if(!player)return;
-  toast('Głośność zmienisz w odtwarzaczu Twitch.');
+  toast('Głośność zmienisz w odtwarzaczu.');
 }
 function setFullscreenIcon(active){
   const b=$('fullscreenBtn');
@@ -574,14 +574,14 @@ function showAdmin(){
 function renderAdmin(){
   $('adminGrid').innerHTML=Object.entries(L).map(([k,v])=>{
     const s=streams[k]||{};
-    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link Twitch</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://twitch.tv/nazwa_kanalu"><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
+    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link transmisji</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://twitch.tv/nazwa_kanalu"><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
   }).join('');
 }
 async function save(k){
   if(!window.auth || !window.auth.currentUser)return toast('Najpierw się zaloguj.');
   if(!window.db)return toast('Firebase nie jest skonfigurowany.');
-  const url=$('u_'+k).value.trim(),id=getTwitchChannel(url),active=$('a_'+k).checked;
-  if(active&&!id)return toast('Podaj poprawny link Twitch.');
+  const url=$('u_'+k).value.trim(),id=getChannel(url),active=$('a_'+k).checked;
+  if(active&&!id)return toast('Podaj poprawny link transmisji.');
   try{
     await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
