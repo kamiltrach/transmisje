@@ -20,7 +20,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .video.hide-cursor, .video.hide-cursor * { cursor: none !important; }
 
-/* KONTENER TWITCH */
+/* KONTENER TWITCH - z powiększeniem ucinającym interfejs i logo */
 .player-wrap{
   position: absolute;
   inset: 0;
@@ -29,13 +29,12 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   overflow: hidden;
   pointer-events: none;
 }
-
 .player-wrap iframe{
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -12%;
+  left: -10%;
+  width: 120%;
+  height: 124%;
   border: 0;
   display: block;
   opacity: 0;
@@ -43,7 +42,6 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   transition: opacity .3s ease;
   pointer-events: none !important;
 }
-
 .player-wrap.playing iframe{
   opacity: 1;
   visibility: visible;
@@ -350,7 +348,7 @@ function createPlayer(id){
       height: '100%',
       channel: id,
       parent: [host],
-      muted: true,
+      muted: true, // Wyciszone na start, by przeglądarka pozwoliła na autoplay w tle
       controls: false
     };
 
@@ -381,12 +379,25 @@ function createPlayer(id){
   }
 }
 
+// Funkcja odpowiedzialna za zdjęcie wyciszenia z opóźnieniem
 function startStreamExplicitly(){
   if($('customStartScreen')) $('customStartScreen').style.display='none';
   if(window.__player){
     try{
+      window.__player.setVolume(1.0);
       window.__player.setMuted(false);
       window.__player.play();
+      
+      const icon=$('muteIcon');
+      if(icon) icon.className='fa-solid fa-volume-high';
+      
+      // Obejście problemów z asynchronicznością wyciszania w Twitch API
+      setTimeout(() => {
+        if(window.__player) {
+          window.__player.setVolume(1.0);
+          window.__player.setMuted(false);
+        }
+      }, 500);
     }catch(e){}
   }
 }
@@ -437,11 +448,16 @@ function toggleMute(){
   if(!window.__player)return;
   const icon=$('muteIcon');
   try {
-    if (window.__player.getMuted()) {
+    const isMuted = window.__player.getMuted();
+    const currentVol = window.__player.getVolume();
+    
+    if (isMuted || currentVol === 0) {
       window.__player.setMuted(false);
+      window.__player.setVolume(1.0);
       icon.className='fa-solid fa-volume-high';
     } else {
       window.__player.setMuted(true);
+      window.__player.setVolume(0);
       icon.className='fa-solid fa-volume-xmark';
     }
   } catch(e){}
@@ -589,7 +605,6 @@ async function save(k){
 }
 function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&quot;","\'":"&#39;"}[m]))}
 
-// Funkcja dostosowana pod pobieranie loginu kanału Twitch
 function getId(url) {
   if (!url) return '';
   const match = url.match(/(?:twitch\.tv\/)([^/?"&]+)/i);
