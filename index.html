@@ -21,67 +21,11 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .video.hide-cursor, .video.hide-cursor * { cursor: none !important; }
 
 /* KONTENER STRUMIENIA */
-.stream-wrap{
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: #000;
-  overflow: hidden;
-}
-
-.stream-wrap iframe{
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  display: block;
-}
+.stream-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden;}
+.stream-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;display:block;}
 
 /* BLOKADA CAŁKOWITA INTERAKCJI Z ELEMENTAMI SILNIKA */
-.stream-shield{
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  background: transparent;
-  pointer-events: auto;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-/* WŁASNY EKRAN STARTOWY */
-.custom-start-screen{
-  position: absolute;
-  inset: 0;
-  z-index: 30;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  cursor: pointer;
-  transition: opacity .25s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.custom-start-btn{
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: var(--green);
-  color: var(--navy);
-  display: grid;
-  place-items: center;
-  font-size: 2.2rem;
-  box-shadow: 0 0 35px rgba(126,211,33,0.6);
-  padding-left: 5px;
-  transition: transform .2s ease;
-  pointer-events: none;
-}
-.custom-start-screen:active .custom-start-btn{ transform: scale(0.94); }
-.custom-start-text{ font-size: 0.85rem; font-weight: 700; color: #fff; letter-spacing: 0.6px; text-transform: uppercase; }
+.stream-shield{position:absolute;inset:0;z-index:10;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
 .watermark{position:absolute;right:20px;top:18px;z-index:15;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
 .watermark img{height:34px;width:auto;display:block}
@@ -93,13 +37,11 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
 .stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 
-.video:fullscreen,
-.video:-webkit-full-screen,
+/* NIEZAWODNY PEŁNY EKRAN CSS (ODPORNY NA OBRACANIE TELEFONU) */
 .video.player-fs {
   position: fixed !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100% !important;
   height: 100dvh !important;
   max-width: none !important;
   max-height: none !important;
@@ -112,8 +54,6 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   background: #000 !important;
 }
 
-.video:fullscreen .controls,
-.video:-webkit-full-screen .controls,
 .video.player-fs .controls {
   position: absolute !important;
   left: 0 !important;
@@ -178,7 +118,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
       
       <div class="controls" id="playerControls">
         <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
-        <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
+        <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
         <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
         <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
         <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
@@ -215,6 +155,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 <footer>© Strefa Gola • Podkarpackie transmisje</footer>
 <div id="toast" class="toast"></div>
 
+<!-- Oficjalne API Odtwarzacza -->
 <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -281,21 +222,6 @@ function createPlayer(channelName){
   innerDiv.style.height='100%';
   wrap.appendChild(innerDiv);
 
-  const startScreen=document.createElement('div');
-  startScreen.id='customStartScreen';
-  startScreen.className='custom-start-screen';
-  startScreen.innerHTML='<div class="custom-start-btn"><i class="fa-solid fa-play"></i></div><div class="custom-start-text">Odtwórz transmisję</div>';
-  
-  const triggerPlay = function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    startStreamExplicitly();
-  };
-  startScreen.addEventListener('touchstart', triggerPlay, {passive: false});
-  startScreen.addEventListener('click', triggerPlay);
-  
-  wrap.appendChild(startScreen);
-
   const shield=document.createElement('div');
   shield.className='stream-shield';
   shield.addEventListener('touchstart', function(e){ handleShieldClick(); }, {passive: true});
@@ -310,7 +236,7 @@ function createPlayer(channelName){
       height: "100%",
       channel: channelName,
       autoplay: true,
-      muted: true,
+      muted: true, // Wymuszone wyciszenie by autoplay przeszedł
       controls: false,
       parent: [window.location.hostname || "localhost"]
     });
@@ -319,12 +245,14 @@ function createPlayer(channelName){
 
     player.addEventListener(Twitch.Player.PLAYING, function() {
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      if($('customStartScreen')) $('customStartScreen').style.display='none';
+      // Przywrócenie prawidłowej ikony po starcie (zgodnie z faktycznym stanem API)
+      if(player.getMuted()) {
+         $('muteIcon').className='fa-solid fa-volume-xmark';
+      }
     });
 
     player.addEventListener(Twitch.Player.PAUSE, function() {
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-      if($('customStartScreen')) $('customStartScreen').style.display='flex';
     });
 
   }catch(err){
@@ -332,21 +260,11 @@ function createPlayer(channelName){
   }
 }
 
-function startStreamExplicitly(){
-  if($('customStartScreen')) $('customStartScreen').style.display='none';
-  if(window.__customPlayer){
-    try{
-      window.__customPlayer.setMuted(false);
-      window.__customPlayer.play();
-    }catch(e){}
-  }
-}
-
 function handleShieldClick(){
   if(window.__customPlayer){
     try{
       if(window.__customPlayer.isPaused()){
-        startStreamExplicitly();
+        window.__customPlayer.play();
       }
     }catch(e){}
   }
@@ -377,7 +295,7 @@ function togglePlay(){
   if(!window.__customPlayer)return;
   try{
     if(window.__customPlayer.isPaused()) {
-      startStreamExplicitly();
+      window.__customPlayer.play();
     } else {
       window.__customPlayer.pause();
     }
@@ -411,7 +329,7 @@ function minimizePlayer() {
   if (v.classList.contains('player-minimized')) {
     v.classList.remove('player-minimized');
   } else {
-    if (document.fullscreenElement || document.webkitFullscreenElement || v.classList.contains('player-fs')) {
+    if (v.classList.contains('player-fs') || document.fullscreenElement) {
       exitPlayerFullscreen();
     }
     v.classList.add('player-minimized');
@@ -421,24 +339,27 @@ function minimizePlayer() {
 async function fullscreen(){
   const v=$('video');
   if(!v)return;
-  v.classList.remove('player-minimized');
 
-  const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || v.classList.contains('player-fs'));
-  if(isFS){
+  // Jeśli jest już na pełnym ekranie, wyjdź
+  if(v.classList.contains('player-fs') || document.fullscreenElement){
     await exitPlayerFullscreen();
     return;
   }
 
-  let req = v.requestFullscreen || v.webkitRequestFullscreen || v.mozRequestFullScreen;
-  if (req) {
-    try { await req.call(v); } catch(e) { v.classList.add('player-fs'); }
-  } else {
-    v.classList.add('player-fs');
-  }
+  v.classList.remove('player-minimized');
 
+  // Niezawodny CSS fullscreen (rozwiązuje problemy z mobilnymi i obracaniem)
+  v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   setFullscreenIcon(true);
   handleUserActivity();
+
+  // Próba natywnego API (dla zniknięcia paska przeglądarki na Androidzie/PC)
+  const el = document.documentElement;
+  let req = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (req) { try { await req.call(el); } catch(e) {} }
+
+  // Próba wymuszenia orientacji poziomej
   try{ if(screen.orientation?.lock) screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
 }
 
@@ -446,28 +367,24 @@ async function exitPlayerFullscreen(){
   const v=$('video');
   if(!v)return;
 
-  let exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+  v.classList.remove('player-fs','show-controls','hide-cursor');
+  document.body.classList.remove('player-fullscreen');
+  setFullscreenIcon(false);
+
+  let exit = document.exitFullscreen || document.webkitExitFullscreen;
   if (document.fullscreenElement || document.webkitFullscreenElement) {
     if (exit) { try { await exit.call(document); } catch(e){} }
   }
 
-  v.classList.remove('player-fs','show-controls','hide-cursor');
-  document.body.classList.remove('player-fullscreen');
-  setFullscreenIcon(false);
   try{ if(screen.orientation?.unlock) screen.orientation.unlock(); }catch(e){}
 }
 
-function syncFullscreenState(){
-  const v=$('video');
-  if(!v)return;
-  const active=!!(document.fullscreenElement || document.webkitFullscreenElement || v.classList.contains('player-fs'));
-  document.body.classList.toggle('player-fullscreen', active);
-  if(!active) v.classList.remove('player-fs','show-controls','hide-cursor');
-  setFullscreenIcon(active);
-}
-
-document.addEventListener('fullscreenchange', syncFullscreenState);
-document.addEventListener('webkitfullscreenchange', syncFullscreenState);
+document.addEventListener('fullscreenchange', () => {
+  if(!document.fullscreenElement) exitPlayerFullscreen();
+});
+document.addEventListener('webkitfullscreenchange', () => {
+  if(!document.webkitFullscreenElement) exitPlayerFullscreen();
+});
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
