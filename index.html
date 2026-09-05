@@ -147,7 +147,6 @@ body.player-fullscreen{
 }
 
 
-/* Safe desktop league navigation refinement — does not alter layout structure */
 @media (max-width:700px){
   .video.player-fs{
     width:100vw!important;
@@ -179,7 +178,6 @@ body.player-fullscreen{
   }
 }
 
-/* YOUTUBE-LIKE CONTROLS: visible on touch, auto-hide after inactivity */
 .video.controls-hidden .controls{
   opacity:0!important;
   pointer-events:none!important;
@@ -208,7 +206,6 @@ body.player-fullscreen{
   }
 }
  
-/* FINAL PLAYER FIXES */
 .video.player-fs .controls,
 .video.player-fs:hover .controls,
 .video.player-fs.show-controls .controls{
@@ -221,7 +218,7 @@ body.player-fullscreen{
   z-index:5!important;
 }
 
-/* ===== NOWE: STYLE MINIMALIZACJI ===== */
+/* ===== STYLE MINIMALIZACJI ===== */
 .video.player-minimized {
   position: fixed !important;
   bottom: 20px !important;
@@ -271,7 +268,6 @@ body.player-fullscreen{
       <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
-      <!-- NOWY PRZYCISK MINIMALIZACJI -->
       <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
       <button id="fullscreenBtn" class="control" onclick="fullscreen()" title="Pełny ekran"><i class="fa-solid fa-expand"></i></button>
     </div>
@@ -310,8 +306,22 @@ body.player-fullscreen{
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
 let streams={},activeLeague=null,player=null,ytReady=false;
+let pendingVideoId = null; // NAPRAWA: zapamiętuje videoId do załadowania gdy API będzie gotowe
 const $=id=>document.getElementById(id);
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+
+// ===== KLUCZOWA NAPRAWA: YouTube IFrame API wymaga tej funkcji =====
+window.onYouTubeIframeAPIReady = function() {
+  console.log('YouTube IFrame API ready');
+  ytReady = true;
+  // Jeśli czekamy na załadowanie transmisji, teraz ją uruchom
+  if (pendingVideoId) {
+    const id = pendingVideoId;
+    pendingVideoId = null;
+    createPlayer(id);
+  }
+};
+
 function renderLeagues(){
   $('leagues').innerHTML=Object.entries(L).map(([k,v])=>`<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`).join('');
   const picker=$('mobilePicker');
@@ -335,10 +345,14 @@ function selectLeague(k){
 }
 
 function removePlayer(){
+  // NAPRAWA: prawidłowe niszczenie YT playera
+  if(window.__ytPlayer){
+    try{ window.__ytPlayer.destroy(); }catch(x){}
+    window.__ytPlayer = null;
+  }
   const p=$('ytplayer'); if(p)p.remove();
   const l=$('streamLoader'); if(l)l.remove();
   player=null;
-  window.__ytPlayer = null; // NAPRAWA: czyszczenie referencji
 }
 
 function renderStream(){
@@ -365,6 +379,32 @@ function renderStream(){
 
 function createPlayer(id){
   removePlayer();
+  
+  // NAPRAWA: Jeśli API nie jest jeszcze gotowe, zapamiętaj videoId i poczekaj
+  if(!ytReady || !window.YT || !window.YT.Player){
+    console.log('YouTube API not ready yet, waiting...');
+    pendingVideoId = id;
+    
+    // Pokaż loader
+    const loader=document.createElement('div');
+    loader.id='streamLoader';
+    loader.className='stream-loader';
+    loader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Strefa Gola">';
+    $('video').appendChild(loader);
+    
+    // Fallback: jeśli API nigdy się nie załaduje po 15s
+    setTimeout(() => {
+      if(pendingVideoId === id && !window.__ytPlayer){
+        pendingVideoId = null;
+        console.error('YouTube API failed to load');
+        const l=$('streamLoader'); if(l) l.remove();
+        $('placeholder').style.display = 'flex';
+        $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
+        $('placeholder').querySelector('p').textContent = 'Nie udało się załadować YouTube API. Sprawdź połączenie internetowe.';
+      }
+    }, 15000);
+    return;
+  }
 
   const loader=document.createElement('div');
   loader.id='streamLoader';
@@ -407,78 +447,67 @@ function createPlayer(id){
     },remaining);
   };
 
-  function startYT(){
-    if(!window.YT || !YT.Player){
-      setTimeout(startYT,150);
-      return;
-    }
+  try{
+    console.log('Creating YT player with videoId:', id);
+    const yt=new YT.Player(iframe,{
+      videoId:id,
+      playerVars:{
+        autoplay:1,
+        mute:1,
+        controls:0,
+        rel:0,
+        modestbranding:1,
+        playsinline:1,
+        iv_load_policy:3,
+        disablekb:1,
+        fs:0
+      },
+      events:{
+        onReady:function(e){
+          console.log('YT Player ready');
+          window.__ytPlayer = e.target;
+          try{ e.target.mute(); }catch(x){}
+          try{ e.target.playVideo(); }catch(x){}
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1000);
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
 
-    try{
-      const yt=new YT.Player(iframe,{
-        videoId:id,
-        playerVars:{
-          autoplay:1,
-          mute:1, // NAPRAWA KLUCZOWA: przeglądarki zezwalają na autoplay TYLKO dla wyciszonych filmów
-          controls:0,
-          rel:0,
-          modestbranding:1,
-          playsinline:1,
-          iv_load_policy:3,
-          disablekb:1,
-          fs:0
+          setTimeout(()=>{
+            try{ e.target.unMute(); }catch(x){}
+            try{ e.target.playVideo(); }catch(x){}
+          },800);
+
+          $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+          $('muteIcon').className='fa-solid fa-volume-high';
+          reveal();
         },
-        events:{
-          onReady:function(e){
-            window.__ytPlayer = e.target; // NAPRAWA: pewne przypisanie API
+        onStateChange:function(e){
+          console.log('YT state change:', e.data);
+          if(e.data===5){
             try{ e.target.mute(); }catch(x){}
             try{ e.target.playVideo(); }catch(x){}
-            setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
-            setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1000);
-            setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
-
-            $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-            $('muteIcon').className='fa-solid fa-volume-xmark'; // Ikona wskazuje, że dźwięk jest wyłączony
-            reveal();
-          },
-          onStateChange:function(e){
-            if(e.data===5){
-              try{ e.target.mute(); }catch(x){}
-              try{ e.target.playVideo(); }catch(x){}
-            }
-            if(e.data===1){
-              $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-              reveal();
-            }
-          },
-          onError: function(e) {
-            console.error("YouTube Player Error:", e.data);
-            reveal();
-            $('placeholder').style.display = 'flex';
-            $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
-            $('placeholder').querySelector('p').textContent = 'Film może być zablokowany do osadzania lub link jest nieprawidłowy.';
           }
+          if(e.data===1){
+            $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+            reveal();
+          }
+        },
+        onError: function(e) {
+          console.error("YouTube Player Error:", e.data);
+          reveal();
+          $('placeholder').style.display = 'flex';
+          $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
+          $('placeholder').querySelector('p').textContent = 'Film może być zablokowany do osadzania lub link jest nieprawidłowy.';
         }
-      });
-      window.__ytPlayer=yt;
-    }catch(err){
-      console.error(err);
-    }
+      }
+    });
+    window.__ytPlayer=yt;
+  }catch(err){
+    console.error('YT Player init error:', err);
+    reveal();
   }
 
-  startYT();
   setTimeout(reveal,7000);
-  
-  // Fallback na wypadek całkowitego zawieszenia API
-  setTimeout(() => {
-    if (!window.__ytPlayer) {
-      console.warn("YouTube API failed to initialize.");
-      $('placeholder').style.display = 'flex';
-      $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
-      $('placeholder').querySelector('p').textContent = 'Nie udało się załadować transmisji. Sprawdź link lub odśwież stronę.';
-      const l=$('streamLoader');
-      if(l) l.remove();
-    }
-  }, 12000);
 }
 
 function youtubeCommand(command){
@@ -487,10 +516,7 @@ function youtubeCommand(command){
     if(command==='playVideo') window.__ytPlayer.playVideo();
     else if(command==='pauseVideo') window.__ytPlayer.pauseVideo();
     else if(command==='mute') window.__ytPlayer.mute();
-    else if(command==='unMute') {
-      window.__ytPlayer.unMute();
-      window.__ytPlayer.playVideo(); // Wymuszenie odtwarzania przy włączaniu dźwięku
-    }
+    else if(command==='unMute') window.__ytPlayer.unMute();
   }catch(e){
     console.error('YouTube command error:',e);
   }
@@ -524,28 +550,19 @@ function setupYouTubeLikeControls(){
 }
 
 function togglePlay(){
-  if(!window.__ytPlayer) return;
+  if(!player)return;
   const icon=$('playBtn').querySelector('i');
-  const playing = icon && icon.classList.contains('fa-pause');
-  try {
-    if (playing) {
-      window.__ytPlayer.pauseVideo();
-      $('playBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
-    } else {
-      window.__ytPlayer.playVideo();
-      $('playBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
-    }
-  } catch(e) { console.error('Play/Pause error:', e); }
+  const playing=icon&&icon.classList.contains('fa-pause');
+  youtubeCommand(playing?'pauseVideo':'playVideo');
+  $('playBtn').innerHTML=playing?'<i class="fa-solid fa-play"></i>':'<i class="fa-solid fa-pause"></i>';
 }
-
 function toggleMute(){
-  if(!window.__ytPlayer) return;
+  if(!player)return;
   const icon=$('muteIcon');
-  const muted = icon.classList.contains('fa-volume-xmark');
+  const muted=icon.classList.contains('fa-volume-xmark');
   youtubeCommand(muted?'unMute':'mute');
-  icon.className = muted ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+  icon.className=muted?'fa-solid fa-volume-high':'fa-solid fa-volume-xmark';
 }
-
 function setFullscreenIcon(active){
   const b=$('fullscreenBtn');
   if(!b)return;
@@ -553,7 +570,6 @@ function setFullscreenIcon(active){
   b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
 }
 
-// ===== NOWA FUNKCJA MINIMALIZACJI =====
 function minimizePlayer() {
   const v = $('video');
   if (!v) return;
@@ -750,7 +766,6 @@ async function save(k){
     await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
     toast('Transmisja zapisana.');
-    // NAPRAWA: Po zapisaniu aktywnej transmisji natychmiast ją wyświetl
     if(active){
       activeLeague = k;
       renderLeagues();
@@ -760,7 +775,6 @@ async function save(k){
 }
 function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[m]))}
 
-// NAPRAWA: Lepsze wykrywanie ID z różnych formatów linków YouTube
 function getId(url) {
   if (!url) return '';
   const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})/;
@@ -818,7 +832,6 @@ if(window.firebase && window.auth && window.db){
 }else{
   setTimeout(loadStreams,300);
 }
-/* MOBILE ROTATION — fullscreen follows landscape orientation */
 (function(){
   function vbox(){ return document.getElementById('video'); }
 
