@@ -15,36 +15,26 @@
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
 .leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
 
-/* ODTWARZACZ Z WINIETAMI GRADIENTOWYMI */
+/* ODTWARZACZ */
 .player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.video.hide-cursor, .video.hide-cursor * { cursor: none !important; }
 
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
 .yt-wrap iframe{width:100%;height:100%;border:0;display:block;pointer-events:none!important;-webkit-user-select:none;user-select:none;}
 
-/* PŁYNNE ELEGANCKIE WINIETY */
+/* WINIETY GRADIENTOWE */
 .yt-vignette-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
+  position: absolute; top: 0; left: 0; right: 0; height: 80px;
   background: linear-gradient(180deg, rgba(7, 16, 31, 0.95) 0%, rgba(7, 16, 31, 0.4) 60%, transparent 100%);
-  z-index: 6;
-  pointer-events: none;
+  z-index: 6; pointer-events: none;
 }
 .yt-vignette-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
+  position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
   background: linear-gradient(0deg, rgba(7, 16, 31, 0.95) 0%, rgba(7, 16, 31, 0.4) 60%, transparent 100%);
-  z-index: 6;
-  pointer-events: none;
+  z-index: 6; pointer-events: none;
 }
 
-/* PRZEZROCZYSTA TARCZA ODBIERAJĄCA DOTYK */
 .yt-shield{position:absolute;inset:0;z-index:7;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
 .watermark{position:absolute;right:20px;top:18px;z-index:10;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
@@ -52,9 +42,8 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 
 .video-placeholder{text-align:center;color:var(--muted);z-index:1}.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}.video-placeholder h2{color:#fff;font-size:1.25rem}.video-placeholder p{font-size:.78rem;margin-top:5px}
 
-.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.95);border-top:1px solid var(--border);position:absolute;left:0;right:0;bottom:0;z-index:20;opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease}
+.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.95);border-top:1px solid var(--border);position:absolute;left:0;right:0;bottom:0;z-index:20;opacity:0;pointer-events:none;transition:opacity .3s ease}
 .video.show-controls .controls{opacity:1;pointer-events:auto}
-.video:hover .controls{opacity:1;pointer-events:auto}
 .control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
 .stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 
@@ -95,26 +84,11 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
 }
 
-body.player-fullscreen {
-  overflow: hidden !important;
-  width: 100% !important;
-  height: 100% !important;
-}
+body.player-fullscreen { overflow: hidden !important; width: 100% !important; height: 100% !important; }
 
 /* MINIMALIZACJA */
 .video.player-minimized {
-  position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  width: 320px !important;
-  height: 180px !important;
-  z-index: 999999 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
-  aspect-ratio: 16/9 !important;
-  border: 1px solid var(--border) !important;
-  background: #000 !important;
-  overflow: hidden !important;
+  position: fixed !important; bottom: 20px !important; right: 20px !important; width: 320px !important; height: 180px !important; z-index: 999999 !important; border-radius: 12px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; aspect-ratio: 16/9 !important; border: 1px solid var(--border) !important; background: #000 !important; overflow: hidden !important;
 }
 .video.player-minimized .watermark { display: none !important; }
 .video.player-minimized .controls { opacity: 1 !important; pointer-events: auto !important; height:48px!important; padding: 0 8px!important;}
@@ -211,7 +185,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 <script src="firebase-config.js"></script>
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,ytReady=false,pendingVideoId=null,resumeTimer=null,hideTimer=null;
+let streams={},activeLeague=null,ytReady=false,pendingVideoId=null,hideTimer=null;
 const $=id=>document.getElementById(id);
 
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
@@ -245,7 +219,6 @@ function selectLeague(k){
 }
 
 function removePlayer(){
-  if(resumeTimer){ clearInterval(resumeTimer); resumeTimer = null; }
   if(window.__ytPlayer){
     try{ window.__ytPlayer.destroy(); }catch(x){}
     window.__ytPlayer = null;
@@ -296,7 +269,6 @@ function createPlayer(id){
   innerDiv.id='ytframe';
   wrap.appendChild(innerDiv);
 
-  /* ELEGANCKIE WINIETY GRADIENTOWE ZAMIAST CZARNYCH PASÓW */
   const topVignette=document.createElement('div');
   topVignette.className='yt-vignette-top';
   wrap.appendChild(topVignette);
@@ -305,15 +277,12 @@ function createPlayer(id){
   bottomVignette.className='yt-vignette-bottom';
   wrap.appendChild(bottomVignette);
 
-  /* PRZEZROCZYSTA TARCZA ODBIERAJĄCA DOTYK */
   const shield=document.createElement('div');
   shield.className='yt-shield';
   shield.onclick = handleShieldClick;
   wrap.appendChild(shield);
   
   $('video').appendChild(wrap);
-
-  let loaderTimer = null;
 
   try{
     const yt=new YT.Player('ytframe',{
@@ -333,29 +302,19 @@ function createPlayer(id){
       events:{
         onReady:function(e){
           window.__ytPlayer = e.target;
-          try{ e.target.mute(); e.target.playVideo(); }catch(x){}
+          try{ 
+            e.target.mute(); 
+            e.target.playVideo(); 
+          }catch(x){}
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
           $('muteIcon').className='fa-solid fa-volume-xmark';
-
-          resumeTimer = setInterval(() => {
-            if(window.__ytPlayer){
-              try{
-                const state = window.__ytPlayer.getPlayerState();
-                if(state === -1 || state === 0 || state === 2 || state === 5){
-                  window.__ytPlayer.playVideo();
-                }
-              }catch(x){}
-            }
-          }, 3000);
         },
         onStateChange:function(e){
-          if(e.data === 1){
+          if(e.data === 1){ // Odtwarzanie rozpoczęte
             $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-            if(!loaderTimer){
-              loaderTimer = setTimeout(() => {
-                hideLoader();
-              }, 2000);
-            }
+            hideLoader();
+          } else if(e.data === 2){ // Pauza
+            $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
           }
         },
         onError: function() { triggerAutoReload(); }
@@ -368,7 +327,7 @@ function createPlayer(id){
 
   setTimeout(() => {
     if($('streamLoader')) hideLoader();
-  }, 7000);
+  }, 6000);
 }
 
 function showLoader(){
@@ -386,23 +345,37 @@ function hideLoader(){
 }
 
 function handleShieldClick(){
-  const v=$('video');
-  if(v.classList.contains('show-controls')){
-    v.classList.remove('show-controls');
-    clearTimeout(hideTimer);
-  } else {
-    showControlsTemporarily();
+  if(window.__ytPlayer){
+    try{
+      const state = window.__ytPlayer.getPlayerState();
+      if(state !== 1 && state !== 3){
+        window.__ytPlayer.playVideo();
+        $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      }
+    }catch(e){}
   }
+  handleUserActivity();
 }
 
-function showControlsTemporarily(){
+function handleUserActivity(){
   const v=$('video');
+  if(!v) return;
   v.classList.add('show-controls');
+  v.classList.remove('hide-cursor');
   clearTimeout(hideTimer);
-  hideTimer=setTimeout(()=>v.classList.remove('show-controls'), 3000);
+  hideTimer=setTimeout(()=>{
+    v.classList.remove('show-controls');
+    if(document.fullscreenElement || document.webkitFullscreenElement || v.classList.contains('player-fs')){
+      v.classList.add('hide-cursor');
+    }
+  }, 3000);
 }
 
-$('video').addEventListener('mousemove', showControlsTemporarily);
+const mainVideo = $('video');
+if(mainVideo){
+  mainVideo.addEventListener('mousemove', handleUserActivity);
+  mainVideo.addEventListener('touchstart', handleUserActivity);
+}
 
 function togglePlay(){
   if(!window.__ytPlayer)return;
@@ -472,6 +445,7 @@ async function fullscreen(){
 
   document.body.classList.add('player-fullscreen');
   setFullscreenIcon(true);
+  handleUserActivity();
   try{ if(screen.orientation?.lock) screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
 }
 
@@ -484,7 +458,7 @@ async function exitPlayerFullscreen(){
     if (exit) { try { await exit.call(document); } catch(e){} }
   }
 
-  v.classList.remove('player-fs','show-controls');
+  v.classList.remove('player-fs','show-controls','hide-cursor');
   document.body.classList.remove('player-fullscreen');
   setFullscreenIcon(false);
   try{ if(screen.orientation?.unlock) screen.orientation.unlock(); }catch(e){}
@@ -495,7 +469,7 @@ function syncFullscreenState(){
   if(!v)return;
   const active=!!(document.fullscreenElement || document.webkitFullscreenElement || v.classList.contains('player-fs'));
   document.body.classList.toggle('player-fullscreen', active);
-  if(!active) v.classList.remove('player-fs','show-controls');
+  if(!active) v.classList.remove('player-fs','show-controls','hide-cursor');
   setFullscreenIcon(active);
 }
 
