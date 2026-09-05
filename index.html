@@ -32,7 +32,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 @keyframes sgSpin{to{transform:rotate(360deg)}}
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000}
 .yt-wrap iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
-.yt-shield{position:absolute;inset:0;z-index:3;background:transparent;touch-action:none}
+.yt-shield{position:absolute;inset:0;z-index:3;background:transparent;touch-action:none;pointer-events:none}
 .yt-wrap{overflow:hidden}
 .yt-wrap iframe{
   pointer-events:none!important;
@@ -40,7 +40,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
   user-select:none;
 }
 .yt-shield{
-  pointer-events:auto!important;
+  pointer-events:none!important;
   cursor:default;
 }
 
@@ -354,12 +354,12 @@ function createPlayer(id){
   const iframe=document.createElement('iframe');
   iframe.id='ytframe';
   iframe.title='Transmisja';
-  iframe.allow='autoplay; encrypted-media; picture-in-picture';
+  iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
   iframe.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
   iframe.style.width='100%';
   iframe.style.height='100%';
   iframe.style.border='0';
-  iframe.setAttribute('allowfullscreen','false');
+  iframe.setAttribute('allowfullscreen','true');
 
   const shield=document.createElement('div');
   shield.className='yt-shield';
@@ -444,7 +444,7 @@ function createPlayer(id){
   setTimeout(reveal,7000);
 }
 
-function youtubeCommandfunction youtubeCommand(command){
+function youtubeCommand(command){
   if(!player||!player.contentWindow)return;
   try{
     player.contentWindow.postMessage(JSON.stringify({event:'command',func:command,args:[]}), 'https://www.youtube-nocookie.com');
@@ -546,7 +546,7 @@ async function fullscreen(){
   }catch(e){}
 }
 
-async function exitPlayerFullscreenasync function exitPlayerFullscreen(){
+async function exitPlayerFullscreen(){
   const v=$('video');
   if(!v)return;
 
@@ -567,7 +567,7 @@ async function exitPlayerFullscreenasync function exitPlayerFullscreen(){
   setFullscreenIcon(false);
 }
 
-function syncFullscreenStatefunction syncFullscreenState(){
+function syncFullscreenState(){
   const v=$('video');
   if(!v)return;
 
@@ -578,6 +578,18 @@ function syncFullscreenStatefunction syncFullscreenState(){
 }
 
 document.addEventListener('fullscreenchange',syncFullscreenState);
+
+// Robust player fullscreen handling
+document.addEventListener('fullscreenchange',()=>{
+  const v=$('video');
+  if(!v)return;
+  const fs=!!document.fullscreenElement;
+  v.classList.toggle('player-fs',fs);
+  document.body.classList.toggle('player-fullscreen',fs);
+  if(!fs) document.body.style.overflow='';
+  setFullscreenIcon(fs);
+});
+
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
