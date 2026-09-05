@@ -14,16 +14,20 @@
 .brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand:visited,.brand:hover,.brand:active{color:#fff;text-decoration:none}.brand img{height:46px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;font-weight:700;margin-top:4px;line-height:1;text-transform:uppercase}
 .admin-btn{height:40px;width:40px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);color:var(--muted);transition:.2s}.admin-btn:hover{color:var(--green);border-color:rgba(126,211,33,.35)}
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.eyebrow{color:var(--green);font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.hero p{color:var(--muted);max-width:520px;margin:10px auto 0;font-size:.95rem}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
-.leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
+.leagues{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:7px 4px 18px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{position:relative;white-space:nowrap;min-width:118px;padding:11px 17px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.09);color:var(--muted);font-size:.74rem;font-weight:800;letter-spacing:.1px;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease;cursor:pointer}.league:hover{transform:translateY(-1px);color:#fff;background:rgba(255,255,255,.08);border-color:rgba(126,211,33,.28)}.league.active{background:linear-gradient(135deg,var(--green),#9ae83f);border-color:var(--green);color:var(--navy);box-shadow:0 7px 25px rgba(126,211,33,.22);transform:translateY(-1px)}
 .player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}.video{position:relative;aspect-ratio:16/9;min-height:330px;background:radial-gradient(circle at 50% 40%,#182a49,#050b15 65%);display:flex;align-items:center;justify-content:center}.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}.watermark{position:absolute;right:20px;top:18px;z-index:4;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px)}.watermark img{height:34px;width:auto;display:block}.video-placeholder{text-align:center;color:var(--muted);z-index:1}.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}.video-placeholder h2{color:#fff;font-size:1.25rem}.video-placeholder p{font-size:.78rem;margin-top:5px}.loading{color:var(--green)}.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.98);border-top:1px solid var(--border)}.control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}.stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 .info{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}.panel{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:20px}.panel h3{font-size:1rem;margin-bottom:8px}.panel p{font-size:.78rem;color:var(--muted)}.schedule-empty{min-height:120px;display:grid;place-items:center;text-align:center}.schedule-empty i{font-size:1.5rem;color:var(--green);margin-bottom:8px}.schedule-empty p{font-size:.74rem}
 .admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}.admin-panel.open{display:block}.admin-box{max-width:720px;margin:0 auto}.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}.admin-card h3{font-size:.88rem;margin-bottom:12px}.field{display:block;font-size:.65rem;color:var(--muted);margin:9px 0 5px}.field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}.save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}.check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}.login-box{max-width:720px;margin:0 auto;text-align:center}.login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}.login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}.login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
 .secret-trigger{position:fixed;bottom:0;right:0;width:70px;height:70px;z-index:999;cursor:default}
 .toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 15px;border-radius:11px;background:#132240;border:1px solid var(--border);font-size:.75rem;display:none}.toast.show{display:block}
 footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
+@media(max-width:900px) and (min-width:701px){
+  .leagues{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-left:2px;padding-right:2px}
+  .league{min-width:auto}
+}
 @media(max-width:700px){.topbar{height:68px}.brand-title{font-size:1rem}.brand-sub{font-size:.5rem;letter-spacing:2px}main{padding-top:92px}.hero{align-items:start;flex-direction:column}.live-dot{align-self:flex-start}.video{min-height:220px}.info{grid-template-columns:1fr}.watermark{right:12px;top:12px}.watermark img{height:27px}.controls{height:56px}.stream-title{max-width:145px}}
 
-.mobile-stream-picker{display:none}
+.mobile-stream-picker{display:none}.leagues-wrap{display:flex;justify-content:center;align-items:center;margin:0 auto 2px;max-width:100%;}
 .watch-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:12px 18px;border-radius:11px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase;box-shadow:0 10px 28px var(--glow)}
 .stream-loader{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:#07101f;transition:opacity .3s ease}
 .stream-loader.hide{opacity:0;pointer-events:none}
@@ -36,8 +40,12 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 .video.player-fs{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;max-width:none!important;min-height:0!important;aspect-ratio:auto!important;border-radius:0!important;background:#000}
 .video.player-fs .yt-wrap{inset:0}
 .video.player-fs .yt-wrap iframe{width:100%!important;height:100%!important}
-.video.player-fs .controls{position:absolute;left:0;right:0;bottom:0;z-index:20}
+.video.player-fs .controls{position:absolute;left:0;right:0;bottom:0;z-index:30}
 .video.player-fs .watermark{z-index:21;right:16px;top:16px}
+@media(max-width:900px) and (min-width:701px){
+  .leagues{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-left:2px;padding-right:2px}
+  .league{min-width:auto}
+}
 @media(max-width:700px){
   .leagues{display:none}
   .mobile-stream-picker{display:block;position:relative;margin:0 0 12px}
@@ -74,7 +82,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
     <div><h1>Transmisje</h1></div>
     <div class="live-dot"><i class="fa-solid fa-circle"></i> TRANSMISJE NA ŻYWO</div>
   </section>
-  <div id="leagues" class="leagues"></div><div id="mobilePicker" class="mobile-stream-picker"></div>
+  <div class="leagues-wrap"><div id="leagues" class="leagues"></div></div><div id="mobilePicker" class="mobile-stream-picker"></div>
   <section class="player-card">
     <div id="video" class="video">
       <div id="placeholder" class="video-placeholder"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><h2>Wybierz ligę</h2><p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p></div>
@@ -85,7 +93,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
       <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
-      <button class="control" onclick="fullscreen()" title="Pełny ekran"><i class="fa-solid fa-expand"></i></button>
+      <button id="fullscreenBtn" class="control" onclick="fullscreen()" title="Pełny ekran"><i class="fa-solid fa-expand"></i></button>
     </div>
   </section>
   <section class="info">
@@ -179,7 +187,7 @@ function createPlayer(id){
   wrap.className='yt-wrap';
 
   const iframe=document.createElement('iframe');
-  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
+  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
   iframe.title='Transmisja';
   iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
   iframe.setAttribute('allowfullscreen','');
@@ -205,7 +213,15 @@ function createPlayer(id){
       if(l){l.classList.add('hide');setTimeout(()=>l.remove(),350);}
     },remaining);
   };
-  iframe.addEventListener('load',()=>{setTimeout(()=>youtubeCommand('playVideo'),150);$('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';reveal();});
+  iframe.addEventListener('load',()=>{
+    setTimeout(()=>{
+      youtubeCommand('unMute');
+      youtubeCommand('playVideo');
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      const mi=$('muteIcon'); if(mi)mi.className='fa-solid fa-volume-high';
+    },120);
+    reveal();
+  });
   setTimeout(reveal,7000);
 }
 
@@ -229,38 +245,73 @@ function toggleMute(){
   youtubeCommand(muted?'unMute':'mute');
   icon.className=muted?'fa-solid fa-volume-high':'fa-solid fa-volume-xmark';
 }
+function setFullscreenIcon(active){
+  const b=$('fullscreenBtn');
+  if(!b)return;
+  b.title=active?'Pomniejsz ekran':'Pełny ekran';
+  b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
+}
+
 async function fullscreen(){
   const v=$('video');
   const native=!!(document.fullscreenElement||document.webkitFullscreenElement);
   const fallback=v.classList.contains('player-fs');
+
   if(native||fallback){
     try{
-      if(document.fullscreenElement&&document.exitFullscreen)await document.exitFullscreen();
-      else if(document.webkitFullscreenElement&&document.webkitExitFullscreen)document.webkitExitFullscreen();
+      if(document.fullscreenElement&&document.exitFullscreen) await document.exitFullscreen();
+      else if(document.webkitFullscreenElement&&document.webkitExitFullscreen) document.webkitExitFullscreen();
     }catch(e){}
     v.classList.remove('player-fs');
     document.body.classList.remove('player-fullscreen');
+    setFullscreenIcon(false);
     return;
   }
+
   document.body.classList.add('player-fullscreen');
+
   try{
-    if(v.requestFullscreen){await v.requestFullscreen({navigationUI:'hide'});return;}
-    if(v.webkitRequestFullscreen){v.webkitRequestFullscreen();return;}
+    if(v.requestFullscreen){
+      await v.requestFullscreen({navigationUI:'hide'});
+      setFullscreenIcon(true);
+      return;
+    }
+    if(v.webkitRequestFullscreen){
+      v.webkitRequestFullscreen();
+      setFullscreenIcon(true);
+      return;
+    }
   }catch(e){}
+
   v.classList.add('player-fs');
+  setFullscreenIcon(true);
 }
+
 document.addEventListener('fullscreenchange',()=>{
   const v=$('video');
-  if(document.fullscreenElement){v.classList.remove('player-fs');document.body.classList.add('player-fullscreen');}
-  else if(!v.classList.contains('player-fs'))document.body.classList.remove('player-fullscreen');
-});
-document.addEventListener('webkitfullscreenchange',()=>{
-  const v=$('video');
-  if(document.webkitFullscreenElement){v.classList.remove('player-fs');document.body.classList.add('player-fullscreen');}
-  else if(!v.classList.contains('player-fs'))document.body.classList.remove('player-fullscreen');
+  const active=!!document.fullscreenElement;
+  if(active){
+    v.classList.remove('player-fs');
+    document.body.classList.add('player-fullscreen');
+  }else if(!v.classList.contains('player-fs')){
+    document.body.classList.remove('player-fullscreen');
+  }
+  setFullscreenIcon(active||v.classList.contains('player-fs'));
 });
 
-async function loadStreams(){try{if(!window.db)throw new Error('Firebase DB unavailable');const snap=await window.db.collection('streams').get();streams={};snap.forEach(d=>streams[d.id]=d.data());}catch(e){console.error(e);toast('Nie udało się pobrać transmisji.')}if(!activeLeague)activeLeague=Object.keys(L)[0];renderLeagues();renderStream();if(document.querySelector('#adminContent').style.display==='block')renderAdmin()}
+document.addEventListener('webkitfullscreenchange',()=>{
+  const v=$('video');
+  const active=!!document.webkitFullscreenElement;
+  if(active){
+    v.classList.remove('player-fs');
+    document.body.classList.add('player-fullscreen');
+  }else if(!v.classList.contains('player-fs')){
+    document.body.classList.remove('player-fullscreen');
+  }
+  setFullscreenIcon(active||v.classList.contains('player-fs'));
+});
+
+function loadStreams(){try{if(!window.db)throw new Error('Firebase DB unavailable');const snap=await window.db.collection('streams').get();streams={};snap.forEach(d=>streams[d.id]=d.data());}catch(e){console.error(e);toast('Nie udało się pobrać transmisji.')}if(!activeLeague)activeLeague=Object.keys(L)[0];renderLeagues();renderStream();if(document.querySelector('#adminContent').style.display==='block')renderAdmin()}
 function openAdmin(){
   const panel=$('adminPanel');
   if(!panel)return;
