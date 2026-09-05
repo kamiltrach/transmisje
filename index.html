@@ -31,14 +31,16 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   border: 0;
   display: block;
   opacity: 0;
+  visibility: hidden;
   transition: opacity .3s ease;
   pointer-events: none !important;
   -webkit-user-select: none;
   user-select: none;
 }
 
-.yt-wrap.ready iframe{
+.yt-wrap.playing iframe{
   opacity: 1;
+  visibility: visible;
 }
 
 .yt-mask-top{
@@ -46,8 +48,8 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   top: 0;
   left: 0;
   right: 0;
-  height: 48px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  height: 52px;
+  background: linear-gradient(to bottom, #000 80%, transparent);
   z-index: 6;
   pointer-events: none;
 }
@@ -57,61 +59,55 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   bottom: 0;
   left: 0;
   right: 0;
-  height: 48px;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  height: 52px;
+  background: linear-gradient(to top, #000 80%, transparent);
   z-index: 6;
   pointer-events: none;
 }
 
-.yt-shield{position:absolute;inset:0;z-index:7;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.yt-shield{position:absolute;inset:0;z-index:10;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
-/* PEŁNY OVERLAY PAUZY */
-.custom-overlay{
+/* PEŁNY EKRAN STARTOWY / PAUZY (NAJWYŻSZY Z-INDEX) */
+.custom-start-screen{
   position: absolute;
   inset: 0;
-  z-index: 12;
-  background: rgba(0, 0, 0, 0.85);
+  z-index: 30;
+  background: #000;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 16px;
   cursor: pointer;
-  transition: opacity .2s ease;
+  transition: opacity .25s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.custom-play-btn{
-  width: 76px;
-  height: 76px;
+.custom-start-btn{
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--green);
   color: var(--navy);
   display: grid;
   place-items: center;
-  font-size: 2rem;
+  font-size: 2.2rem;
   box-shadow: 0 0 35px rgba(126,211,33,0.6);
   padding-left: 5px;
   transition: transform .2s ease;
   pointer-events: none;
 }
-.custom-overlay:active .custom-play-btn{ transform: scale(0.95); }
-.custom-overlay-text{ font-size: 0.85rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
+.custom-start-screen:active .custom-start-btn{ transform: scale(0.94); }
+.custom-start-text{ font-size: 0.85rem; font-weight: 700; color: #fff; letter-spacing: 0.6px; text-transform: uppercase; }
 
-.watermark{position:absolute;right:20px;top:18px;z-index:10;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
+.watermark{position:absolute;right:20px;top:18px;z-index:15;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
 .watermark img{height:34px;width:auto;display:block}
 
 .video-placeholder{text-align:center;color:var(--muted);z-index:1}.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}.video-placeholder h2{color:#fff;font-size:1.25rem}.video-placeholder p{font-size:.78rem;margin-top:5px}
 
-.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.95);border-top:1px solid var(--border);position:absolute;left:0;right:0;bottom:0;z-index:20;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.95);border-top:1px solid var(--border);position:absolute;left:0;right:0;bottom:0;z-index:25;opacity:0;pointer-events:none;transition:opacity .3s ease}
 .video.show-controls .controls{opacity:1;pointer-events:auto}
 .control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
 .stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
-
-.stream-loader{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:#000;transition:opacity .4s ease}
-.stream-loader.hide{opacity:0;pointer-events:none}
-.stream-loader img{width:88px;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
-.stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
-@keyframes sgSpin{to{transform:rotate(360deg)}}
 
 .video:fullscreen,
 .video:-webkit-full-screen,
@@ -248,7 +244,6 @@ const $=id=>document.getElementById(id);
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 
 function triggerAutoReload() {
-  showLoader();
   setTimeout(() => location.reload(), 1200);
 }
 
@@ -281,7 +276,6 @@ function removePlayer(){
     window.__ytPlayer = null;
   }
   const p=$('ytplayer'); if(p)p.remove();
-  const l=$('streamLoader'); if(l)l.remove();
 }
 
 function renderStream(){
@@ -305,7 +299,6 @@ function renderStream(){
 
 function createPlayer(id){
   removePlayer();
-  showLoader();
 
   if(!ytReady || !window.YT || !window.YT.Player){
     pendingVideoId = id;
@@ -334,22 +327,21 @@ function createPlayer(id){
   maskBottom.className='yt-mask-bottom';
   wrap.appendChild(maskBottom);
 
-  // OVERLAY PRZYCISKU PLAY (ZAKRYWA CAŁE WIDEO GDY TRANSMISJA STOI)
-  const overlay=document.createElement('div');
-  overlay.id='customOverlay';
-  overlay.className='custom-overlay';
-  overlay.style.display='none';
-  overlay.innerHTML='<div class="custom-play-btn"><i class="fa-solid fa-play"></i></div><div class="custom-overlay-text">Kliknij, aby odtworzyć transmisję</div>';
+  // EKRAN STARTOWY / PAUZY PRZESŁANIAJĄCY CAŁKOWICIE YT
+  const startScreen=document.createElement('div');
+  startScreen.id='customStartScreen';
+  startScreen.className='custom-start-screen';
+  startScreen.innerHTML='<div class="custom-start-btn"><i class="fa-solid fa-play"></i></div><div class="custom-start-text">Odtwórz transmisję</div>';
   
   const triggerPlay = function(e){
     e.preventDefault();
     e.stopPropagation();
     startStreamExplicitly();
   };
-  overlay.addEventListener('touchstart', triggerPlay, {passive: false});
-  overlay.addEventListener('click', triggerPlay);
+  startScreen.addEventListener('touchstart', triggerPlay, {passive: false});
+  startScreen.addEventListener('click', triggerPlay);
   
-  wrap.appendChild(overlay);
+  wrap.appendChild(startScreen);
 
   const shield=document.createElement('div');
   shield.className='yt-shield';
@@ -383,16 +375,14 @@ function createPlayer(id){
           }catch(x){}
         },
         onStateChange:function(e){
-          if(e.data === 1){ // PLAYING
-            wrap.classList.add('ready');
+          if(e.data === 1){ // PLAYING - Odsłaniamy ramkę i chowamy ekran startowy
+            wrap.classList.add('playing');
             $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-            if($('customOverlay')) $('customOverlay').style.display='none';
-            hideLoader();
+            if($('customStartScreen')) $('customStartScreen').style.display='none';
           } else if(e.data === 2 || e.data === -1 || e.data === 0) { // PAUSED / UNSTARTED / ENDED
+            wrap.classList.remove('playing');
             $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-            if($('customOverlay')) $('customOverlay').style.display='flex';
-            wrap.classList.add('ready');
-            hideLoader();
+            if($('customStartScreen')) $('customStartScreen').style.display='flex';
           }
         },
         onError: function() { triggerAutoReload(); }
@@ -402,37 +392,16 @@ function createPlayer(id){
   }catch(err){
     triggerAutoReload();
   }
-
-  setTimeout(() => {
-    if($('streamLoader')) {
-      wrap.classList.add('ready');
-      hideLoader();
-    }
-  }, 5000);
 }
 
 function startStreamExplicitly(){
-  if($('customOverlay')) $('customOverlay').style.display='none';
+  if($('customStartScreen')) $('customStartScreen').style.display='none';
   if(window.__ytPlayer){
     try{
       window.__ytPlayer.unMute();
       window.__ytPlayer.playVideo();
     }catch(e){}
   }
-}
-
-function showLoader(){
-  if($('streamLoader')) return;
-  const loader=document.createElement('div');
-  loader.id='streamLoader';
-  loader.className='stream-loader';
-  loader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Strefa Gola">';
-  $('video').appendChild(loader);
-}
-
-function hideLoader(){
-  const l=$('streamLoader');
-  if(l){ l.classList.add('hide'); setTimeout(()=>l.remove(), 400); }
 }
 
 function handleShieldClick(){
