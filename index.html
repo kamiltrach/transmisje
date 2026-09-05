@@ -354,13 +354,13 @@ function createPlayer(channel){
     player=new Twitch.Player('twitchplayer',{
       channel:channel,
       parent:[parent],
-      autoplay:true,
-      muted:true,
+      autoplay:false,
+      muted:false,
       controls:false
     });
 
     player.setVolume(1);
-    player.setMuted(true);
+    player.setMuted(false);
 
     const reveal=()=>{
       const l=$('streamLoader');
@@ -369,8 +369,8 @@ function createPlayer(channel){
 
     player.addEventListener(Twitch.Player.READY,()=>{
       player.setVolume(1);
-      player.setMuted(true);
-      $('muteIcon').className='fa-solid fa-volume-xmark';
+      player.setMuted(false);
+      $('muteIcon').className='fa-solid fa-volume-high';
       streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       reveal();
@@ -385,6 +385,21 @@ function createPlayer(channel){
       streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       playBusy=false;
+    });
+    player.addEventListener(Twitch.Player.PLAYBACK_BLOCKED,()=>{
+      streamPlaying=false;
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+      playBusy=false;
+      console.warn('Twitch blocked playback by browser policy');
+    });
+    player.addEventListener(Twitch.Player.PLAYING,()=>{
+      streamPlaying=true;
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      playBusy=false;
+    });
+    player.addEventListener(Twitch.Player.OFFLINE,()=>{
+      streamPlaying=false;
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
     });
     setTimeout(reveal,7000);
   }catch(e){
