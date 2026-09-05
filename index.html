@@ -20,37 +20,27 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .video.hide-cursor, .video.hide-cursor * { cursor: none !important; }
 
-/* KONTENER YOUTUBE Z KROPOWANIEM INTERFEJSU (ZOOM 130%) */
-.yt-wrap{
+/* KONTENER STRUMIENIA */
+.stream-wrap{
   position: absolute;
   inset: 0;
   z-index: 2;
   background: #000;
   overflow: hidden;
-  pointer-events: none;
 }
 
-.yt-wrap iframe{
+.stream-wrap iframe{
   position: absolute;
-  top: -15%;
-  left: -15%;
-  width: 130%;
-  height: 130%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
   display: block;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .3s ease;
-  pointer-events: none !important;
 }
 
-.yt-wrap.playing iframe{
-  opacity: 1;
-  visibility: visible;
-}
-
-/* BLOKADA INTERAKCJI Z ELEMENTAMI YT */
-.yt-shield{
+/* BLOKADA CAŁKOWITA INTERAKCJI Z ELEMENTAMI SILNIKA */
+.stream-shield{
   position: absolute;
   inset: 0;
   z-index: 10;
@@ -217,7 +207,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
         <h3>Zarządzanie transmisjami</h3>
         <button class="control" onclick="closeAdmin()" title="Zamknij"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1.2rem">Ustaw link transmisji dla każdej ligi. Zmiany są zapisywane w Firebase.</p>
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1.2rem">Ustaw identyfikator transmisji/kanału dla każdej ligi.</p>
       <div id="adminGrid" class="admin-grid"></div>
     </div>
   </section>
@@ -225,30 +215,17 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 <footer>© Strefa Gola • Podkarpackie transmisje</footer>
 <div id="toast" class="toast"></div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
+<script src="https://player.twitch.tv/js/embed/v1.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,ytReady=false,pendingVideoId=null,hideTimer=null;
+let streams={},activeLeague=null,hideTimer=null;
 const $=id=>document.getElementById(id);
 
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
-
-function triggerAutoReload() {
-  setTimeout(() => location.reload(), 1200);
-}
-
-window.onYouTubeIframeAPIReady = function() {
-  ytReady = true;
-  if (pendingVideoId) {
-    const id = pendingVideoId;
-    pendingVideoId = null;
-    createPlayer(id);
-  }
-};
 
 function renderLeagues(){
   $('leagues').innerHTML=Object.entries(L).map(([k,v])=>`<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`).join('');
@@ -265,11 +242,11 @@ function selectLeague(k){
 }
 
 function removePlayer(){
-  if(window.__ytPlayer){
-    try{ window.__ytPlayer.destroy(); }catch(x){}
-    window.__ytPlayer = null;
+  if(window.__customPlayer){
+    try{ window.__customPlayer.pause(); }catch(x){}
+    window.__customPlayer = null;
   }
-  const p=$('ytplayer'); if(p)p.remove();
+  const p=$('streamWrap'); if(p)p.remove();
 }
 
 function renderStream(){
@@ -291,26 +268,17 @@ function renderStream(){
   createPlayer(s.videoId);
 }
 
-function createPlayer(id){
+function createPlayer(channelName){
   removePlayer();
 
-  if(!ytReady || !window.YT || !window.YT.Player){
-    pendingVideoId = id;
-    setTimeout(() => {
-      if(pendingVideoId === id && !window.__ytPlayer){
-        pendingVideoId = null;
-        triggerAutoReload();
-      }
-    }, 10000);
-    return;
-  }
-
   const wrap=document.createElement('div');
-  wrap.id='ytplayer';
-  wrap.className='yt-wrap';
+  wrap.id='streamWrap';
+  wrap.className='stream-wrap';
   
   const innerDiv=document.createElement('div');
-  innerDiv.id='ytframe';
+  innerDiv.id='playerEmbed';
+  innerDiv.style.width='100%';
+  innerDiv.style.height='100%';
   wrap.appendChild(innerDiv);
 
   const startScreen=document.createElement('div');
@@ -329,7 +297,7 @@ function createPlayer(id){
   wrap.appendChild(startScreen);
 
   const shield=document.createElement('div');
-  shield.className='yt-shield';
+  shield.className='stream-shield';
   shield.addEventListener('touchstart', function(e){ handleShieldClick(); }, {passive: true});
   shield.onclick = handleShieldClick;
   wrap.appendChild(shield);
@@ -337,63 +305,47 @@ function createPlayer(id){
   $('video').appendChild(wrap);
 
   try{
-    const yt=new YT.Player('ytframe',{
-      videoId:id,
-      playerVars:{
-        autoplay:1,
-        mute:1,
-        controls:0,
-        rel:0,
-        modestbranding:1,
-        playsinline:1,
-        iv_load_policy:3,
-        disablekb:1,
-        enablejsapi:1,
-        origin: window.location.origin
-      },
-      events:{
-        onReady:function(e){
-          window.__ytPlayer = e.target;
-          try{ 
-            e.target.mute(); 
-            e.target.playVideo(); 
-          }catch(x){}
-        },
-        onStateChange:function(e){
-          if(e.data === 1){
-            wrap.classList.add('playing');
-            $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-            if($('customStartScreen')) $('customStartScreen').style.display='none';
-          } else if(e.data === 2 || e.data === -1 || e.data === 0) {
-            wrap.classList.remove('playing');
-            $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-            if($('customStartScreen')) $('customStartScreen').style.display='flex';
-          }
-        },
-        onError: function() { triggerAutoReload(); }
-      }
+    const player = new Twitch.Player("playerEmbed", {
+      width: "100%",
+      height: "100%",
+      channel: channelName,
+      autoplay: true,
+      muted: true,
+      controls: false,
+      parent: [window.location.hostname || "localhost"]
     });
-    window.__ytPlayer=yt;
+
+    window.__customPlayer = player;
+
+    player.addEventListener(Twitch.Player.PLAYING, function() {
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      if($('customStartScreen')) $('customStartScreen').style.display='none';
+    });
+
+    player.addEventListener(Twitch.Player.PAUSE, function() {
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+      if($('customStartScreen')) $('customStartScreen').style.display='flex';
+    });
+
   }catch(err){
-    triggerAutoReload();
+    console.error(err);
   }
 }
 
 function startStreamExplicitly(){
   if($('customStartScreen')) $('customStartScreen').style.display='none';
-  if(window.__ytPlayer){
+  if(window.__customPlayer){
     try{
-      window.__ytPlayer.unMute();
-      window.__ytPlayer.playVideo();
+      window.__customPlayer.setMuted(false);
+      window.__customPlayer.play();
     }catch(e){}
   }
 }
 
 function handleShieldClick(){
-  if(window.__ytPlayer){
+  if(window.__customPlayer){
     try{
-      const state = window.__ytPlayer.getPlayerState();
-      if(state !== 1){
+      if(window.__customPlayer.isPaused()){
         startStreamExplicitly();
       }
     }catch(e){}
@@ -422,26 +374,25 @@ if(mainVideo){
 }
 
 function togglePlay(){
-  if(!window.__ytPlayer)return;
+  if(!window.__customPlayer)return;
   try{
-    const state = window.__ytPlayer.getPlayerState();
-    if(state === 1) {
-      window.__ytPlayer.pauseVideo();
-    } else {
+    if(window.__customPlayer.isPaused()) {
       startStreamExplicitly();
+    } else {
+      window.__customPlayer.pause();
     }
   }catch(e){}
 }
 
 function toggleMute(){
-  if(!window.__ytPlayer)return;
+  if(!window.__customPlayer)return;
   const icon=$('muteIcon');
   try {
-    if (window.__ytPlayer.isMuted()) {
-      window.__ytPlayer.unMute();
+    if (window.__customPlayer.getMuted()) {
+      window.__customPlayer.setMuted(false);
       icon.className='fa-solid fa-volume-high';
     } else {
-      window.__ytPlayer.mute();
+      window.__customPlayer.setMuted(true);
       icon.className='fa-solid fa-volume-xmark';
     }
   } catch(e){}
@@ -573,13 +524,13 @@ function showAdmin(){
 function renderAdmin(){
   $('adminGrid').innerHTML=Object.entries(L).map(([k,v])=>{
     const s=streams[k]||{};
-    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link transmisji</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="Wklej link do wideo"><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
+    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Nazwa kanału / ID strumienia</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="Wpisz nazwę kanału"><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
   }).join('');
 }
 async function save(k){
   if(!window.auth?.currentUser)return toast('Najpierw się zaloguj.');
   const url=$('u_'+k).value.trim(),id=getId(url),active=$('a_'+k).checked;
-  if(active&&!id)return toast('Podaj poprawny link transmisji.');
+  if(active&&!id)return toast('Podaj poprawną nazwę kanału.');
   try{
     await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
@@ -590,8 +541,8 @@ async function save(k){
 function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&quot;","\'":"&#39;"}[m]))}
 function getId(url) {
   if (!url) return '';
-  const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})/);
-  return match ? match[1] : '';
+  const clean = url.trim().replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '').split('/')[0].split('?')[0];
+  return clean;
 }
 
 if(window.auth) window.auth.onAuthStateChanged(u=>{ if(u && $('adminPanel').classList.contains('open'))showAdmin(); });
