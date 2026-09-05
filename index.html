@@ -331,6 +331,36 @@ function youtubeCommand(command){
     player.contentWindow.postMessage(JSON.stringify({event:'command',func:command,args:[]}), 'https://www.youtube-nocookie.com');
   }catch(e){}
 }
+
+function setupYouTubeLikeControls(){
+  const v=$('video'), c=document.querySelector('.player-card > .controls');
+  if(!v || !c || c.parentElement===v)return;
+  v.appendChild(c);
+
+  let hideTimer=null;
+  const show=()=>{
+    v.classList.add('show-controls');
+    clearTimeout(hideTimer);
+    hideTimer=setTimeout(()=>{
+      if(!v.matches(':hover')) v.classList.remove('show-controls');
+    },3000);
+  };
+
+  // Desktop: movement over the player shows controls.
+  v.addEventListener('mousemove',show);
+
+  // Touch: first tap shows controls, next tap hides them.
+  v.addEventListener('touchstart',(e)=>{
+    if(e.target.closest('.controls')) return;
+    if(v.classList.contains('show-controls')){
+      v.classList.remove('show-controls');
+      clearTimeout(hideTimer);
+    }else{
+      show();
+    }
+  },{passive:true});
+}
+
 function togglePlay(){
   if(!player)return;
   const icon=$('playBtn').querySelector('i');
@@ -414,30 +444,6 @@ document.addEventListener('webkitfullscreenchange',()=>{
   }
   setFullscreenIcon(active||v.classList.contains('player-fs'));
 });
-
-
-let controlsHideTimer=null;
-function showPlayerControls(){
-  const v=$('video');
-  if(!v)return;
-  v.classList.add('show-controls');
-  clearTimeout(controlsHideTimer);
-  controlsHideTimer=setTimeout(()=>v.classList.remove('show-controls'),3000);
-}
-function setupPlayerControls(){
-  const v=$('video');
-  if(!v || v.dataset.controlsReady)return;
-  v.dataset.controlsReady='1';
-  v.addEventListener('mousemove',showPlayerControls);
-  v.addEventListener('touchstart',()=>{
-    if(v.classList.contains('show-controls')){
-      v.classList.remove('show-controls');
-      clearTimeout(controlsHideTimer);
-    }else{
-      showPlayerControls();
-    }
-  },{passive:true});
-}
 
 async function loadStreams(){try{if(!window.db)throw new Error('Firebase DB unavailable');const snap=await window.db.collection('streams').get();streams={};snap.forEach(d=>streams[d.id]=d.data());}catch(e){console.error(e);toast('Nie udało się pobrać transmisji.')}if(!activeLeague)activeLeague=Object.keys(L)[0];renderLeagues();renderStream();if(document.querySelector('#adminContent').style.display==='block')renderAdmin()}
 function openAdmin(){
@@ -556,7 +562,7 @@ mobileTrigger.addEventListener('click',()=>{
 });
 
 activeLeague=Object.keys(L)[0];
-setupPlayerControls();
+setupYouTubeLikeControls();
 loadStreams().then(()=>{
   const s=streams[activeLeague];
   if(s?.active && s.videoId){
