@@ -37,34 +37,12 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
 .stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 
-/* NIEZAWODNY PEŁNY EKRAN CSS (ODPORNY NA OBRACANIE TELEFONU) */
+/* NIEZAWODNY PEŁNY EKRAN CSS */
 .video.player-fs {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100dvh !important;
-  max-width: none !important;
-  max-height: none !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  z-index: 999999 !important;
-  aspect-ratio: auto !important;
-  overflow: hidden !important;
-  background: #000 !important;
+  position: fixed !important; inset: 0 !important; width: 100% !important; height: 100dvh !important; max-width: none !important; max-height: none !important; min-height: 0 !important; margin: 0 !important; border-radius: 0 !important; z-index: 999999 !important; aspect-ratio: auto !important; overflow: hidden !important; background: #000 !important;
 }
-
-.video.player-fs .controls {
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  z-index: 1000000 !important;
-  padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
-}
-
+.video.player-fs .controls { position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 1000000 !important; padding-bottom: max(12px, env(safe-area-inset-bottom)) !important; }
 body.player-fullscreen { overflow: hidden !important; width: 100% !important; height: 100% !important; }
-
 .video.player-minimized {
   position: fixed !important; bottom: 20px !important; right: 20px !important; width: 320px !important; height: 180px !important; z-index: 999999 !important; border-radius: 12px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; aspect-ratio: 16/9 !important; border: 1px solid var(--border) !important; background: #000 !important; overflow: hidden !important;
 }
@@ -76,7 +54,6 @@ body.player-fullscreen { overflow: hidden !important; width: 100% !important; he
 .admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}.admin-panel.open{display:block}.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}.admin-card h3{font-size:.88rem;margin-bottom:12px}.field{display:block;font-size:.65rem;color:var(--muted);margin:9px 0 5px}.field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}.save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}.check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}.login-box{max-width:720px;margin:0 auto;text-align:center}.login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}.login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}.login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
 .toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 15px;border-radius:11px;background:#132240;border:1px solid var(--border);font-size:.75rem;display:none}.toast.show{display:block}
 footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
-
 .mobile-stream-picker{display:none}
 
 @media(max-width:700px){
@@ -155,7 +132,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 <footer>© Strefa Gola • Podkarpackie transmisje</footer>
 <div id="toast" class="toast"></div>
 
-<!-- Oficjalne API Odtwarzacza -->
+<!-- Skrypty -->
 <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -176,11 +153,7 @@ function renderLeagues(){
 function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open'); }
 function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
 
-function selectLeague(k){
-  activeLeague=k;
-  renderLeagues();
-  renderStream();
-}
+function selectLeague(k){ activeLeague=k; renderLeagues(); renderStream(); }
 
 function removePlayer(){
   if(window.__customPlayer){
@@ -196,7 +169,7 @@ function renderStream(){
   $('sideInfo').textContent=s?.active&&s.videoId?'Transmisja: '+(s.title||L[activeLeague]):'Brak aktywnej transmisji dla tej ligi.';
   removePlayer();
   $('placeholder').style.display='block';
-  $('muteIcon').className='fa-solid fa-volume-xmark'; // Reset ikony dźwięku
+  $('muteIcon').className='fa-solid fa-volume-xmark';
 
   if(!s?.active||!s.videoId){
     $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
@@ -223,10 +196,11 @@ function createPlayer(channelName){
   innerDiv.style.height='100%';
   wrap.appendChild(innerDiv);
 
+  // Tarcza, która po dotknięciu natychmiast odpala dźwięk i wideo
   const shield=document.createElement('div');
   shield.className='stream-shield';
-  shield.addEventListener('touchstart', function(e){ handleShieldClick(); }, {passive: true});
-  shield.onclick = handleShieldClick;
+  shield.addEventListener('click', forcePlayAndUnmute);
+  shield.addEventListener('touchend', forcePlayAndUnmute);
   wrap.appendChild(shield);
   
   $('video').appendChild(wrap);
@@ -236,40 +210,37 @@ function createPlayer(channelName){
       width: "100%",
       height: "100%",
       channel: channelName,
-      autoplay: true,
-      muted: true, // Zawsze wyciszone na start dla autostartu
+      autoplay: true, // Wymusza autostart
+      muted: true,    // MUSI BYĆ WYCISZONY, inaczej przeglądarka zablokuje autostart
       controls: false,
       parent: [window.location.hostname || "localhost"]
     });
 
     window.__customPlayer = player;
 
+    // Kiedy API jest gotowe, bezczelnie wymuszamy Play, gdyby przeglądarka próbowała to zatrzymać
+    player.addEventListener(Twitch.Player.READY, function() {
+      try { player.play(); } catch(e){}
+    });
+
     player.addEventListener(Twitch.Player.PLAYING, function() {
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
     });
-
     player.addEventListener(Twitch.Player.PAUSE, function() {
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
     });
 
-  }catch(err){
-    console.error(err);
-  }
+  }catch(err){ console.error(err); }
 }
 
-function handleShieldClick(){
+function forcePlayAndUnmute(e) {
   if(window.__customPlayer){
     try{
-      // Kliknięcie wideo zawsze aktywuje pełny dźwięk
-      if(window.__customPlayer.getMuted() || window.__customPlayer.getVolume() === 0){
-        window.__customPlayer.setMuted(false);
-        window.__customPlayer.setVolume(1.0);
-        $('muteIcon').className='fa-solid fa-volume-high';
-      }
-      if(window.__customPlayer.isPaused()){
-        window.__customPlayer.play();
-      }
-    }catch(e){}
+      window.__customPlayer.setMuted(false);
+      window.__customPlayer.setVolume(1.0);
+      $('muteIcon').className='fa-solid fa-volume-high';
+      window.__customPlayer.play(); // Wymuszamy dodatkowo Play przy każdym dotknięciu wideo
+    }catch(err){}
   }
   handleUserActivity();
 }
@@ -299,6 +270,10 @@ function togglePlay(){
   try{
     if(window.__customPlayer.isPaused()) {
       window.__customPlayer.play();
+      // Jak puszczasz play z palca, zdejmujemy z automatu wyciszenie
+      window.__customPlayer.setMuted(false);
+      window.__customPlayer.setVolume(1.0);
+      $('muteIcon').className='fa-solid fa-volume-high';
     } else {
       window.__customPlayer.pause();
     }
@@ -311,7 +286,8 @@ function toggleMute(){
   try {
     if (window.__customPlayer.getMuted() || window.__customPlayer.getVolume() === 0) {
       window.__customPlayer.setMuted(false);
-      window.__customPlayer.setVolume(1.0); // Zawsze 100% po włączeniu
+      window.__customPlayer.setVolume(1.0);
+      window.__customPlayer.play(); // Zabezpieczenie: jeśli był spauzowany, play() go obudzi
       icon.className='fa-solid fa-volume-high';
     } else {
       window.__customPlayer.setMuted(true);
@@ -326,65 +302,43 @@ function setFullscreenIcon(active){
   b.title=active?'Pomniejsz ekran':'Pełny ekran';
   b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
 }
-
 function minimizePlayer() {
   const v = $('video');
   if (!v) return;
   if (v.classList.contains('player-minimized')) {
     v.classList.remove('player-minimized');
   } else {
-    if (v.classList.contains('player-fs') || document.fullscreenElement) {
-      exitPlayerFullscreen();
-    }
+    if (v.classList.contains('player-fs') || document.fullscreenElement) exitPlayerFullscreen();
     v.classList.add('player-minimized');
   }
 }
-
 async function fullscreen(){
   const v=$('video');
   if(!v)return;
-
-  if(v.classList.contains('player-fs') || document.fullscreenElement){
-    await exitPlayerFullscreen();
-    return;
-  }
-
+  if(v.classList.contains('player-fs') || document.fullscreenElement){ await exitPlayerFullscreen(); return; }
   v.classList.remove('player-minimized');
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   setFullscreenIcon(true);
   handleUserActivity();
-
   const el = document.documentElement;
   let req = el.requestFullscreen || el.webkitRequestFullscreen;
   if (req) { try { await req.call(el); } catch(e) {} }
-
   try{ if(screen.orientation?.lock) screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
 }
-
 async function exitPlayerFullscreen(){
   const v=$('video');
   if(!v)return;
-
   v.classList.remove('player-fs','show-controls','hide-cursor');
   document.body.classList.remove('player-fullscreen');
   setFullscreenIcon(false);
-
   let exit = document.exitFullscreen || document.webkitExitFullscreen;
-  if (document.fullscreenElement || document.webkitFullscreenElement) {
-    if (exit) { try { await exit.call(document); } catch(e){} }
-  }
-
+  if (document.fullscreenElement || document.webkitFullscreenElement) { if (exit) { try { await exit.call(document); } catch(e){} } }
   try{ if(screen.orientation?.unlock) screen.orientation.unlock(); }catch(e){}
 }
 
-document.addEventListener('fullscreenchange', () => {
-  if(!document.fullscreenElement) exitPlayerFullscreen();
-});
-document.addEventListener('webkitfullscreenchange', () => {
-  if(!document.webkitFullscreenElement) exitPlayerFullscreen();
-});
-
+document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement) exitPlayerFullscreen(); });
+document.addEventListener('webkitfullscreenchange', () => { if(!document.webkitFullscreenElement) exitPlayerFullscreen(); });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     const v=$('video');
@@ -403,40 +357,23 @@ async function loadStreams(){
     streams={};
     snap.forEach(d=>streams[d.id]=d.data());
   }catch(e){ toast('Nie udało się pobrać transmisji.'); }
-
   const autoLive=Object.keys(L).find(k=>streams[k]?.active && streams[k]?.videoId);
   if(autoLive) activeLeague=autoLive;
   else if(!activeLeague) activeLeague=Object.keys(L)[0];
-
   renderLeagues();
   renderStream();
-
   if(document.querySelector('#adminContent').style.display==='block')renderAdmin();
 }
 
-function openAdmin(){
-  $('adminPanel').classList.add('open');
-  document.body.style.overflow='hidden';
-  if(window.auth?.currentUser) showAdmin();
-}
-function closeAdmin(){
-  $('adminPanel').classList.remove('open');
-  document.body.style.overflow='';
-}
+function openAdmin(){ $('adminPanel').classList.add('open'); document.body.style.overflow='hidden'; if(window.auth?.currentUser) showAdmin(); }
+function closeAdmin(){ $('adminPanel').classList.remove('open'); document.body.style.overflow=''; }
 async function login(){
   const e=$('email').value.trim(), p=$('password').value, msg=$('loginMsg');
   msg.textContent='';
   if(!e || !p){ msg.textContent='Wpisz email i hasło.'; return; }
-  try{
-    await window.auth.signInWithEmailAndPassword(e,p);
-    showAdmin();
-  }catch(err){ msg.textContent='Błąd logowania.'; }
+  try{ await window.auth.signInWithEmailAndPassword(e,p); showAdmin(); }catch(err){ msg.textContent='Błąd logowania.'; }
 }
-function showAdmin(){
-  $('loginBox').style.display='none';
-  $('adminContent').style.display='block';
-  renderAdmin();
-}
+function showAdmin(){ $('loginBox').style.display='none'; $('adminContent').style.display='block'; renderAdmin(); }
 function renderAdmin(){
   $('adminGrid').innerHTML=Object.entries(L).map(([k,v])=>{
     const s=streams[k]||{};
@@ -457,8 +394,7 @@ async function save(k){
 function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&quot;","\'":"&#39;"}[m]))}
 function getId(url) {
   if (!url) return '';
-  const clean = url.trim().replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '').split('/')[0].split('?')[0];
-  return clean;
+  return url.trim().replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '').split('/')[0].split('?')[0];
 }
 
 if(window.auth) window.auth.onAuthStateChanged(u=>{ if(u && $('adminPanel').classList.contains('open'))showAdmin(); });
@@ -467,18 +403,12 @@ document.addEventListener('click',e=>{ if($('mobilePicker') && !$('mobilePicker'
 
 let mobileAdminTaps=0,mobileAdminTimer=null;
 const mobileTrigger=document.createElement('button');
-mobileTrigger.type='button';
-mobileTrigger.setAttribute('aria-hidden','true');
-mobileTrigger.setAttribute('tabindex','-1');
+mobileTrigger.type='button'; mobileTrigger.setAttribute('aria-hidden','true'); mobileTrigger.setAttribute('tabindex','-1');
 mobileTrigger.style.cssText='position:fixed;right:0;bottom:0;width:76px;height:76px;z-index:9999;background:transparent;border:0;padding:0;opacity:0;';
 document.body.appendChild(mobileTrigger);
 mobileTrigger.addEventListener('click',()=>{
-  mobileAdminTaps++;
-  clearTimeout(mobileAdminTimer);
-  if(mobileAdminTaps>=5){
-    mobileAdminTaps=0;
-    openAdmin();
-  }
+  mobileAdminTaps++; clearTimeout(mobileAdminTimer);
+  if(mobileAdminTaps>=5){ mobileAdminTaps=0; openAdmin(); }
   mobileAdminTimer=setTimeout(()=>mobileAdminTaps=0,1500);
 });
 
