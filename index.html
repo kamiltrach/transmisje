@@ -33,6 +33,17 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000}
 .yt-wrap iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
 .yt-shield{position:absolute;inset:0;z-index:3;background:transparent;touch-action:none}
+.yt-wrap{overflow:hidden}
+.yt-wrap iframe{
+  pointer-events:none!important;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.yt-shield{
+  pointer-events:auto!important;
+  cursor:default;
+}
+
 .video.player-fs{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;max-width:none!important;min-height:0!important;aspect-ratio:auto!important;border-radius:0!important;background:#000}
 .video.player-fs .yt-wrap{inset:0}
 .video.player-fs{
@@ -216,7 +227,20 @@ function renderLeagues(){
 }
 function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open'); }
 function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
-function selectLeague(k){ activeLeague=k; renderLeagues(); renderStream(); }
+function selectLeague(k){
+  activeLeague=k;
+  renderLeagues();
+  renderStream();
+  const s=streams[activeLeague];
+  if(s?.active && s.videoId){
+    setTimeout(()=>{
+      if(activeLeague===k && !player){
+        $('placeholder').style.display='none';
+        createPlayer(s.videoId);
+      }
+    },80);
+  }
+}
 
 function removePlayer(){
   const p=$('ytplayer'); if(p)p.remove();
@@ -264,7 +288,7 @@ function createPlayer(id){
   wrap.className='yt-wrap';
 
   const iframe=document.createElement('iframe');
-  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
+  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
   iframe.title='Transmisja';
   iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
   iframe.setAttribute('allowfullscreen','');
@@ -292,10 +316,9 @@ function createPlayer(id){
   };
   iframe.addEventListener('load',()=>{
     setTimeout(()=>{
-      youtubeCommand('unMute');
       youtubeCommand('playVideo');
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      const mi=$('muteIcon'); if(mi)mi.className='fa-solid fa-volume-high';
+      const mi=$('muteIcon'); if(mi)mi.className='fa-solid fa-volume-xmark';
     },150);
     reveal();
   });
@@ -333,17 +356,11 @@ function fullscreen(){
   const v=$('video');
   if(!v)return;
 
-  const active=v.classList.contains('player-fs') ||
-               !!document.fullscreenElement ||
-               !!document.webkitFullscreenElement;
-
-  if(active){
+  if(v.classList.contains('player-fs')){
     exitPlayerFullscreen();
     return;
   }
 
-  // Prefer the CSS fallback. It is more reliable on phones and
-  // gives us a real minimize button that always returns to normal view.
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   document.body.style.overflow='hidden';
@@ -514,6 +531,15 @@ mobileTrigger.addEventListener('click',()=>{
   mobileAdminTimer=setTimeout(()=>mobileAdminTaps=0,1500);
 });
 
-activeLeague=Object.keys(L)[0];loadStreams();</script>
+activeLeague=Object.keys(L)[0];
+loadStreams().then(()=>{
+  const s=streams[activeLeague];
+  if(s?.active && s.videoId){
+    setTimeout(()=>{
+      $('placeholder').style.display='none';
+      createPlayer(s.videoId);
+    },120);
+  }
+});</script>
 </body>
 </html>
