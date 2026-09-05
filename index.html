@@ -22,7 +22,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
 
-/* CROP IFRAME + CZARNE MASKI PRZYCIEMNIAJĄCE GÓRĘ I DÓŁ */
+/* CROP IFRAME + MASKI */
 .yt-wrap iframe{
   position: absolute;
   top: -15%;
@@ -36,31 +36,12 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   user-select: none;
 }
 
-.yt-mask-top{
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 75px;
-  background: #000;
-  z-index: 6;
-  pointer-events: none;
-}
-
-.yt-mask-bottom{
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 55px;
-  background: #000;
-  z-index: 6;
-  pointer-events: none;
-}
+.yt-mask-top{ position: absolute; top: 0; left: 0; right: 0; height: 75px; background: #000; z-index: 6; pointer-events: none; }
+.yt-mask-bottom{ position: absolute; bottom: 0; left: 0; right: 0; height: 55px; background: #000; z-index: 6; pointer-events: none; }
 
 .yt-shield{position:absolute;inset:0;z-index:7;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
-/* SOLIDNE CZARNE TŁO PRZY PAUZIE */
+/* OVERLAY PRZYCISKU PLAY */
 .custom-overlay{
   position: absolute;
   inset: 0;
@@ -70,7 +51,8 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: opacity .3s ease;
+  transition: opacity .2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 .custom-play-btn{
   width: 76px;
@@ -84,8 +66,9 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
   box-shadow: 0 0 35px rgba(126,211,33,0.6);
   padding-left: 5px;
   transition: transform .2s ease;
+  pointer-events: none;
 }
-.custom-overlay:hover .custom-play-btn{ transform: scale(1.1); }
+.custom-overlay:active .custom-play-btn{ transform: scale(0.95); }
 
 .watermark{position:absolute;right:20px;top:18px;z-index:10;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
 .watermark img{height:34px;width:auto;display:block}
@@ -319,7 +302,7 @@ function createPlayer(id){
   innerDiv.id='ytframe';
   wrap.appendChild(innerDiv);
 
-  // CZARNE MASKI PRZYCIEMNIAJĄCE GÓRĘ I DÓŁ YOUTUBE'A
+  // CZARNE MASKI
   const maskTop=document.createElement('div');
   maskTop.className='yt-mask-top';
   wrap.appendChild(maskTop);
@@ -328,17 +311,27 @@ function createPlayer(id){
   maskBottom.className='yt-mask-bottom';
   wrap.appendChild(maskBottom);
 
-  // CZARNY OVERLAY DLA SYSTEMÓW Z BLOKADĄ AUTOPLAY
+  // OVERLAY PAUZY I JEDNOKLIKNIĘCIOWY AUTOPLAY
   const overlay=document.createElement('div');
   overlay.id='customOverlay';
   overlay.className='custom-overlay';
   overlay.style.display='none';
   overlay.innerHTML='<div class="custom-play-btn"><i class="fa-solid fa-play"></i></div>';
-  overlay.onclick=startStreamExplicitly;
+  
+  // BEZPOŚREDNIA OBSŁUGA TOUCH/CLICK DLA 1-KLIKNIĘCIA
+  const triggerPlay = function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    startStreamExplicitly();
+  };
+  overlay.addEventListener('touchstart', triggerPlay, {passive: false});
+  overlay.addEventListener('click', triggerPlay);
+  
   wrap.appendChild(overlay);
 
   const shield=document.createElement('div');
   shield.className='yt-shield';
+  shield.addEventListener('touchstart', function(e){ handleShieldClick(); }, {passive: true});
   shield.onclick = handleShieldClick;
   wrap.appendChild(shield);
   
@@ -392,8 +385,10 @@ function createPlayer(id){
 }
 
 function startStreamExplicitly(){
+  if($('customOverlay')) $('customOverlay').style.display='none';
   if(window.__ytPlayer){
     try{
+      window.__ytPlayer.unMute();
       window.__ytPlayer.playVideo();
     }catch(e){}
   }
@@ -442,7 +437,7 @@ function handleUserActivity(){
 const mainVideo = $('video');
 if(mainVideo){
   mainVideo.addEventListener('mousemove', handleUserActivity);
-  mainVideo.addEventListener('touchstart', handleUserActivity);
+  mainVideo.addEventListener('touchstart', handleUserActivity, {passive: true});
 }
 
 function togglePlay(){
