@@ -9,9 +9,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root{--navy:#0b162c;--green:#7ed321;--gold:#f5a623;--white:#fff;--muted:#8b9bb4;--border:rgba(255,255,255,.08);--glass:rgba(19,34,64,.72);--radius:18px;--glow:rgba(126,211,33,.25)}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%),repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(255,255,255,.012) 120px,rgba(255,255,255,.012) 240px)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
-.topbar{height:76px;position:fixed;inset:0 0 auto;z-index:20;background:rgba(11,22,44,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:0 4%}
-.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand:visited,.brand:hover,.brand:active{color:#fff;text-decoration:none}.brand img{height:46px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;font-weight:700;margin-top:4px;line-height:1;text-transform:uppercase}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
+.topbar{height:76px;position:fixed;inset:0 0 auto;z-index:20;background:rgba(11,22,44,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:0 4%}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand img{height:46px;width:auto}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;margin-top:4px;line-height:1;text-transform:uppercase}
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
 .leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
 
@@ -20,7 +20,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:default;}
 .video.hide-cursor, .video.hide-cursor * { cursor: none !important; }
 
-/* BLOKUJEMY KLIKANIE W RAMKĘ TWITCHA - ODBIERA TO NASZE UI */
+/* BLOKOWANIE KLIKANIA W TWITCHA - CAŁY RUCH PRZECHWYTUJE NASZE UI */
 .stream-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden;}
 .stream-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;display:block;pointer-events:none !important;}
 
@@ -33,22 +33,22 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
 .stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 
-.video.player-fs { position: fixed !important; inset: 0 !important; width: 100% !important; height: 100dvh !important; max-width: none !important; max-height: none !important; min-height: 0 !important; margin: 0 !important; border-radius: 0 !important; z-index: 999999 !important; aspect-ratio: auto !important; overflow: hidden !important; background: #000 !important; }
+.video.player-fs { position: fixed !important; inset: 0 !important; width: 100% !important; height: 100dvh !important; max-width: none !important; max-height: none !important; min-height: 0 !important; margin: 0 !important; border-radius: 0 !important; z-index: 999999 !important; aspect-ratio: auto !important; background: #000 !important; }
 .video.player-fs .controls { position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 1000000 !important; padding-bottom: max(12px, env(safe-area-inset-bottom)) !important; }
 body.player-fullscreen { overflow: hidden !important; width: 100% !important; height: 100% !important; }
-.video.player-minimized { position: fixed !important; bottom: 20px !important; right: 20px !important; width: 320px !important; height: 180px !important; z-index: 999999 !important; border-radius: 12px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; aspect-ratio: 16/9 !important; border: 1px solid var(--border) !important; background: #000 !important; overflow: hidden !important; }
+.video.player-minimized { position: fixed !important; bottom: 20px !important; right: 20px !important; width: 320px !important; height: 180px !important; z-index: 999999 !important; border-radius: 12px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; aspect-ratio: 16/9 !important; border: 1px solid var(--border); background: #000 !important; }
 .video.player-minimized .watermark { display: none !important; }
 .video.player-minimized .controls { opacity: 1 !important; pointer-events: auto !important; height:48px!important; padding: 0 8px!important;}
 .video.player-minimized .stream-title { font-size: .65rem!important; max-width: 100px!important; }
 
 .info{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}.panel{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:20px}.panel h3{font-size:1rem;margin-bottom:8px}.panel p{font-size:.78rem;color:var(--muted)}.schedule-empty{min-height:120px;display:grid;place-items:center;text-align:center}.schedule-empty i{font-size:1.5rem;color:var(--green);margin-bottom:8px}.schedule-empty p{font-size:.74rem}
-.admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}.admin-panel.open{display:block}.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}.admin-card h3{font-size:.88rem;margin-bottom:12px}.field{display:block;font-size:.65rem;color:var(--muted);margin:9px 0 5px}.field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}.save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}.check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}.login-box{max-width:720px;margin:0 auto;text-align:center}.login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}.login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}.login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}.admin-panel.open{display:block}.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}.admin-card h3{font-size:.88rem;margin-bottom:12px}.field{display:block;font-size:.65rem;color:var(--muted);margin:9px 0 5px}.field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}.save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}.check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}.login-box{max-width:720px;margin:0 auto;text-align:center}.login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}.login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}.login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase}
 .toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 15px;border-radius:11px;background:#132240;border:1px solid var(--border);font-size:.75rem;display:none}.toast.show{display:block}
 footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 .mobile-stream-picker{display:none}
 
 @media(max-width:700px){
-  .topbar{height:68px}.brand-title{font-size:1rem}.brand-sub{font-size:.5rem;letter-spacing:2px}main{padding-top:92px}.hero{align-items:start;flex-direction:column}.live-dot{align-self:flex-start}.video{min-height:220px}.info{grid-template-columns:1fr}.watermark{right:10px;top:10px;padding:6px 8px}.watermark img{height:28px}.controls{height:56px;padding:0 8px;gap:6px}.stream-title{max-width:125px;font-size:.68rem}.status{display:none}
+  .topbar{height:68px}.brand-title{font-size:1rem}.brand-sub{font-size:.5rem}main{padding-top:92px}.hero{align-items:start;flex-direction:column}.live-dot{align-self:flex-start}.video{min-height:220px}.watermark{right:10px;top:10px;padding:6px 8px}.watermark img{height:28px}.controls{height:56px;padding:0 8px;gap:6px}.stream-title{max-width:125px;font-size:.68rem}.status{display:none}
   .leagues{display:none}
   .mobile-stream-picker{display:block;position:relative;margin:0 0 12px}
   .mobile-picker-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 14px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid var(--border);font-size:.74rem;font-weight:800}
@@ -81,7 +81,6 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
       <div class="watermark"><img src="logo.png" alt="Strefa Gola"></div>
       
       <div class="controls" id="playerControls">
-        <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
         <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
         <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
         <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
@@ -115,15 +114,14 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 <footer>© Strefa Gola • Podkarpackie transmisje</footer>
 <div id="toast" class="toast"></div>
 
-<!-- Skrypty -->
-<script src="https://player.twitch.tv/js/embed/v1.js"></script>
+<!-- Skrypty Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,hideTimer=null;
+let streams={},activeLeague=null,hideTimer=null,isMuted=true,currentChannel=null;
 const $=id=>document.getElementById(id);
 
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
@@ -136,10 +134,6 @@ function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
 function selectLeague(k){ activeLeague=k; renderLeagues(); renderStream(); }
 
 function removePlayer(){
-  if(window.__customPlayer){
-    try{ window.__customPlayer.pause(); }catch(x){}
-    window.__customPlayer = null;
-  }
   const p=$('streamWrap'); if(p)p.remove();
 }
 
@@ -149,46 +143,35 @@ function renderStream(){
   $('sideInfo').textContent=s?.active&&s.videoId?'Transmisja: '+(s.title||L[activeLeague]):'Brak aktywnej transmisji dla tej ligi.';
   removePlayer();
   $('placeholder').style.display='block';
-  $('muteIcon').className='fa-solid fa-volume-xmark';
+  
   if(!s?.active||!s.videoId){
     $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
     $('placeholder').querySelector('p').textContent=s?'Administrator nie ustawił jeszcze aktywnej transmisji.':'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
     return;
   }
   $('placeholder').style.display='none';
-  createPlayer(s.videoId);
+  currentChannel=s.videoId;
+  isMuted=true; // Zawsze startuje wyciszony, żeby autoplay zadziałał w przeglądarce
+  $('muteIcon').className='fa-solid fa-volume-xmark';
+  createIframePlayer(currentChannel, isMuted);
 }
 
-// TOTALNIE CZYSTE ODPALANIE API TWITCHA (żadnych kombinacji i wymuszeń play)
-function createPlayer(channelName){
+// 100% NIEZAWODNY AUTOPLAY PRZEZ NATIVE IFRAME TWITCHA
+function createIframePlayer(channel, muted){
   removePlayer();
   const wrap=document.createElement('div');
   wrap.id='streamWrap';
   wrap.className='stream-wrap';
   
-  const innerDiv=document.createElement('div');
-  innerDiv.id='playerEmbed';
-  innerDiv.style.width='100%';
-  innerDiv.style.height='100%';
-  wrap.appendChild(innerDiv);
+  // Pobieramy aktualną domenę lub fallback na localhost/localhost-compatible
+  const hostname = window.location.hostname || 'localhost';
+  
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://player.twitch.tv/?channel=${channel}&autoplay=true&muted=${muted ? 'true' : 'false'}&parent=${hostname}`;
+  iframe.setAttribute('allowfullscreen', 'true');
+  iframe.setAttribute('scrolling', 'no');
+  wrap.appendChild(iframe);
   $('video').appendChild(wrap);
-
-  try{
-    const player = new Twitch.Player("playerEmbed", {
-      width: "100%",
-      height: "100%",
-      channel: channelName,
-      autoplay: true, // Automatyczne uruchamianie
-      muted: true,    // Przeglądarka przepuści autoplay TYLKO jeśli wideo startuje wyciszone
-      controls: false,
-      parent: [window.location.hostname || "localhost"]
-    });
-    window.__customPlayer = player;
-    
-    // Zostawiam tylko podmianę ikonek na wypadek buforowania
-    player.addEventListener(Twitch.Player.PLAYING, function() { $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>'; });
-    player.addEventListener(Twitch.Player.PAUSE, function() { $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>'; });
-  }catch(err){ console.error(err); }
 }
 
 function handleUserActivity(){
@@ -205,7 +188,6 @@ function handleUserActivity(){
   }, 3000);
 }
 
-// Czyste wyświetlanie kontrolerów po kliknięciu/najechaniu w obszar całego okna
 const mainVideo = $('video');
 if(mainVideo){
   mainVideo.addEventListener('mousemove', handleUserActivity);
@@ -213,28 +195,17 @@ if(mainVideo){
   mainVideo.addEventListener('touchstart', handleUserActivity, {passive: true});
 }
 
-function togglePlay(){
-  if(!window.__customPlayer)return;
-  try{
-    if(window.__customPlayer.isPaused()) { window.__customPlayer.play(); } 
-    else { window.__customPlayer.pause(); }
-  }catch(e){}
-}
-
-// CZYSTE ODCISZANIE/WYCISZANIE
+// ODCISZANIE / WYCISZANIE PRZEZ PRZEŁADOWANIE IFRAME Z NOWYM PARAMETREM
 function toggleMute(){
-  if(!window.__customPlayer)return;
+  if(!currentChannel)return;
+  isMuted = !isMuted;
   const icon=$('muteIcon');
-  try {
-    if (window.__customPlayer.getMuted()) {
-      window.__customPlayer.setMuted(false);
-      window.__customPlayer.setVolume(1.0);
-      icon.className='fa-solid fa-volume-high';
-    } else {
-      window.__customPlayer.setMuted(true);
-      icon.className='fa-solid fa-volume-xmark';
-    }
-  } catch(e){}
+  if(isMuted){
+    icon.className='fa-solid fa-volume-xmark';
+  } else {
+    icon.className='fa-solid fa-volume-high';
+  }
+  createIframePlayer(currentChannel, isMuted);
 }
 
 function setFullscreenIcon(active){
