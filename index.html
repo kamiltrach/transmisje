@@ -486,13 +486,28 @@ async function fullscreen(){
   try{
     if(document.fullscreenElement){
       await document.exitFullscreen();
-    }else if(el.requestFullscreen){
+      return;
+    }
+
+    // Keep the SAME Twitch player in the DOM. Only change the container size.
+    el.classList.add('player-fs');
+    document.body.classList.add('player-fullscreen');
+    document.body.style.overflow='hidden';
+
+    if(el.requestFullscreen){
       await el.requestFullscreen();
     }else if(el.webkitRequestFullscreen){
       el.webkitRequestFullscreen();
     }
-    setTimeout(syncFullscreenState,150);
-  }catch(e){console.error(e);}
+
+    syncFullscreenState();
+  }catch(e){
+    el.classList.remove('player-fs');
+    document.body.classList.remove('player-fullscreen');
+    document.body.style.overflow='';
+    setFullscreenIcon(false);
+    console.error(e);
+  }
 }
 
 async function exitPlayerFullscreen(){
@@ -520,21 +535,19 @@ function syncFullscreenState(){
   const v=$('video');
   if(!v)return;
 
-  const active=v.classList.contains('player-fs');
+  const active=document.fullscreenElement===v;
+  v.classList.toggle('player-fs',active);
   document.body.classList.toggle('player-fullscreen',active);
-  if(!active)document.body.style.overflow='';
+  document.body.style.overflow=active?'hidden':'';
   setFullscreenIcon(active);
 }
 
 document.addEventListener('fullscreenchange',syncFullscreenState);
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){
-    const v=$('video');
-    if(v && v.classList.contains('player-fs')){
-      e.preventDefault();
-      exitPlayerFullscreen();
-    }
+  if(e.key==='Escape' && document.fullscreenElement){
+    // Let the browser exit fullscreen; fullscreenchange will restore the GUI.
+    return;
   }
 });
 
