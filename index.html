@@ -191,6 +191,19 @@ body.player-fullscreen{
     z-index:9999!important;
   }
 }
+ 
+/* FINAL PLAYER FIXES */
+.video.player-fs .controls,
+.video.player-fs:hover .controls,
+.video.player-fs.show-controls .controls{
+  z-index:2147483647!important;
+}
+.video.player-fs.controls-hidden .controls{
+  opacity:0!important;
+}
+.video.player-fs .yt-shield{
+  z-index:5!important;
+}
 </style>
 </head>
 <body>
@@ -304,13 +317,9 @@ function renderStream(){
   }
 
   $('placeholder').querySelector('h2').textContent=s.title||L[activeLeague]||'Transmisja';
-  $('placeholder').querySelector('p').textContent='Kliknij poniżej, aby rozpocząć oglądanie.';
-
-  const btn=document.createElement('button');
-  btn.className='watch-btn';
-  btn.innerHTML='<i class="fa-solid fa-play"></i> Oglądaj transmisję';
-  btn.onclick=()=>{ $('placeholder').style.display='none'; createPlayer(s.videoId); };
-  $('placeholder').appendChild(btn);
+  $('placeholder').querySelector('p').textContent='Ładowanie transmisji…';
+  $('placeholder').style.display='none';
+  createPlayer(s.videoId);
 }
 
 function createPlayer(id){
@@ -363,8 +372,9 @@ function createPlayer(id){
     setTimeout(()=>{
       youtubeCommand('playVideo');
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      youtubeCommand('unMute');
       const mi=$('muteIcon');
-      if(mi)mi.className='fa-solid fa-volume-xmark';
+      if(mi)mi.className='fa-solid fa-volume-high';
     },500);
     reveal();
   });
