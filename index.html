@@ -31,7 +31,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 .stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
 @keyframes sgSpin{to{transform:rotate(360deg)}}
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000}
-.yt-wrap iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
+.yt-wrap iframe{width:100%;height:100%;border:0;display:block}
 .yt-shield{position:absolute;inset:0;z-index:3;background:transparent;touch-action:none;pointer-events:none}
 .yt-wrap{overflow:hidden}
 .yt-wrap iframe{
@@ -306,15 +306,15 @@ body.player-fullscreen{
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
 let streams={},activeLeague=null,player=null,ytReady=false;
-let pendingVideoId = null; // NAPRAWA: zapamiętuje videoId do załadowania gdy API będzie gotowe
+let pendingVideoId = null;
+let resumeTimer = null; // NAPRAWA: timer do automatycznego wznawiania
 const $=id=>document.getElementById(id);
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 
 // ===== KLUCZOWA NAPRAWA: YouTube IFrame API wymaga tej funkcji =====
 window.onYouTubeIframeAPIReady = function() {
-  console.log('YouTube IFrame API ready');
+  console.log('[YT] API ready');
   ytReady = true;
-  // Jeśli czekamy na załadowanie transmisji, teraz ją uruchom
   if (pendingVideoId) {
     const id = pendingVideoId;
     pendingVideoId = null;
@@ -336,7 +336,7 @@ function selectLeague(k){
   const s=streams[activeLeague];
   if(s?.active && s.videoId){
     setTimeout(()=>{
-      if(activeLeague===k && !player){
+      if(activeLeague===k && !window.__ytPlayer){
         $('placeholder').style.display='none';
         createPlayer(s.videoId);
       }
@@ -345,7 +345,7 @@ function selectLeague(k){
 }
 
 function removePlayer(){
-  // NAPRAWA: prawidłowe niszczenie YT playera
+  if(resumeTimer){ clearInterval(resumeTimer); resumeTimer = null; }
   if(window.__ytPlayer){
     try{ window.__ytPlayer.destroy(); }catch(x){}
     window.__ytPlayer = null;
@@ -380,23 +380,21 @@ function renderStream(){
 function createPlayer(id){
   removePlayer();
   
-  // NAPRAWA: Jeśli API nie jest jeszcze gotowe, zapamiętaj videoId i poczekaj
+  // Jeśli API nie jest jeszcze gotowe, zapamiętaj videoId i poczekaj
   if(!ytReady || !window.YT || !window.YT.Player){
-    console.log('YouTube API not ready yet, waiting...');
+    console.log('[YT] API not ready, waiting...');
     pendingVideoId = id;
     
-    // Pokaż loader
     const loader=document.createElement('div');
     loader.id='streamLoader';
     loader.className='stream-loader';
     loader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Strefa Gola">';
     $('video').appendChild(loader);
     
-    // Fallback: jeśli API nigdy się nie załaduje po 15s
     setTimeout(() => {
       if(pendingVideoId === id && !window.__ytPlayer){
         pendingVideoId = null;
-        console.error('YouTube API failed to load');
+        console.error('[YT] API failed to load');
         const l=$('streamLoader'); if(l) l.remove();
         $('placeholder').style.display = 'flex';
         $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
@@ -412,27 +410,23 @@ function createPlayer(id){
   loader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Strefa Gola">';
   $('video').appendChild(loader);
 
+  // NAPRAWA KLUCZOWA: tworzymy DIV (nie iframe), a YouTube sam stworzy iframe wewnątrz
+  // Dzięki temu YouTube Player API działa poprawnie i nie traci referencji
   const wrap=document.createElement('div');
   wrap.id='ytplayer';
   wrap.className='yt-wrap';
-
-  const iframe=document.createElement('iframe');
-  iframe.id='ytframe';
-  iframe.title='Transmisja';
-  iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
-  iframe.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
-  iframe.style.width='100%';
-  iframe.style.height='100%';
-  iframe.style.border='0';
-  iframe.setAttribute('allowfullscreen','true');
+  
+  const innerDiv=document.createElement('div');
+  innerDiv.id='ytframe';
+  innerDiv.style.cssText='width:100%;height:100%;position:absolute;top:0;left:0;';
+  wrap.appendChild(innerDiv);
 
   const shield=document.createElement('div');
   shield.className='yt-shield';
-
-  wrap.appendChild(iframe);
   wrap.appendChild(shield);
+  
   $('video').appendChild(wrap);
-  player=iframe;
+  player=wrap; // Teraz player to div, nie iframe - YouTube sam stworzy iframe wewnątrz
 
   const started=Date.now();
   let done=false;
@@ -448,8 +442,8 @@ function createPlayer(id){
   };
 
   try{
-    console.log('Creating YT player with videoId:', id);
-    const yt=new YT.Player(iframe,{
+    console.log('[YT] Creating player with videoId:', id);
+    const yt=new YT.Player('ytframe',{
       videoId:id,
       playerVars:{
         autoplay:1,
@@ -459,51 +453,75 @@ function createPlayer(id){
         modestbranding:1,
         playsinline:1,
         iv_load_policy:3,
-        disablekb:1,
-        fs:0
+        loop:1
       },
       events:{
         onReady:function(e){
-          console.log('YT Player ready');
+          console.log('[YT] Player ready');
           window.__ytPlayer = e.target;
+          
+          // Wymuszenie odtwarzania - wielokrotne próby
           try{ e.target.mute(); }catch(x){}
           try{ e.target.playVideo(); }catch(x){}
-          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
+          
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },200);
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },500);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1000);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
-
+          
+          // Próba włączenia dźwięku po interakcji
           setTimeout(()=>{
             try{ e.target.unMute(); }catch(x){}
+            try{ e.target.setVolume(100); }catch(x){}
             try{ e.target.playVideo(); }catch(x){}
-          },800);
+          },1200);
 
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-          $('muteIcon').className='fa-solid fa-volume-high';
+          $('muteIcon').className='fa-solid fa-volume-xmark';
           reveal();
+          
+          // NAPRAWA KLUCZOWA: automatyczne wznawianie co 3 sekundy
+          // YouTube LIVE czasem samoczynnie pauzuje - to wymusza odtwarzanie
+          resumeTimer = setInterval(() => {
+            if(window.__ytPlayer){
+              try{
+                const state = window.__ytPlayer.getPlayerState();
+                // -1=unstarted, 0=ended, 2=paused, 5=cued - wszystkie wymagają playVideo()
+                if(state === -1 || state === 0 || state === 2 || state === 5){
+                  console.log('[YT] Resuming playback, state:', state);
+                  window.__ytPlayer.playVideo();
+                }
+              }catch(x){}
+            }
+          }, 3000);
         },
         onStateChange:function(e){
-          console.log('YT state change:', e.data);
-          if(e.data===5){
-            try{ e.target.mute(); }catch(x){}
-            try{ e.target.playVideo(); }catch(x){}
+          console.log('[YT] State:', e.data);
+          // 0=ENDED, 2=PAUSED, 5=CUED - wznów odtwarzanie
+          if(e.data === 0 || e.data === 2 || e.data === 5){
+            setTimeout(() => {
+              if(window.__ytPlayer){
+                try{ window.__ytPlayer.playVideo(); }catch(x){}
+              }
+            }, 100);
           }
-          if(e.data===1){
+          if(e.data===1){ // PLAYING
             $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
             reveal();
           }
         },
         onError: function(e) {
-          console.error("YouTube Player Error:", e.data);
+          console.error("[YT] Error:", e.data);
           reveal();
           $('placeholder').style.display = 'flex';
           $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
-          $('placeholder').querySelector('p').textContent = 'Film może być zablokowany do osadzania lub link jest nieprawidłowy.';
+          $('placeholder').querySelector('p').textContent = 'Film może być zablokowany do osadzania lub link jest nieprawidłowy. Kod błędu: ' + e.data;
         }
       }
     });
     window.__ytPlayer=yt;
   }catch(err){
-    console.error('YT Player init error:', err);
+    console.error('[YT] Init error:', err);
     reveal();
   }
 
@@ -516,9 +534,12 @@ function youtubeCommand(command){
     if(command==='playVideo') window.__ytPlayer.playVideo();
     else if(command==='pauseVideo') window.__ytPlayer.pauseVideo();
     else if(command==='mute') window.__ytPlayer.mute();
-    else if(command==='unMute') window.__ytPlayer.unMute();
+    else if(command==='unMute') {
+      window.__ytPlayer.unMute();
+      window.__ytPlayer.playVideo();
+    }
   }catch(e){
-    console.error('YouTube command error:',e);
+    console.error('[YT] Command error:',e);
   }
 }
 
@@ -550,14 +571,14 @@ function setupYouTubeLikeControls(){
 }
 
 function togglePlay(){
-  if(!player)return;
+  if(!window.__ytPlayer)return;
   const icon=$('playBtn').querySelector('i');
   const playing=icon&&icon.classList.contains('fa-pause');
   youtubeCommand(playing?'pauseVideo':'playVideo');
   $('playBtn').innerHTML=playing?'<i class="fa-solid fa-play"></i>':'<i class="fa-solid fa-pause"></i>';
 }
 function toggleMute(){
-  if(!player)return;
+  if(!window.__ytPlayer)return;
   const icon=$('muteIcon');
   const muted=icon.classList.contains('fa-volume-xmark');
   youtubeCommand(muted?'unMute':'mute');
