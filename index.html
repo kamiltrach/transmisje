@@ -190,6 +190,43 @@ body.player-fullscreen{
 .video.player-fs .watermark{z-index:61!important}
 body.player-fullscreen{overflow:hidden!important}
 
+
+/* MOBILE PLAYER — fullscreen/minimize + rotation only */
+@media (max-width:700px){
+  .video.player-fs{
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:0!important;
+    max-height:none!important;
+    inset:0!important;
+    aspect-ratio:auto!important;
+  }
+
+  .video.player-fs .yt-wrap,
+  .video.player-fs .yt-wrap iframe{
+    width:100vw!important;
+    height:100dvh!important;
+    inset:0!important;
+  }
+
+  .video.player-fs .controls{
+    height:64px!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+    padding-bottom:max(8px,env(safe-area-inset-bottom))!important;
+  }
+
+  .video.player-fs .control{
+    width:42px!important;
+    height:42px!important;
+    flex:0 0 42px!important;
+  }
+
+  .video.player-fs .stream-title{
+    max-width:42vw!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -441,7 +478,10 @@ async function fullscreen(){
   const v=$('video');
   if(!v || !player)return;
 
-  if(document.fullscreenElement===v){
+  const isNative=!!document.fullscreenElement;
+  const isFallback=v.classList.contains('player-fs');
+
+  if(isNative || isFallback){
     await exitPlayerFullscreen();
     return;
   }
@@ -451,13 +491,18 @@ async function fullscreen(){
       await v.requestFullscreen();
       document.body.classList.add('player-fullscreen');
       setFullscreenIcon(true);
+
+      // Na telefonach prosimy przeglądarkę o landscape, ale tylko jeśli
+      // API jest dostępne. Po obrocie player pozostaje fullscreen.
+      if(screen.orientation && screen.orientation.lock){
+        try{ await screen.orientation.lock('landscape'); }catch(e){}
+      }
       return;
     }
   }catch(e){
     console.warn('Fullscreen API:',e);
   }
 
-  // Fallback dla przeglądarek bez Fullscreen API.
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   document.body.style.overflow='hidden';
@@ -467,6 +512,12 @@ async function fullscreen(){
 async function exitPlayerFullscreen(){
   const v=$('video');
   if(!v)return;
+
+  try{
+    if(screen.orientation && screen.orientation.unlock){
+      screen.orientation.unlock();
+    }
+  }catch(e){}
 
   try{
     if(document.fullscreenElement && document.exitFullscreen){
@@ -483,6 +534,7 @@ async function exitPlayerFullscreen(){
 function syncFullscreenState(){
   const v=$('video');
   if(!v)return;
+
   const active=!!document.fullscreenElement || v.classList.contains('player-fs');
   document.body.classList.toggle('player-fullscreen',active);
   if(!active)document.body.style.overflow='';
