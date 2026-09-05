@@ -44,6 +44,22 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
   cursor:default;
 }
 
+
+.video.player-fs:fullscreen{
+  width:100vw!important;
+  height:100vh!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  border-radius:0!important;
+  background:#000!important;
+}
+.video.player-fs:fullscreen .yt-wrap,
+.video.player-fs:fullscreen .yt-wrap iframe{
+  width:100%!important;
+  height:100%!important;
+}
+
 .video.player-fs{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;max-width:none!important;min-height:0!important;aspect-ratio:auto!important;border-radius:0!important;background:#000}
 .video.player-fs .yt-wrap{inset:0}
 .video.player-fs{
@@ -83,11 +99,6 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 .video.player-fs .watermark{
   z-index:31!important;
 }
-
-.video.player-fs .controls{opacity:0!important;pointer-events:none!important;transition:opacity .2s ease}
-.video.player-fs.show-controls .controls{opacity:1!important;pointer-events:auto!important}
-.video.player-fs:hover .controls{opacity:0!important;pointer-events:none!important}
-
 body.player-fullscreen{
   overflow:hidden!important;
   width:100%!important;
@@ -341,14 +352,14 @@ function createPlayer(id){
   wrap.className='yt-wrap';
 
   const iframe=document.createElement('iframe');
-  const origin = location.origin && location.origin !== 'null' ? location.origin : '';
-  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)
-    +'?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1'
-    +'&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1'
-    +(origin ? '&origin='+encodeURIComponent(origin) : '');
+  iframe.id='ytframe';
   iframe.title='Transmisja';
   iframe.allow='autoplay; encrypted-media; picture-in-picture';
   iframe.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+  iframe.style.width='100%';
+  iframe.style.height='100%';
+  iframe.style.border='0';
+  iframe.setAttribute('allowfullscreen','false');
 
   const shield=document.createElement('div');
   shield.className='yt-shield';
@@ -371,22 +382,69 @@ function createPlayer(id){
     },remaining);
   };
 
-  iframe.addEventListener('load',()=>{
-    const forcePlay=()=>{
-      youtubeCommand('playVideo');
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-    };
-    setTimeout(forcePlay,300);
-    setTimeout(forcePlay,900);
-    setTimeout(forcePlay,1800);
-    setTimeout(forcePlay,3000);
-    reveal();
-  });
+  function startYT(){
+    if(!window.YT || !YT.Player){
+      setTimeout(startYT,150);
+      return;
+    }
 
+    try{
+      const yt=new YT.Player(iframe,{
+        videoId:id,
+        playerVars:{
+          autoplay:1,
+          controls:0,
+          rel:0,
+          modestbranding:1,
+          playsinline:1,
+          iv_load_policy:3,
+          disablekb:1,
+          fs:0
+        },
+        events:{
+          onReady:function(e){
+            try{ e.target.mute(); }catch(x){}
+            try{ e.target.playVideo(); }catch(x){}
+            setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
+            setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1000);
+            setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
+
+            /* Jeżeli przeglądarka pozwala na dźwięk, od razu go włącz.
+               Jeżeli nie pozwala na autoplay z dźwiękiem, LIVE i tak startuje. */
+            setTimeout(()=>{
+              try{ e.target.unMute(); }catch(x){}
+              try{ e.target.playVideo(); }catch(x){}
+            },800);
+
+            $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+            $('muteIcon').className='fa-solid fa-volume-high';
+            reveal();
+          },
+          onStateChange:function(e){
+            /* 5 = CUED. YouTube czasem zatrzymuje LIVE właśnie tutaj.
+               Ponowne playVideo() usuwa stan oczekiwania na kliknięcie. */
+            if(e.data===5){
+              try{ e.target.mute(); }catch(x){}
+              try{ e.target.playVideo(); }catch(x){}
+            }
+            if(e.data===1){
+              $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+              reveal();
+            }
+          }
+        }
+      });
+      window.__ytPlayer=yt;
+    }catch(err){
+      console.error(err);
+    }
+  }
+
+  startYT();
   setTimeout(reveal,7000);
 }
 
-function youtubeCommand(command){
+function youtubeCommandfunction youtubeCommand(command){
   if(!player||!player.contentWindow)return;
   try{
     player.contentWindow.postMessage(JSON.stringify({event:'command',func:command,args:[]}), 'https://www.youtube-nocookie.com');
@@ -403,8 +461,7 @@ function setupYouTubeLikeControls(){
     v.classList.add('show-controls');
     clearTimeout(hideTimer);
     hideTimer=setTimeout(()=>{
-      if(v.classList.contains('player-fs')) v.classList.remove('show-controls');
-      else if(!v.matches(':hover')) v.classList.remove('show-controls');
+      v.classList.remove('show-controls');
     },2500);
   };
 
@@ -457,32 +514,46 @@ async function fullscreen(){
   const v=$('video');
   if(!v || !player)return;
 
-  const active=v.classList.contains('player-fs');
+  const active=v.classList.contains('player-fs') || !!document.fullscreenElement;
   if(active){
     await exitPlayerFullscreen();
     return;
   }
 
+  /* Najpierw prawdziwy fullscreen przeglądarki. Dzięki temu na telefonie
+     znika pasek Safari, jeśli dana wersja iOS go obsługuje. */
+  try{
+    if(v.requestFullscreen){
+      await v.requestFullscreen();
+      v.classList.add('player-fs');
+      document.body.classList.add('player-fullscreen');
+      document.body.style.overflow='hidden';
+      setFullscreenIcon(true);
+      return;
+    }
+  }catch(e){}
+
+  /* Fallback dla przeglądarek bez Fullscreen API. */
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   document.body.style.overflow='hidden';
   setFullscreenIcon(true);
 
   try{
-    if(v.requestFullscreen) await v.requestFullscreen();
+    if(screen.orientation && screen.orientation.lock){
+      await screen.orientation.lock('landscape');
+    }
   }catch(e){}
-
-  if(screen.orientation && screen.orientation.lock){
-    try{ await screen.orientation.lock('landscape'); }catch(e){}
-  }
 }
 
-async function exitPlayerFullscreen(){
+async function exitPlayerFullscreenasync function exitPlayerFullscreen(){
   const v=$('video');
   if(!v)return;
 
   try{
-    if(document.fullscreenElement) await document.exitFullscreen();
+    if(document.fullscreenElement && document.exitFullscreen){
+      await document.exitFullscreen();
+    }
   }catch(e){}
 
   v.classList.remove('player-fs','landscape-player','show-controls','controls-hidden');
@@ -496,7 +567,7 @@ async function exitPlayerFullscreen(){
   setFullscreenIcon(false);
 }
 
-function syncFullscreenState(){
+function syncFullscreenStatefunction syncFullscreenState(){
   const v=$('video');
   if(!v)return;
 
