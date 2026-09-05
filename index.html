@@ -240,7 +240,7 @@ body.player-fullscreen{
   height: 100% !important;
 }
 
-/* NAPRAWA: Lepszy fullscreen na telefonie po obróceniu */
+/* Lepszy fullscreen na telefonie po obróceniu */
 @media (max-width:700px) and (orientation:landscape){
   .video.player-fs{
     width:100vw!important;
@@ -288,8 +288,7 @@ body.player-fullscreen{
     </div>
     <div class="controls">
       <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
-      <!-- NAPRAWA: Domyślna ikona to przekreślony głośnik (wyciszony) -->
-      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
+      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
       <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
@@ -332,6 +331,8 @@ const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',
 let streams={},activeLeague=null,player=null,ytReady=false;
 let pendingVideoId = null;
 let resumeTimer = null;
+let errorRetryTimer = null; // NAPRAWA: timer do ponownych prób po błędzie
+let errorRetryCount = 0; // NAPRAWA: licznik prób
 const $=id=>document.getElementById(id);
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 
@@ -369,6 +370,8 @@ function selectLeague(k){
 
 function removePlayer(){
   if(resumeTimer){ clearInterval(resumeTimer); resumeTimer = null; }
+  if(errorRetryTimer){ clearTimeout(errorRetryTimer); errorRetryTimer = null; }
+  errorRetryCount = 0; // NAPRAWA: reset licznika prób
   if(window.__ytPlayer){
     try{ window.__ytPlayer.destroy(); }catch(x){}
     window.__ytPlayer = null;
@@ -480,11 +483,8 @@ function createPlayer(id){
           console.log('[YT] Player ready');
           window.__ytPlayer = e.target;
           
-          // NAPRAWA: Natychmiastowe wyciszenie i odtwarzanie
-          try{ e.target.mute(); }catch(x){}
           try{ e.target.playVideo(); }catch(x){}
           
-          // Wielokrotne próby odtwarzania
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },100);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },600);
@@ -492,12 +492,18 @@ function createPlayer(id){
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1500);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
 
-          // NAPRAWA: Ikona głośności - domyślnie przekreślona (wyciszony)
+          setTimeout(()=>{
+            try{ 
+              e.target.unMute(); 
+              e.target.setVolume(100);
+              e.target.playVideo();
+            }catch(x){}
+          }, 500);
+
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-          $('muteIcon').className='fa-solid fa-volume-xmark';
+          $('muteIcon').className='fa-solid fa-volume-high';
           reveal();
           
-          // Automatyczne wznawianie co 3 sekundy
           resumeTimer = setInterval(() => {
             if(window.__ytPlayer){
               try{
@@ -524,12 +530,60 @@ function createPlayer(id){
             reveal();
           }
         },
+        // NAPRAWA: Obsługa błędów z automatycznym retry
         onError: function(e) {
           console.error("[YT] Error:", e.data);
-          reveal();
-          $('placeholder').style.display = 'flex';
-          $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
-          $('placeholder').querySelector('p').textContent = 'Film może być zablokowany do osadzania lub link jest nieprawidłowy. Kod błędu: ' + e.data;
+          const errorCode = e.data;
+          
+          // Kody 100, 101, 150 = film nie istnieje lub zablokowany - nie retry
+          if(errorCode === 100 || errorCode === 101 || errorCode === 150){
+            reveal();
+            $('placeholder').style.display = 'flex';
+            $('placeholder').querySelector('h2').textContent = 'Transmisja niedostępna';
+            $('placeholder').querySelector('p').textContent = 'Ta transmisja została usunięta lub właściciel nie zezwala na osadzanie.';
+            return;
+          }
+          
+          // Dla innych błędów (2, 5) - spróbuj ponownie do 3 razy
+          if(errorRetryCount < 3){
+            errorRetryCount++;
+            console.log(`[YT] Retry ${errorRetryCount}/3 after error ${errorCode}`);
+            
+            // Pokaż loader ponownie
+            $('placeholder').style.display = 'none';
+            const l=$('streamLoader'); 
+            if(l){ l.classList.remove('hide'); l.style.opacity='1'; }
+            else {
+              const newLoader=document.createElement('div');
+              newLoader.id='streamLoader';
+              newLoader.className='stream-loader';
+              newLoader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Strefa Gola">';
+              $('video').appendChild(newLoader);
+            }
+            
+            // Spróbuj ponownie po 3 sekundach
+            errorRetryTimer = setTimeout(() => {
+              if(window.__ytPlayer){
+                try{
+                  window.__ytPlayer.loadVideoById(id);
+                  window.__ytPlayer.playVideo();
+                }catch(x){
+                  // Jeśli loadVideoById nie działa, zniszcz i stwórz nowy player
+                  removePlayer();
+                  createPlayer(id);
+                }
+              } else {
+                removePlayer();
+                createPlayer(id);
+              }
+            }, 3000);
+          } else {
+            // Po 3 próbach - pokaż błąd
+            reveal();
+            $('placeholder').style.display = 'flex';
+            $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
+            $('placeholder').querySelector('p').textContent = 'Nie udało się załadować transmisji. Spróbuj odświeżyć stronę lub wybrać inną ligę.';
+          }
         }
       }
     });
@@ -592,7 +646,6 @@ function togglePlay(){
   $('playBtn').innerHTML=playing?'<i class="fa-solid fa-play"></i>':'<i class="fa-solid fa-pause"></i>';
 }
 
-// NAPRAWA: Poprawna obsługa ikony głośności
 function toggleMute(){
   if(!window.__ytPlayer)return;
   const icon=$('muteIcon');
@@ -655,7 +708,6 @@ async function fullscreen(){
   document.body.style.overflow='hidden';
   setFullscreenIcon(true);
 
-  // NAPRAWA: Wymuszenie orientacji landscape na telefonie
   try{
     if(screen.orientation && screen.orientation.lock){
       await screen.orientation.lock('landscape');
