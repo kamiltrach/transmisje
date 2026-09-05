@@ -222,6 +222,20 @@ body.player-fullscreen{
   z-index:5!important;
 }
 </style>
+
+<style id="mobile-player-fix">
+html,body{max-width:100%;overflow-x:hidden}
+#video{width:100%;max-width:100%;box-sizing:border-box}
+#twitchplayer,#twitchplayer iframe{width:100%;height:100%;display:block}
+@media (orientation:landscape) and (max-width:900px){
+  #video.player-fs,#video.player-fullscreen{
+    width:100vw!important;
+    height:100vh!important;
+    max-width:100vw!important;
+    max-height:100vh!important;
+  }
+}
+</style>
 </head>
 <body>
 <header class="topbar">
@@ -440,6 +454,26 @@ function setupYouTubeLikeControls(){
 
 let playBusy=false;
 let streamPlaying=false;
+
+function startStreamFromTap(e){
+  if(!player || playBusy)return;
+  if(e.target && e.target.closest && e.target.closest('.control'))return;
+  try{
+    if(!streamPlaying){
+      playBusy=true;
+      player.setVolume(1);
+      player.setMuted(false);
+      player.play();
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      $('muteIcon').className='fa-solid fa-volume-high';
+      setTimeout(()=>playBusy=false,500);
+    }
+  }catch(err){
+    console.error(err);
+    playBusy=false;
+  }
+}
+
 function togglePlay(){
   if(!player || playBusy)return;
   try{
@@ -534,6 +568,7 @@ function syncFullscreenState(){
   setFullscreenIcon(active);
 }
 
+$('video').addEventListener('pointerup',startStreamFromTap);
 document.addEventListener('fullscreenchange',syncFullscreenState);
 
 document.addEventListener('keydown',e=>{
