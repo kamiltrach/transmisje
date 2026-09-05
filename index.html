@@ -8,65 +8,660 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--navy:#0b162c;--green:#7ed321;--gold:#f5a623;--white:#fff;--muted:#8b9bb4;--border:rgba(255,255,255,.08);--glass:rgba(19,34,64,.72);--radius:18px;--glow:rgba(126,211,33,.25)}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%),repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(255,255,255,.012) 120px,rgba(255,255,255,.012) 240px)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
-.topbar{height:76px;position:fixed;inset:0 0 auto;z-index:20;background:rgba(11,22,44,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:0 4%}
-.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand:visited,.brand:hover,.brand:active{color:#fff;text-decoration:none}.brand img{height:46px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;font-weight:700;margin-top:4px;line-height:1;text-transform:uppercase}
-main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
-.leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
+:root {
+  --navy: #0b162c;
+  --green: #7ed321;
+  --gold: #f5a623;
+  --white: #fff;
+  --muted: #8b9bb4;
+  --border: rgba(255,255,255,.08);
+  --glass: rgba(19,34,64,.72);
+  --radius: 18px;
+  --glow: rgba(126,211,33,.25);
+}
 
-/* CONTAINER ODTWARZACZA */
-.player-card{position:relative;background:#000;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
-.video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.video.hide-cursor, .video.hide-cursor * { cursor: none !important; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* KONTENER STRUMIENIA */
-.stream-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden;}
-.stream-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;display:block;}
+html {
+  scroll-behavior: smooth;
+}
 
-/* BLOKADA CAŁKOWITA INTERAKCJI Z ELEMENTAMI SILNIKA */
-.stream-shield{position:absolute;inset:0;z-index:10;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+body {
+  min-height: 100vh;
+  background: var(--navy);
+  color: #fff;
+  font-family: Inter, sans-serif;
+  background-image: 
+    radial-gradient(circle at 8% 8%, rgba(126,211,33,.08), transparent 34%),
+    radial-gradient(circle at 92% 92%, rgba(245,166,35,.06), transparent 34%),
+    repeating-linear-gradient(90deg, transparent, transparent 120px, rgba(255,255,255,.012) 120px, rgba(255,255,255,.012) 240px);
+}
 
-.watermark{position:absolute;right:20px;top:18px;z-index:15;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
-.watermark img{height:34px;width:auto;display:block}
+button, input {
+  font: inherit;
+}
 
-.video-placeholder{text-align:center;color:var(--muted);z-index:1}.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}.video-placeholder h2{color:#fff;font-size:1.25rem}.video-placeholder p{font-size:.78rem;margin-top:5px}
+button {
+  cursor: pointer;
+  color: inherit;
+  border: 0;
+}
 
-.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.95);border-top:1px solid var(--border);position:absolute;left:0;right:0;bottom:0;z-index:25;opacity:0;pointer-events:none;transition:opacity .3s ease}
-.video.show-controls .controls{opacity:1;pointer-events:auto}
-.control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
-.stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
+h1, h2, h3 {
+  font-family: Outfit, sans-serif;
+}
 
-/* NIEZAWODNY PEŁNY EKRAN CSS */
+/* TOPBAR */
+.topbar {
+  height: 76px;
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  background: rgba(11,22,44,.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.brand img {
+  height: 46px;
+  width: auto;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.4));
+}
+
+.brand-title {
+  font: 800 1.1rem Outfit;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  line-height: 1;
+}
+
+.brand-title .gola {
+  color: var(--green);
+}
+
+.brand-sub {
+  font: 700 .55rem Outfit;
+  color: var(--muted);
+  letter-spacing: 2.4px;
+  margin-top: 4px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+main {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 112px 20px 50px;
+}
+
+.hero {
+  text-align: center;
+  padding: 2.6rem 0 2.2rem;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.live-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  margin-top: 14px;
+}
+
+.live-dot i {
+  color: var(--green);
+  font-size: .5rem;
+  box-shadow: 0 0 12px var(--green);
+}
+
+/* LEAGUES */
+.leagues {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  padding: 4px 2px 13px;
+  scrollbar-width: none;
+}
+
+.leagues::-webkit-scrollbar {
+  display: none;
+}
+
+.league {
+  white-space: nowrap;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.league:hover {
+  color: #fff;
+  background: rgba(255,255,255,.07);
+}
+
+.league.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--navy);
+  box-shadow: 0 0 22px var(--glow);
+}
+
+/* ODTWARZACZ */
+.player-card {
+  position: relative;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 25px 70px #0006;
+}
+
+.video {
+  position: relative;
+  aspect-ratio: 16/9;
+  min-height: 330px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.video.hide-cursor, .video.hide-cursor * { 
+  cursor: none !important; 
+}
+
+.stream-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #000;
+  overflow: hidden;
+}
+
+.stream-wrap iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.stream-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.watermark {
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  z-index: 15;
+  background: rgba(11,22,44,.75);
+  padding: 8px 10px;
+  border-radius: 11px;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.watermark img {
+  height: 34px;
+  width: auto;
+  display: block;
+}
+
+.video-placeholder {
+  text-align: center;
+  color: var(--muted);
+  z-index: 1;
+}
+
+.video-placeholder .icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(126,211,33,.1);
+  color: var(--green);
+  font-size: 1.4rem;
+}
+
+.video-placeholder h2 {
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.video-placeholder p {
+  font-size: .78rem;
+  margin-top: 5px;
+}
+
+/* KONTROLKI */
+.controls {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 15px;
+  background: rgba(8,16,31,.95);
+  border-top: 1px solid var(--border);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.video.show-controls .controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.control {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.05);
+  color: #c9d2df;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.control:hover {
+  background: rgba(126,211,33,.12);
+  color: var(--green);
+}
+
+.stream-title {
+  font-size: .78rem;
+  font-weight: 700;
+  margin-left: 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.controls .spacer { flex: 1; }
+
+.status {
+  font-size: .65rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status i {
+  color: var(--green);
+  font-size: .45rem;
+}
+
+/* PEŁNY EKRAN / MINIMALIZACJA */
 .video.player-fs {
-  position: fixed !important; inset: 0 !important; width: 100% !important; height: 100dvh !important; max-width: none !important; max-height: none !important; min-height: 0 !important; margin: 0 !important; border-radius: 0 !important; z-index: 999999 !important; aspect-ratio: auto !important; overflow: hidden !important; background: #000 !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  z-index: 999999 !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+  background: #000 !important;
 }
-.video.player-fs .controls { position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 1000000 !important; padding-bottom: max(12px, env(safe-area-inset-bottom)) !important; }
-body.player-fullscreen { overflow: hidden !important; width: 100% !important; height: 100% !important; }
+
+.video.player-fs .controls {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1000000 !important;
+  padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+}
+
+body.player-fullscreen { 
+  overflow: hidden !important; 
+  width: 100% !important; 
+  height: 100% !important; 
+}
+
 .video.player-minimized {
-  position: fixed !important; bottom: 20px !important; right: 20px !important; width: 320px !important; height: 180px !important; z-index: 999999 !important; border-radius: 12px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; aspect-ratio: 16/9 !important; border: 1px solid var(--border) !important; background: #000 !important; overflow: hidden !important;
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  width: 320px !important;
+  height: 180px !important;
+  z-index: 999999 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+  aspect-ratio: 16/9 !important;
+  border: 1px solid var(--border) !important;
+  background: #000 !important;
+  overflow: hidden !important;
 }
+
 .video.player-minimized .watermark { display: none !important; }
-.video.player-minimized .controls { opacity: 1 !important; pointer-events: auto !important; height:48px!important; padding: 0 8px!important;}
-.video.player-minimized .stream-title { font-size: .65rem!important; max-width: 100px!important; }
+.video.player-minimized .controls { 
+  opacity: 1 !important; 
+  pointer-events: auto !important; 
+  height: 48px !important; 
+  padding: 0 8px !important;
+}
+.video.player-minimized .stream-title { 
+  font-size: .65rem !important; 
+  max-width: 100px !important; 
+}
 
-.info{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}.panel{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:20px}.panel h3{font-size:1rem;margin-bottom:8px}.panel p{font-size:.78rem;color:var(--muted)}.schedule-empty{min-height:120px;display:grid;place-items:center;text-align:center}.schedule-empty i{font-size:1.5rem;color:var(--green);margin-bottom:8px}.schedule-empty p{font-size:.74rem}
-.admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}.admin-panel.open{display:block}.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}.admin-card h3{font-size:.88rem;margin-bottom:12px}.field{display:block;font-size:.65rem;color:var(--muted);margin:9px 0 5px}.field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}.save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}.check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}.login-box{max-width:720px;margin:0 auto;text-align:center}.login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}.login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}.login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
-.toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 15px;border-radius:11px;background:#132240;border:1px solid var(--border);font-size:.75rem;display:none}.toast.show{display:block}
-footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
-.mobile-stream-picker{display:none}
+/* INFO I ADMIN */
+.info {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 18px;
+  margin-top: 18px;
+}
 
-@media(max-width:700px){
-  .topbar{height:68px}.brand-title{font-size:1rem}.brand-sub{font-size:.5rem;letter-spacing:2px}main{padding-top:92px}.hero{align-items:start;flex-direction:column}.live-dot{align-self:flex-start}.video{min-height:220px}.info{grid-template-columns:1fr}.watermark{right:10px;top:10px;padding:6px 8px}.watermark img{height:28px}.controls{height:56px;padding:0 8px;gap:6px}.stream-title{max-width:125px;font-size:.68rem}.status{display:none}
-  .leagues{display:none}
-  .mobile-stream-picker{display:block;position:relative;margin:0 0 12px}
-  .mobile-picker-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 14px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid var(--border);font-size:.74rem;font-weight:800}
-  .mobile-picker-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .mobile-picker-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:40;padding:6px;background:rgba(11,22,44,.99);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.5);max-height:56vh;overflow:auto}
-  .mobile-stream-picker.open .mobile-picker-menu{display:block}
-  .mobile-picker-option{width:100%;padding:11px 12px;text-align:left;background:transparent;border-radius:99px;color:#c9d2df;font-size:.7rem;font-weight:700}
-  .mobile-picker-option.active{background:rgba(126,211,33,.13);color:var(--green)}
-  .video.player-minimized { width: 240px !important; height: 135px !important; bottom: 15px !important; right: 15px !important; }
+.panel {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.panel h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.panel p {
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+.schedule-empty {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.schedule-empty i {
+  font-size: 1.5rem;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+.schedule-empty p {
+  font-size: .74rem;
+}
+
+.admin-panel {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 96px;
+  transform: translateX(-50%);
+  width: min(1180px, calc(100% - 28px));
+  max-height: calc(100vh - 112px);
+  overflow: auto;
+  z-index: 100;
+  background: rgba(11,22,44,.98);
+  box-shadow: 0 24px 70px rgba(0,0,0,.55);
+  margin: 0;
+}
+
+.admin-panel.open {
+  display: block;
+}
+
+.admin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 12px;
+}
+
+.admin-card {
+  background: rgba(255,255,255,.035);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 15px;
+}
+
+.admin-card h3 {
+  font-size: .88rem;
+  margin-bottom: 12px;
+}
+
+.field {
+  display: block;
+  font-size: .65rem;
+  color: var(--muted);
+  margin: 9px 0 5px;
+}
+
+.field input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  outline: 0;
+  background: rgba(0,0,0,.35);
+  color: #fff;
+  font-size: .8rem;
+}
+
+.save {
+  width: 100%;
+  margin-top: 11px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--green);
+  color: var(--navy);
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.check {
+  font-size: .7rem;
+  color: #c9d2df;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.login-box {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.login-box .lock {
+  font-size: 2rem;
+  color: var(--green);
+  margin-bottom: 1rem;
+}
+
+.login-box input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,.35);
+  color: #fff;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--green);
+  color: var(--navy);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  padding: 12px 15px;
+  border-radius: 11px;
+  background: #132240;
+  border: 1px solid var(--border);
+  font-size: .75rem;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+footer {
+  text-align: center;
+  color: #60718d;
+  font-size: .65rem;
+  padding: 15px 20px 28px;
+}
+
+.mobile-stream-picker {
+  display: none;
+}
+
+@media(max-width: 700px) {
+  .topbar { height: 68px; }
+  .brand-title { font-size: 1rem; }
+  .brand-sub { font-size: .5rem; letter-spacing: 2px; }
+  main { padding-top: 92px; }
+  .hero { align-items: start; flex-direction: column; }
+  .live-dot { align-self: flex-start; }
+  .video { min-height: 220px; }
+  .info { grid-template-columns: 1fr; }
+  .watermark { right: 10px; top: 10px; padding: 6px 8px; }
+  .watermark img { height: 28px; }
+  .controls { height: 56px; padding: 0 8px; gap: 6px; }
+  .stream-title { max-width: 125px; font-size: .68rem; }
+  .status { display: none; }
+  .leagues { display: none; }
+  .mobile-stream-picker { display: block; position: relative; margin: 0 0 12px; }
+  
+  .mobile-picker-btn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--border);
+    font-size: .74rem;
+    font-weight: 800;
+  }
+  
+  .mobile-picker-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 40;
+    padding: 6px;
+    background: rgba(11,22,44,.99);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    max-height: 56vh;
+    overflow: auto;
+  }
+  
+  .mobile-stream-picker.open .mobile-picker-menu { display: block; }
+  
+  .mobile-picker-option {
+    width: 100%;
+    padding: 11px 12px;
+    text-align: left;
+    background: transparent;
+    border-radius: 99px;
+    color: #c9d2df;
+    font-size: .7rem;
+    font-weight: 700;
+  }
+  
+  .mobile-picker-option.active {
+    background: rgba(126,211,33,.13);
+    color: var(--green);
+  }
+  
+  .video.player-minimized { 
+    width: 240px !important; 
+    height: 135px !important; 
+    bottom: 15px !important; 
+    right: 15px !important; 
+  }
 }
 </style>
 </head>
@@ -86,17 +681,25 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
     <div><h1>Transmisje</h1></div>
     <div class="live-dot"><i class="fa-solid fa-circle"></i> TRANSMISJE NA ŻYWO</div>
   </section>
-  <div id="leagues" class="leagues"></div><div id="mobilePicker" class="mobile-stream-picker"></div>
+  
+  <div id="leagues" class="leagues"></div>
+  <div id="mobilePicker" class="mobile-stream-picker"></div>
   
   <section class="player-card">
     <div id="video" class="video">
-      <div id="placeholder" class="video-placeholder"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><h2>Wybierz ligę</h2><p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p></div>
+      <div id="placeholder" class="video-placeholder">
+        <div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+        <h2>Wybierz ligę</h2>
+        <p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p>
+      </div>
+      
       <div class="watermark"><img src="logo.png" alt="Strefa Gola"></div>
       
       <div class="controls" id="playerControls">
         <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
         <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
-        <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
+        <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div>
+        <div class="spacer"></div>
         <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
         <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
         <button id="fullscreenBtn" class="control" onclick="fullscreen()" title="Pełny ekran"><i class="fa-solid fa-expand"></i></button>
@@ -105,8 +708,16 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
   </section>
 
   <section class="info">
-    <div class="panel"><h3>Oglądaj na żywo</h3><p>Wybierz ligę, aby przełączyć transmisję.</p></div>
-    <div class="panel schedule-empty"><div><i class="fa-regular fa-calendar"></i><p id="sideInfo">Brak aktywnej transmisji.</p></div></div>
+    <div class="panel">
+      <h3>Oglądaj na żywo</h3>
+      <p>Wybierz ligę, aby przełączyć transmisję.</p>
+    </div>
+    <div class="panel schedule-empty">
+      <div>
+        <i class="fa-regular fa-calendar"></i>
+        <p id="sideInfo">Brak aktywnej transmisji.</p>
+      </div>
+    </div>
   </section>
   
   <section id="adminPanel" class="panel admin-panel">
@@ -139,119 +750,167 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
-const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,hideTimer=null;
-const $=id=>document.getElementById(id);
+const L = {
+  iv_liga: 'IV Liga Podkarpacka',
+  okr_jaroslaw: 'Klasa Okręgowa Jarosław',
+  okr_krosno: 'Klasa Okręgowa Krosno',
+  okr_rzeszow: 'Klasa Okręgowa Rzeszów',
+  okr_debica: 'Klasa Okręgowa Dębica',
+  okr_stalowa: 'Klasa Okręgowa Stalowa Wola',
+  a_przeworsk: 'A Klasa Przeworsk',
+  b_przeworsk: 'B Klasa Przeworsk',
+  a_jaroslaw: 'A Klasa Jarosław',
+  b_jaroslaw: 'B Klasa Jarosław',
+  a_rzeszow: 'A Klasa Rzeszów',
+  b_rzeszow: 'B Klasa Rzeszów'
+};
 
-function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+let streams = {};
+let activeLeague = null;
+let hideTimer = null;
+const $ = id => document.getElementById(id);
 
-function renderLeagues(){
-  $('leagues').innerHTML=Object.entries(L).map(([k,v])=>`<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`).join('');
-  const picker=$('mobilePicker');
-  picker.innerHTML=`<button type="button" class="mobile-picker-btn" onclick="toggleMobilePicker()"><span><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:7px"></i>${L[activeLeague]||'Wybierz transmisję'}</span><i class="fa-solid fa-chevron-down"></i></button><div class="mobile-picker-menu">${Object.entries(L).map(([k,v])=>`<button type="button" class="mobile-picker-option ${k===activeLeague?'active':''}" onclick="selectLeague('${k}');closeMobilePicker()">${v}</button>`).join('')}</div>`;
+function toast(t) {
+  $('toast').textContent = t;
+  $('toast').classList.add('show');
+  setTimeout(() => $('toast').classList.remove('show'), 2600);
 }
-function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open'); }
-function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
 
-function selectLeague(k){ activeLeague=k; renderLeagues(); renderStream(); }
+function renderLeagues() {
+  $('leagues').innerHTML = Object.entries(L).map(([k, v]) => 
+    `<button class="league ${k === activeLeague ? 'active' : ''}" onclick="selectLeague('${k}')">${v}</button>`
+  ).join('');
+  
+  const picker = $('mobilePicker');
+  picker.innerHTML = `
+    <button type="button" class="mobile-picker-btn" onclick="toggleMobilePicker()">
+      <span><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:7px"></i>${L[activeLeague] || 'Wybierz transmisję'}</span>
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <div class="mobile-picker-menu">
+      ${Object.entries(L).map(([k, v]) => 
+        `<button type="button" class="mobile-picker-option ${k === activeLeague ? 'active' : ''}" onclick="selectLeague('${k}');closeMobilePicker()">${v}</button>`
+      ).join('')}
+    </div>`;
+}
 
-function removePlayer(){
-  if(window.__customPlayer){
-    try{ window.__customPlayer.pause(); }catch(x){}
+function toggleMobilePicker() { $('mobilePicker').classList.toggle('open'); }
+function closeMobilePicker() { $('mobilePicker').classList.remove('open'); }
+
+function selectLeague(k) { 
+  activeLeague = k; 
+  renderLeagues(); 
+  renderStream(); 
+}
+
+function removePlayer() {
+  if(window.__customPlayer) {
+    try { window.__customPlayer.pause(); } catch(x) {}
     window.__customPlayer = null;
   }
-  const p=$('streamWrap'); if(p)p.remove();
+  const p = $('streamWrap'); 
+  if(p) p.remove();
 }
 
-function renderStream(){
-  const s=streams[activeLeague];
-  $('streamTitle').textContent=s?.title||L[activeLeague]||'Transmisja';
-  $('sideInfo').textContent=s?.active&&s.videoId?'Transmisja: '+(s.title||L[activeLeague]):'Brak aktywnej transmisji dla tej ligi.';
+function renderStream() {
+  const s = streams[activeLeague];
+  $('streamTitle').textContent = s?.title || L[activeLeague] || 'Transmisja';
+  $('sideInfo').textContent = s?.active && s.videoId ? 'Transmisja: ' + (s.title || L[activeLeague]) : 'Brak aktywnej transmisji dla tej ligi.';
+  
   removePlayer();
-  $('placeholder').style.display='block';
-  $('muteIcon').className='fa-solid fa-volume-xmark';
+  $('placeholder').style.display = 'block';
+  $('muteIcon').className = 'fa-solid fa-volume-xmark';
 
-  if(!s?.active||!s.videoId){
-    $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
-    $('placeholder').querySelector('p').textContent=s?'Administrator nie ustawił jeszcze aktywnej transmisji.':'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
+  if(!s?.active || !s.videoId) {
+    $('placeholder').querySelector('h2').textContent = s ? 'Transmisja niedostępna' : 'Wybierz ligę';
+    $('placeholder').querySelector('p').textContent = s ? 'Administrator nie ustawił jeszcze aktywnej transmisji.' : 'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
     return;
   }
 
-  $('placeholder').querySelector('h2').textContent=s.title||L[activeLeague]||'Transmisja';
-  $('placeholder').querySelector('p').textContent='Ładowanie transmisji…';
-  $('placeholder').style.display='none';
+  $('placeholder').querySelector('h2').textContent = s.title || L[activeLeague] || 'Transmisja';
+  $('placeholder').querySelector('p').textContent = 'Ładowanie transmisji…';
+  $('placeholder').style.display = 'none';
   createPlayer(s.videoId);
 }
 
-function createPlayer(channelName){
+function createPlayer(channelName) {
   removePlayer();
 
-  const wrap=document.createElement('div');
-  wrap.id='streamWrap';
-  wrap.className='stream-wrap';
+  const wrap = document.createElement('div');
+  wrap.id = 'streamWrap';
+  wrap.className = 'stream-wrap';
   
-  const innerDiv=document.createElement('div');
-  innerDiv.id='playerEmbed';
-  innerDiv.style.width='100%';
-  innerDiv.style.height='100%';
+  const innerDiv = document.createElement('div');
+  innerDiv.id = 'playerEmbed';
+  innerDiv.style.width = '100%';
+  innerDiv.style.height = '100%';
   wrap.appendChild(innerDiv);
 
-  // Tarcza, która po dotknięciu natychmiast odpala dźwięk i wideo
-  const shield=document.createElement('div');
-  shield.className='stream-shield';
-  shield.addEventListener('click', forcePlayAndUnmute);
-  shield.addEventListener('touchend', forcePlayAndUnmute);
-  wrap.appendChild(shield);
+  // Tarcza, która przechwytuje kliknięcia w ekran
+  const shield = document.createElement('div');
+  shield.className = 'stream-shield';
   
+  // LOGIKA: Pierwsze kliknięcie daje DŹWIĘK, kolejne pauzują/odpalają.
+  shield.onclick = function() {
+    if(!window.__customPlayer) return;
+    
+    // Jeśli wideo jest wyciszone, natychmiast daj na 100%
+    if (window.__customPlayer.getMuted() || window.__customPlayer.getVolume() === 0) {
+      window.__customPlayer.setMuted(false);
+      window.__customPlayer.setVolume(1.0);
+      $('muteIcon').className = 'fa-solid fa-volume-high';
+    } else {
+      // Jeśli już jest dźwięk, to działaj jak normalny Play/Pause
+      if (window.__customPlayer.isPaused()) {
+        window.__customPlayer.play();
+      } else {
+        window.__customPlayer.pause();
+      }
+    }
+  };
+  
+  wrap.appendChild(shield);
   $('video').appendChild(wrap);
 
-  try{
+  try {
     const player = new Twitch.Player("playerEmbed", {
       width: "100%",
       height: "100%",
       channel: channelName,
-      autoplay: true, // Wymusza autostart
-      muted: true,    // MUSI BYĆ WYCISZONY, inaczej przeglądarka zablokuje autostart
+      autoplay: true,    // Startuje automatycznie...
+      muted: true,       // ...ale musi być wyciszone na start dla przeglądarki!
       controls: false,
       parent: [window.location.hostname || "localhost"]
     });
 
     window.__customPlayer = player;
 
-    // Kiedy API jest gotowe, bezczelnie wymuszamy Play, gdyby przeglądarka próbowała to zatrzymać
+    // Kiedy API jest gotowe, bezczelnie wymuszamy autostart
     player.addEventListener(Twitch.Player.READY, function() {
       try { player.play(); } catch(e){}
     });
 
+    // Podpinamy ikonki
     player.addEventListener(Twitch.Player.PLAYING, function() {
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      $('playBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
     });
+    
     player.addEventListener(Twitch.Player.PAUSE, function() {
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+      $('playBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
     });
 
-  }catch(err){ console.error(err); }
-}
-
-function forcePlayAndUnmute(e) {
-  if(window.__customPlayer){
-    try{
-      window.__customPlayer.setMuted(false);
-      window.__customPlayer.setVolume(1.0);
-      $('muteIcon').className='fa-solid fa-volume-high';
-      window.__customPlayer.play(); // Wymuszamy dodatkowo Play przy każdym dotknięciu wideo
-    }catch(err){}
+  } catch(err) { 
+    console.error(err); 
   }
-  handleUserActivity();
 }
 
-function handleUserActivity(){
-  const v=$('video');
+function handleUserActivity() {
+  const v = $('video');
   if(!v) return;
   v.classList.add('show-controls');
   v.classList.remove('hide-cursor');
   clearTimeout(hideTimer);
-  hideTimer=setTimeout(()=>{
+  hideTimer = setTimeout(() => {
     v.classList.remove('show-controls');
     if(document.fullscreenElement || document.webkitFullscreenElement || v.classList.contains('player-fs')){
       v.classList.add('hide-cursor');
@@ -260,48 +919,49 @@ function handleUserActivity(){
 }
 
 const mainVideo = $('video');
-if(mainVideo){
+if(mainVideo) {
   mainVideo.addEventListener('mousemove', handleUserActivity);
   mainVideo.addEventListener('touchstart', handleUserActivity, {passive: true});
 }
 
-function togglePlay(){
-  if(!window.__customPlayer)return;
-  try{
+function togglePlay() {
+  if(!window.__customPlayer) return;
+  try {
     if(window.__customPlayer.isPaused()) {
       window.__customPlayer.play();
-      // Jak puszczasz play z palca, zdejmujemy z automatu wyciszenie
+      // Odkręcamy też dźwięk dla wygody
       window.__customPlayer.setMuted(false);
       window.__customPlayer.setVolume(1.0);
-      $('muteIcon').className='fa-solid fa-volume-high';
+      $('muteIcon').className = 'fa-solid fa-volume-high';
     } else {
       window.__customPlayer.pause();
     }
-  }catch(e){}
+  } catch(e) {}
 }
 
-function toggleMute(){
-  if(!window.__customPlayer)return;
-  const icon=$('muteIcon');
+function toggleMute() {
+  if(!window.__customPlayer) return;
+  const icon = $('muteIcon');
   try {
     if (window.__customPlayer.getMuted() || window.__customPlayer.getVolume() === 0) {
       window.__customPlayer.setMuted(false);
       window.__customPlayer.setVolume(1.0);
-      window.__customPlayer.play(); // Zabezpieczenie: jeśli był spauzowany, play() go obudzi
-      icon.className='fa-solid fa-volume-high';
+      window.__customPlayer.play(); // Budzimy, jeśli było na pauzie
+      icon.className = 'fa-solid fa-volume-high';
     } else {
       window.__customPlayer.setMuted(true);
-      icon.className='fa-solid fa-volume-xmark';
+      icon.className = 'fa-solid fa-volume-xmark';
     }
-  } catch(e){}
+  } catch(e) {}
 }
 
-function setFullscreenIcon(active){
-  const b=$('fullscreenBtn');
-  if(!b)return;
-  b.title=active?'Pomniejsz ekran':'Pełny ekran';
-  b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
+function setFullscreenIcon(active) {
+  const b = $('fullscreenBtn');
+  if(!b) return;
+  b.title = active ? 'Pomniejsz ekran' : 'Pełny ekran';
+  b.innerHTML = active ? '<i class="fa-solid fa-compress"></i>' : '<i class="fa-solid fa-expand"></i>';
 }
+
 function minimizePlayer() {
   const v = $('video');
   if (!v) return;
@@ -312,37 +972,47 @@ function minimizePlayer() {
     v.classList.add('player-minimized');
   }
 }
-async function fullscreen(){
-  const v=$('video');
-  if(!v)return;
-  if(v.classList.contains('player-fs') || document.fullscreenElement){ await exitPlayerFullscreen(); return; }
+
+async function fullscreen() {
+  const v = $('video');
+  if(!v) return;
+  if(v.classList.contains('player-fs') || document.fullscreenElement) { 
+    await exitPlayerFullscreen(); 
+    return; 
+  }
   v.classList.remove('player-minimized');
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   setFullscreenIcon(true);
   handleUserActivity();
+  
   const el = document.documentElement;
   let req = el.requestFullscreen || el.webkitRequestFullscreen;
   if (req) { try { await req.call(el); } catch(e) {} }
-  try{ if(screen.orientation?.lock) screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
+  try{ if(screen.orientation?.lock) screen.orientation.lock('landscape').catch(()=>{}); } catch(e){}
 }
-async function exitPlayerFullscreen(){
-  const v=$('video');
-  if(!v)return;
-  v.classList.remove('player-fs','show-controls','hide-cursor');
+
+async function exitPlayerFullscreen() {
+  const v = $('video');
+  if(!v) return;
+  v.classList.remove('player-fs', 'show-controls', 'hide-cursor');
   document.body.classList.remove('player-fullscreen');
   setFullscreenIcon(false);
+  
   let exit = document.exitFullscreen || document.webkitExitFullscreen;
-  if (document.fullscreenElement || document.webkitFullscreenElement) { if (exit) { try { await exit.call(document); } catch(e){} } }
-  try{ if(screen.orientation?.unlock) screen.orientation.unlock(); }catch(e){}
+  if (document.fullscreenElement || document.webkitFullscreenElement) { 
+    if (exit) { try { await exit.call(document); } catch(e){} } 
+  }
+  try{ if(screen.orientation?.unlock) screen.orientation.unlock(); } catch(e){}
 }
 
 document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement) exitPlayerFullscreen(); });
 document.addEventListener('webkitfullscreenchange', () => { if(!document.webkitFullscreenElement) exitPlayerFullscreen(); });
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){
-    const v=$('video');
-    if(v && (v.classList.contains('player-fs') || v.classList.contains('player-minimized') || document.fullscreenElement)){
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') {
+    const v = $('video');
+    if(v && (v.classList.contains('player-fs') || v.classList.contains('player-minimized') || document.fullscreenElement)) {
       e.preventDefault();
       if(v.classList.contains('player-minimized')) minimizePlayer();
       else exitPlayerFullscreen();
@@ -350,71 +1020,147 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-async function loadStreams(){
-  try{
-    if(!window.db)throw new Error('DB Error');
-    const snap=await window.db.collection('streams').get();
-    streams={};
-    snap.forEach(d=>streams[d.id]=d.data());
-  }catch(e){ toast('Nie udało się pobrać transmisji.'); }
-  const autoLive=Object.keys(L).find(k=>streams[k]?.active && streams[k]?.videoId);
-  if(autoLive) activeLeague=autoLive;
-  else if(!activeLeague) activeLeague=Object.keys(L)[0];
+async function loadStreams() {
+  try {
+    if(!window.db) throw new Error('DB Error');
+    const snap = await window.db.collection('streams').get();
+    streams = {};
+    snap.forEach(d => streams[d.id] = d.data());
+  } catch(e) { 
+    toast('Nie udało się pobrać transmisji.'); 
+  }
+  
+  const autoLive = Object.keys(L).find(k => streams[k]?.active && streams[k]?.videoId);
+  if(autoLive) activeLeague = autoLive;
+  else if(!activeLeague) activeLeague = Object.keys(L)[0];
+  
   renderLeagues();
   renderStream();
-  if(document.querySelector('#adminContent').style.display==='block')renderAdmin();
+  if(document.querySelector('#adminContent').style.display === 'block') renderAdmin();
 }
 
-function openAdmin(){ $('adminPanel').classList.add('open'); document.body.style.overflow='hidden'; if(window.auth?.currentUser) showAdmin(); }
-function closeAdmin(){ $('adminPanel').classList.remove('open'); document.body.style.overflow=''; }
-async function login(){
-  const e=$('email').value.trim(), p=$('password').value, msg=$('loginMsg');
-  msg.textContent='';
-  if(!e || !p){ msg.textContent='Wpisz email i hasło.'; return; }
-  try{ await window.auth.signInWithEmailAndPassword(e,p); showAdmin(); }catch(err){ msg.textContent='Błąd logowania.'; }
+function openAdmin() { 
+  $('adminPanel').classList.add('open'); 
+  document.body.style.overflow = 'hidden'; 
+  if(window.auth?.currentUser) showAdmin(); 
 }
-function showAdmin(){ $('loginBox').style.display='none'; $('adminContent').style.display='block'; renderAdmin(); }
-function renderAdmin(){
-  $('adminGrid').innerHTML=Object.entries(L).map(([k,v])=>{
-    const s=streams[k]||{};
-    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Nazwa kanału / ID strumienia</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="Wpisz nazwę kanału"><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
+
+function closeAdmin() { 
+  $('adminPanel').classList.remove('open'); 
+  document.body.style.overflow = ''; 
+}
+
+async function login() {
+  const e = $('email').value.trim(), p = $('password').value, msg = $('loginMsg');
+  msg.textContent = '';
+  if(!e || !p) { msg.textContent = 'Wpisz email i hasło.'; return; }
+  try { 
+    await window.auth.signInWithEmailAndPassword(e,p); 
+    showAdmin(); 
+  } catch(err) { 
+    msg.textContent = 'Błąd logowania.'; 
+  }
+}
+
+function showAdmin() { 
+  $('loginBox').style.display = 'none'; 
+  $('adminContent').style.display = 'block'; 
+  renderAdmin(); 
+}
+
+function renderAdmin() {
+  $('adminGrid').innerHTML = Object.entries(L).map(([k, v]) => {
+    const s = streams[k] || {};
+    return `
+      <div class="admin-card">
+        <h3>${v}</h3>
+        <label class="field">Nazwa transmisji</label>
+        <input id="t_${k}" value="${esc(s.title || v)}">
+        <label class="field">Nazwa kanału / ID strumienia</label>
+        <input id="u_${k}" value="${esc(s.url || '')}" placeholder="Wpisz nazwę kanału">
+        <label class="check">
+          <input type="checkbox" id="a_${k}" ${s.active ? 'checked' : ''}> aktywna transmisja
+        </label>
+        <button class="save" onclick="save('${k}')">Zapisz</button>
+      </div>
+    `;
   }).join('');
 }
-async function save(k){
-  if(!window.auth?.currentUser)return toast('Najpierw się zaloguj.');
-  const url=$('u_'+k).value.trim(),id=getId(url),active=$('a_'+k).checked;
-  if(active&&!id)return toast('Podaj poprawną nazwę kanału.');
-  try{
-    await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-    streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
+
+async function save(k) {
+  if(!window.auth?.currentUser) return toast('Najpierw się zaloguj.');
+  const url = $('u_'+k).value.trim(), id = getId(url), active = $('a_'+k).checked;
+  
+  if(active && !id) return toast('Podaj poprawną nazwę kanału.');
+  
+  try {
+    await window.db.collection('streams').doc(k).set({
+      league: k, 
+      title: $('t_'+k).value.trim() || L[k], 
+      url, 
+      videoId: id, 
+      active, 
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    
+    streams[k] = { ... (streams[k] || {}), league: k, title: $('t_'+k).value.trim() || L[k], url, videoId: id, active };
     toast('Transmisja zapisana.');
-    if(active){ activeLeague = k; renderLeagues(); renderStream(); }
-  }catch(e){toast('Błąd zapisu.')}
+    
+    if(active) { 
+      activeLeague = k; 
+      renderLeagues(); 
+      renderStream(); 
+    }
+  } catch(e) {
+    toast('Błąd zapisu.')
+  }
 }
-function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&quot;","\'":"&#39;"}[m]))}
+
+function esc(x) {
+  return String(x).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&quot;","\'":"&#39;"}[m]));
+}
+
 function getId(url) {
   if (!url) return '';
   return url.trim().replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '').split('/')[0].split('?')[0];
 }
 
-if(window.auth) window.auth.onAuthStateChanged(u=>{ if(u && $('adminPanel').classList.contains('open'))showAdmin(); });
-document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&(e.key==='m'||e.code==='KeyM')){ e.preventDefault(); openAdmin(); } });
-document.addEventListener('click',e=>{ if($('mobilePicker') && !$('mobilePicker').contains(e.target))$('mobilePicker').classList.remove('open'); });
-
-let mobileAdminTaps=0,mobileAdminTimer=null;
-const mobileTrigger=document.createElement('button');
-mobileTrigger.type='button'; mobileTrigger.setAttribute('aria-hidden','true'); mobileTrigger.setAttribute('tabindex','-1');
-mobileTrigger.style.cssText='position:fixed;right:0;bottom:0;width:76px;height:76px;z-index:9999;background:transparent;border:0;padding:0;opacity:0;';
-document.body.appendChild(mobileTrigger);
-mobileTrigger.addEventListener('click',()=>{
-  mobileAdminTaps++; clearTimeout(mobileAdminTimer);
-  if(mobileAdminTaps>=5){ mobileAdminTaps=0; openAdmin(); }
-  mobileAdminTimer=setTimeout(()=>mobileAdminTaps=0,1500);
+if(window.auth) window.auth.onAuthStateChanged(u => { 
+  if(u && $('adminPanel').classList.contains('open')) showAdmin(); 
 });
 
-activeLeague=null;
+document.addEventListener('keydown', e => { 
+  if((e.ctrlKey || e.metaKey) && (e.key === 'm' || e.code === 'KeyM')) { 
+    e.preventDefault(); 
+    openAdmin(); 
+  } 
+});
+
+document.addEventListener('click', e => { 
+  if($('mobilePicker') && !$('mobilePicker').contains(e.target)) $('mobilePicker').classList.remove('open'); 
+});
+
+let mobileAdminTaps = 0, mobileAdminTimer = null;
+const mobileTrigger = document.createElement('button');
+mobileTrigger.type = 'button'; 
+mobileTrigger.setAttribute('aria-hidden', 'true'); 
+mobileTrigger.setAttribute('tabindex', '-1');
+mobileTrigger.style.cssText = 'position:fixed;right:0;bottom:0;width:76px;height:76px;z-index:9999;background:transparent;border:0;padding:0;opacity:0;';
+document.body.appendChild(mobileTrigger);
+
+mobileTrigger.addEventListener('click', () => {
+  mobileAdminTaps++; 
+  clearTimeout(mobileAdminTimer);
+  if(mobileAdminTaps >= 5) { 
+    mobileAdminTaps = 0; 
+    openAdmin(); 
+  }
+  mobileAdminTimer = setTimeout(() => mobileAdminTaps = 0, 1500);
+});
+
+activeLeague = null;
 if(window.firebase && window.auth && window.db) loadStreams();
-else setTimeout(loadStreams,300);
+else setTimeout(loadStreams, 300);
 </script>
 </body>
 </html>
