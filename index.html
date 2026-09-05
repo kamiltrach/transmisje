@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://player.twitch.tv/js/embed/v1.js"></script>
 <style>
 :root{--navy:#0b162c;--green:#7ed321;--gold:#f5a623;--white:#fff;--muted:#8b9bb4;--border:rgba(255,255,255,.08);--glass:rgba(19,34,64,.72);--radius:18px;--glow:rgba(126,211,33,.25)}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%),repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(255,255,255,.012) 120px,rgba(255,255,255,.012) 240px)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
@@ -354,12 +355,12 @@ function createPlayer(channel){
       channel:channel,
       parent:[parent],
       autoplay:true,
-      muted:false,
+      muted:true,
       controls:false
     });
 
     player.setVolume(1);
-    player.setMuted(false);
+    player.setMuted(true);
 
     const reveal=()=>{
       const l=$('streamLoader');
@@ -368,8 +369,8 @@ function createPlayer(channel){
 
     player.addEventListener(Twitch.Player.READY,()=>{
       player.setVolume(1);
-      player.setMuted(false);
-      $('muteIcon').className='fa-solid fa-volume-high';
+      player.setMuted(true);
+      $('muteIcon').className='fa-solid fa-volume-xmark';
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       player.play();
       reveal();
@@ -415,9 +416,13 @@ function setupYouTubeLikeControls(){
 function togglePlay(){
   if(!player)return;
   try{
-    if(player.getPaused && player.getPaused()){
+    const paused=player.getPaused();
+    if(paused){
+      player.setMuted(false);
+      player.setVolume(1);
       player.play();
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      $('muteIcon').className='fa-solid fa-volume-high';
     }else{
       player.pause();
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
