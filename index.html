@@ -288,8 +288,7 @@ body.player-fullscreen{
     </div>
     <div class="controls">
       <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
-      <!-- NAPRAWA: Domyślna ikona to przekreślony głośnik (wyciszony) -->
-      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
+      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
       <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
@@ -467,7 +466,7 @@ function createPlayer(id){
       videoId:id,
       playerVars:{
         autoplay:1,
-        mute:1,
+        mute:0,
         controls:0,
         rel:0,
         modestbranding:1,
@@ -480,8 +479,8 @@ function createPlayer(id){
           console.log('[YT] Player ready');
           window.__ytPlayer = e.target;
           
-          // NAPRAWA: Natychmiastowe wyciszenie i odtwarzanie
-          try{ e.target.mute(); }catch(x){}
+          // Natychmiastowe odtwarzanie z dźwiękiem
+          try{ e.target.unMute(); }catch(x){}
           try{ e.target.playVideo(); }catch(x){}
           
           // Wielokrotne próby odtwarzania
@@ -492,9 +491,9 @@ function createPlayer(id){
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1500);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
 
-          // NAPRAWA: Ikona głośności - domyślnie przekreślona (wyciszony)
+          // Ikona głośności - domyślnie włączona
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-          $('muteIcon').className='fa-solid fa-volume-xmark';
+          $('muteIcon').className='fa-solid fa-volume-high';
           reveal();
           
           // Automatyczne wznawianie co 3 sekundy
