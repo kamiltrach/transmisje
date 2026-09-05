@@ -377,6 +377,7 @@ function createPlayer(channel){
     player.addEventListener(Twitch.Player.PLAY,()=>{
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       reveal();
+      playBusy=false;
     });
     setTimeout(reveal,7000);
   }catch(e){
@@ -415,13 +416,16 @@ function setupYouTubeLikeControls(){
   },{passive:true});
 }
 
+let playBusy=false;
 function togglePlay(){
-  if(!player)return;
+  if(!player || playBusy)return;
   try{
+    playBusy=true;
     const paused=player.getPaused();
     if(paused){
-      player.setMuted(false);
+      // The click is a user gesture: enable audio and start only once.
       player.setVolume(1);
+      player.setMuted(false);
       player.play();
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       $('muteIcon').className='fa-solid fa-volume-high';
@@ -429,15 +433,19 @@ function togglePlay(){
       player.pause();
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
     }
-  }catch(e){console.error(e);}
+  }catch(e){
+    console.error(e);
+  }finally{
+    setTimeout(()=>playBusy=false,500);
+  }
 }
 function toggleMute(){
   if(!player)return;
   try{
     const muted=player.getMuted();
     if(muted){
-      player.setMuted(false);
       player.setVolume(1);
+      player.setMuted(false);
       $('muteIcon').className='fa-solid fa-volume-high';
     }else{
       player.setMuted(true);
