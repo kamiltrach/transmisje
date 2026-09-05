@@ -4,342 +4,461 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Strefa Gola — Transmisje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-  body { background: #0d1117; color: #fff; min-height: 100vh; }
-  header { background: linear-gradient(135deg, #c62828, #8e0000); padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-  header h1 { font-size: 28px; letter-spacing: 2px; }
-  header .sub { font-size: 14px; opacity: 0.9; margin-top: 4px; letter-spacing: 4px; }
-  .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-  .section-title { font-size: 22px; margin-bottom: 20px; border-left: 4px solid #c62828; padding-left: 12px; }
-  .controls { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
-  select, input, button { padding: 12px 16px; border-radius: 8px; border: 1px solid #30363d; background: #161b22; color: #fff; font-size: 15px; }
-  select:focus, input:focus { outline: 2px solid #c62828; }
-  button { background: #c62828; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
-  button:hover { background: #e53935; }
+:root{--navy:#0b162c;--green:#7ed321;--gold:#f5a623;--white:#fff;--muted:#8b9bb4;--border:rgba(255,255,255,.08);--glass:rgba(19,34,64,.72);--radius:18px;--glow:rgba(126,211,33,.25)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%),repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(255,255,255,.012) 120px,rgba(255,255,255,.012) 240px)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
+.topbar{height:76px;position:fixed;inset:0 0 auto;z-index:20;background:rgba(11,22,44,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:0 4%}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand:visited,.brand:hover,.brand:active{color:#fff;text-decoration:none}.brand img{height:46px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;font-weight:700;margin-top:4px;line-height:1;text-transform:uppercase}
+.admin-btn{height:40px;width:40px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);color:var(--muted);transition:.2s}.admin-btn:hover{color:var(--green);border-color:rgba(126,211,33,.35)}
+main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.eyebrow{color:var(--green);font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.hero p{color:var(--muted);max-width:520px;margin:10px auto 0;font-size:.95rem}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
+.leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
+.player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}.video{position:relative;aspect-ratio:16/9;min-height:330px;background:radial-gradient(circle at 50% 40%,#182a49,#050b15 65%);display:flex;align-items:center;justify-content:center}.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}.watermark{position:absolute;right:20px;top:18px;z-index:4;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px)}.watermark img{height:34px;width:auto;display:block}.video-placeholder{text-align:center;color:var(--muted);z-index:1}.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}.video-placeholder h2{color:#fff;font-size:1.25rem}.video-placeholder p{font-size:.78rem;margin-top:5px}.loading{color:var(--green)}.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.98);border-top:1px solid var(--border)}.control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}.stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
+.info{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}.panel{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:20px}.panel h3{font-size:1rem;margin-bottom:8px}.panel p{font-size:.78rem;color:var(--muted)}.schedule-empty{min-height:120px;display:grid;place-items:center;text-align:center}.schedule-empty i{font-size:1.5rem;color:var(--green);margin-bottom:8px}.schedule-empty p{font-size:.74rem}
+.admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}.admin-panel.open{display:block}.admin-box{max-width:720px;margin:0 auto}.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}.admin-card h3{font-size:.88rem;margin-bottom:12px}.field{display:block;font-size:.65rem;color:var(--muted);margin:9px 0 5px}.field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}.save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}.check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}.login-box{max-width:720px;margin:0 auto;text-align:center}.login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}.login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}.login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.secret-trigger{position:fixed;bottom:0;right:0;width:70px;height:70px;z-index:999;cursor:default}
+.toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 15px;border-radius:11px;background:#132240;border:1px solid var(--border);font-size:.75rem;display:none}.toast.show{display:block}
+footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
+@media(max-width:700px){.topbar{height:68px}.brand-title{font-size:1rem}.brand-sub{font-size:.5rem;letter-spacing:2px}main{padding-top:92px}.hero{align-items:start;flex-direction:column}.live-dot{align-self:flex-start}.video{min-height:220px}.info{grid-template-columns:1fr}.watermark{right:12px;top:12px}.watermark img{height:27px}.controls{height:56px}.stream-title{max-width:145px}}
 
-  /* === ODTWARZACZ === */
-  .player-wrapper {
-    position: relative;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 16/9;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-  }
-  #yt-player {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    border: 0;
-    display: none;          /* ukryty domyślnie, pokazuje się po play */
-  }
-  .placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #8b949e;
-    text-align: center;
-    padding: 20px;
-  }
+.mobile-stream-picker{display:none}
+.yt-frame-wrap{position:absolute;inset:0;z-index:2;background:#050b15;overflow:hidden}
+.yt-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:none}
+.yt-click-shield{position:absolute;inset:0;z-index:3;background:transparent;touch-action:none}
+.stream-loading{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#050b15;transition:opacity .35s ease}
+.stream-loading.hide{opacity:0;pointer-events:none}
+.stream-loading img{width:92px;height:auto;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))}
+.stream-loading .loader-ring{position:absolute;width:126px;height:126px;border:2px solid rgba(126,211,33,.16);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.video.mobile-fullscreen{position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100dvh!important;max-width:none!important;min-height:0!important;aspect-ratio:auto!important;border-radius:0!important;background:#000!important}
+.video.mobile-fullscreen .yt-frame-wrap,.video:fullscreen .yt-frame-wrap,.video:-webkit-full-screen .yt-frame-wrap{inset:0}
+.video.mobile-fullscreen .yt-frame-wrap iframe,.video:fullscreen .yt-frame-wrap iframe,.video:-webkit-full-screen .yt-frame-wrap iframe{width:100%!important;height:100%!important}
+.video.mobile-fullscreen .controls,.video:fullscreen .controls,.video:-webkit-full-screen .controls{position:absolute;left:0;right:0;bottom:0;z-index:30;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.video.mobile-fullscreen .watermark,.video:fullscreen .watermark,.video:-webkit-full-screen .watermark{z-index:31;top:max(12px,env(safe-area-inset-top));right:12px}
+body.player-fullscreen{overflow:hidden!important;overscroll-behavior:none}
 
-  /* === NAPRAWA MINIMALIZACJI === */
-  .player-wrapper.minimized {
-    position: fixed !important;
-    bottom: 20px;
-    right: 20px;
-    width: 360px !important;
-    height: 202px !important;
-    aspect-ratio: auto !important;
-    z-index: 99999;
-    border-radius: 10px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.9);
-  }
-  .player-wrapper.minimized .minimize-hint {
-    display: block;
-  }
-  .minimize-hint {
-    display: none;
-    position: absolute;
-    top: 6px; right: 8px;
-    background: rgba(0,0,0,0.7);
-    color: #fff;
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    z-index: 10;
-    cursor: pointer;
-  }
+@media(max-width:700px){
+  .topbar{height:68px}
+  .brand-title{font-size:1rem}
+  .brand-sub{font-size:.5rem;letter-spacing:2px}
+  main{padding:92px 12px 35px}
+  .hero{align-items:flex-start;flex-direction:column;padding:1.8rem 0 1.2rem}
+  .live-dot{align-self:flex-start}
+  .leagues{display:none}
+  .mobile-stream-picker{display:block;position:relative;margin:0 0 14px}
+  .mobile-picker-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid var(--border);font-size:.78rem;font-weight:800}
+  .mobile-picker-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mobile-picker-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 7px);z-index:50;padding:7px;background:rgba(11,22,44,.99);border:1px solid var(--border);border-radius:14px;box-shadow:0 20px 50px #0008;max-height:55vh;overflow:auto}
+  .mobile-stream-picker.open .mobile-picker-menu{display:block}
+  .mobile-picker-option{width:100%;text-align:left;padding:12px 13px;border-radius:10px;background:transparent;color:#c9d2df;font-size:.74rem;font-weight:700}
+  .mobile-picker-option.active{background:rgba(126,211,33,.14);color:var(--green)}
+  .video{min-height:0;aspect-ratio:16/9}
+  .watermark{right:12px;top:10px;padding:8px 10px;border-radius:11px}
+  .watermark img{height:42px}
+  .controls{height:58px;padding:0 9px;gap:6px}
+  .control{width:40px;height:40px;flex:0 0 40px;-webkit-tap-highlight-color:transparent}
+  .stream-title{max-width:120px;font-size:.7rem}
+  .status{display:none}
+  .video-placeholder{padding:16px}
+  .video-placeholder h2{font-size:1.05rem}
+  .video-placeholder p{font-size:.7rem}
+  .watch-btn{display:inline-flex;align-items:center;gap:9px;margin-top:18px;padding:11px 15px;border-radius:12px;background:var(--green);color:var(--navy);font-size:.7rem;font-weight:800;text-transform:uppercase;box-shadow:0 10px 30px var(--glow)}
+}
 
-  .player-controls { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-  .player-controls button { flex: 1; min-width: 140px; }
-  .live-badge { display: inline-block; background: #c62828; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-left: 8px; animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .admin-section { margin-top: 50px; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 25px; }
-  .admin-section h2 { margin-bottom: 15px; color: #c62828; }
-  .auth-box { background: #0d1117; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-  .admin-grid { display: grid; grid-template-columns: 1fr 2fr auto; gap: 10px; margin-bottom: 15px; align-items: center; }
-  .admin-grid input { width: 100%; }
-  footer { text-align: center; padding: 25px; color: #8b949e; margin-top: 40px; border-top: 1px solid #30363d; }
-  .msg { padding: 10px; border-radius: 6px; margin-top: 10px; display: none; }
-  .msg.success { background: #1b4332; color: #95d5b2; display: block; }
-  .msg.error { background: #5c1a1a; color: #ffadad; display: block; }
 </style>
 </head>
 <body>
-
-<header>
-  <h1>STREFA GOLAPODKARPACIE</h1>
-  <div class="sub">Transmisje</div>
+<header class="topbar">
+  <a class="brand" href="https://strefagola.pl" aria-label="Strefa Gola — strefagola.pl">
+    <img src="logo.png" onerror="this.style.display='none'" alt="Strefa Gola">
+    <div>
+      <div class="brand-title">STREFA <span class="gola">GOLA</span></div>
+      <div class="brand-sub">PODKARPACIE</div>
+    </div>
+  </a>
+  <div aria-hidden="true" style="width:40px;height:40px;"></div>
 </header>
-
-<div class="container">
-  <h2 class="section-title">TRANSMISJE NA ŻYWO</h2>
-
-  <div class="controls">
-    <select id="leagueSelect">
-      <option value="">Wybierz ligę</option>
-      <option value="liga1">Liga 1</option>
-      <option value="liga2">Liga 2</option>
-      <option value="liga3">Liga 3</option>
-    </select>
-    <select id="streamSelect">
-      <option value="">Wybierz transmisję</option>
-    </select>
-  </div>
-
-  <div class="player-wrapper" id="playerWrapper">
-    <span class="minimize-hint" onclick="toggleMinimize()">✕ Zamknij mini</span>
-    <!-- NAPRAWIONE: allowfullscreen + allow="... fullscreen" -->
-    <iframe id="yt-player"
-            src="about:blank"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin"></iframe>
-    <div class="placeholder" id="placeholder">
-      <div>
-        <p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p>
-        <p style="margin-top:10px; font-size:13px;">Brak wybranej transmisji <span class="live-badge">LIVE</span></p>
-      </div>
+<main>
+  <section class="hero">
+    <div><h1>Transmisje</h1></div>
+    <div class="live-dot"><i class="fa-solid fa-circle"></i> TRANSMISJE NA ŻYWO</div>
+  </section>
+  <div id="leagues" class="leagues"></div><div id="mobilePicker" class="mobile-stream-picker"></div>
+  <section class="player-card">
+    <div id="video" class="video">
+      <div id="placeholder" class="video-placeholder"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><h2>Wybierz ligę</h2><p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p></div>
+      <div class="watermark"><img src="logo.png" alt="Strefa Gola"></div>
     </div>
-  </div>
-
-  <div class="player-controls">
-    <button onclick="playStream()">▶ Oglądaj na żywo</button>
-    <button onclick="toggleFullscreen()">⛶ Pełny ekran</button>
-    <button onclick="toggleMinimize()">▬ Minimalizuj</button>
-    <button onclick="stopStream()">✕ Zatrzymaj</button>
-  </div>
-
-  <p id="streamInfo" style="margin-top:15px; color:#8b949e;">Wybierz ligę, aby przełączyć transmisję.</p>
-
-  <!-- PANEL REDAKCJI -->
-  <div class="admin-section">
-    <h2>Panel Redakcji</h2>
-    <p style="color:#8b949e; margin-bottom:15px;">Autoryzowany dostęp</p>
-
-    <div class="auth-box" id="authBox">
-      <input type="password" id="adminPass" placeholder="Hasło administratora" style="width:100%; margin-bottom:10px;">
-      <button onclick="authenticate()">Autoryzacja</button>
-      <div id="authMsg" class="msg"></div>
+    <div class="controls">
+      <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
+      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
+      <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
+      <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
+      <button class="control" onclick="fullscreen()" title="Pełny ekran"><i class="fa-solid fa-expand"></i></button>
     </div>
-
-    <div id="adminPanel" style="display:none;">
-      <h3 style="margin-bottom:15px;">Zarządzanie transmisjami</h3>
-      <p style="color:#8b949e; margin-bottom:15px;">Ustaw link YouTube dla każdej ligi. Zmiany są zapisywane w Firebase.</p>
-
-      <div class="admin-grid">
-        <strong>Liga 1</strong>
-        <input type="text" id="urlLiga1" placeholder="https://www.youtube.com/watch?v=...">
-        <button onclick="saveUrl('liga1')">Zapisz</button>
-      </div>
-      <div class="admin-grid">
-        <strong>Liga 2</strong>
-        <input type="text" id="urlLiga2" placeholder="https://www.youtube.com/watch?v=...">
-        <button onclick="saveUrl('liga2')">Zapisz</button>
-      </div>
-      <div class="admin-grid">
-        <strong>Liga 3</strong>
-        <input type="text" id="urlLiga3" placeholder="https://www.youtube.com/watch?v=...">
-        <button onclick="saveUrl('liga3')">Zapisz</button>
-      </div>
-      <div id="saveMsg" class="msg"></div>
+  </section>
+  <section class="info">
+    <div class="panel"><h3>Oglądaj na żywo</h3><p>Wybierz ligę, aby przełączyć transmisję.</p></div>
+    <div class="panel schedule-empty"><div><i class="fa-regular fa-calendar"></i><p id="sideInfo">Brak aktywnej transmisji.</p></div></div>
+  </section>
+  <section id="adminPanel" class="panel admin-panel">
+    <div id="loginBox" class="login-box">
+      <i class="fa-solid fa-lock lock"></i>
+      <h2 style="margin-bottom:.4rem;">Panel Redakcji</h2>
+      <p style="color:var(--muted);margin-bottom:2rem;font-size:.82rem;">Autoryzowany dostęp</p>
+      <input id="email" type="email" placeholder="Email" value="admin@b.pl">
+      <input id="password" type="password" placeholder="Hasło">
+      <button onclick="login()">Autoryzacja</button>
+      <p id="loginMsg" style="margin-top:1.1rem;font-size:.76rem;color:#ff6b6b;"></p>
     </div>
-  </div>
-</div>
-
+    <div id="adminContent" style="display:none">
+      <div class="admin-head">
+        <h3>Zarządzanie transmisjami</h3>
+        <button class="control" onclick="closeAdmin()" title="Zamknij"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1.2rem">Ustaw link YouTube dla każdej ligi. Zmiany są zapisywane w Firebase.</p>
+      <div id="adminGrid" class="admin-grid"></div>
+    </div>
+  </section>
+</main>
 <footer>© Strefa Gola • Podkarpackie transmisje</footer>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
+<div id="toast" class="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script>
-  // === KONFIGURACJA FIREBASE (uzupełnij swoimi danymi) ===
-  const firebaseConfig = {
-    apiKey: "TWOJ_API_KEY",
-    authDomain: "TWOJA_DOMENA.firebaseapp.com",
-    databaseURL: "https://TWOJA_DOMENA.firebaseio.com",
-    projectId: "TWOJA_DOMENA",
-    storageBucket: "TWOJA_DOMENA.appspot.com",
-    messagingSenderId: "XXXX",
-    appId: "XXXX"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
+let streams={},activeLeague=null,player=null,playerStarted=false;
+const $=id=>document.getElementById(id);
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+function renderLeagues(){
+  $('leagues').innerHTML=Object.entries(L).map(([k,v])=>
+    `<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`
+  ).join('');
 
-  const player       = document.getElementById('yt-player');
-  const placeholder  = document.getElementById('placeholder');
-  const playerWrapper= document.getElementById('playerWrapper');
-  const streamInfo   = document.getElementById('streamInfo');
+  $('mobilePicker').innerHTML=
+    `<button type="button" class="mobile-picker-btn" onclick="toggleMobilePicker()">
+      <span><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:8px"></i>${L[activeLeague]||'Wybierz transmisję'}</span>
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <div class="mobile-picker-menu">
+      ${Object.entries(L).map(([k,v])=>
+        `<button type="button" class="mobile-picker-option ${k===activeLeague?'active':''}" onclick="selectLeague('${k}');closeMobilePicker()">${v}</button>`
+      ).join('')}
+    </div>`;
+}
 
-  // =============================================
-  // KONWERSJA LINKU YT NA EMBED
-  // =============================================
-  function toEmbedUrl(url) {
-    if (!url) return '';
-    let id = '';
-    const m1 = url.match(/[?&]v=([^&]+)/);
-    const m2 = url.match(/youtu\.be\/([^?&]+)/);
-    const m3 = url.match(/\/embed\/([^?&]+)/);
-    if (m1) id = m1[1];
-    else if (m2) id = m2[1];
-    else if (m3) id = m3[1];
-    return id ? 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0&enablejsapi=1' : '';
+function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open'); }
+function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
+
+function selectLeague(k){
+  activeLeague=k;
+  renderLeagues();
+  renderStream();
+}
+
+function clearPlayer(){
+  const old=$('ytplayer');
+  if(old) old.remove();
+  const loading=$('streamLoading');
+  if(loading) loading.remove();
+  player=null;
+  playerStarted=false;
+}
+
+function renderStream(){
+  const s=streams[activeLeague];
+  $('streamTitle').textContent=s?.title||L[activeLeague]||'Transmisja';
+  $('sideInfo').textContent=s?.active&&s.videoId
+    ?'Transmisja: '+(s.title||L[activeLeague])
+    :'Brak aktywnej transmisji dla tej ligi.';
+
+  clearPlayer();
+  $('placeholder').style.display='block';
+
+  let oldBtn=$('placeholder').querySelector('.watch-btn');
+  if(oldBtn) oldBtn.remove();
+
+  if(!s?.active||!s.videoId){
+    $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
+    $('placeholder').querySelector('p').textContent=s
+      ?'Administrator nie ustawił jeszcze aktywnej transmisji.'
+      :'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
+    return;
   }
 
-  // =============================================
-  // ODTWARZANIE — NAPRAWIONE
-  // =============================================
-  function playStream() {
-    var url = document.getElementById('streamSelect').value;
-    if (!url) {
-      streamInfo.textContent = 'Brak aktywnej transmisji.';
+  $('placeholder').querySelector('h2').textContent=s.title||L[activeLeague]||'Transmisja';
+  $('placeholder').querySelector('p').textContent='Transmisja jest gotowa do odtworzenia.';
+
+  const btn=document.createElement('button');
+  btn.className='watch-btn';
+  btn.innerHTML='<i class="fa-solid fa-play"></i> Oglądaj transmisję';
+  btn.onclick=()=>{
+    $('placeholder').style.display='none';
+    createPlayer(s.videoId);
+  };
+  $('placeholder').appendChild(btn);
+}
+
+function createPlayer(id){
+  clearPlayer();
+
+  const loading=document.createElement('div');
+  loading.id='streamLoading';
+  loading.className='stream-loading';
+  loading.innerHTML='<div class="loader-ring"></div><img src="logo.png" alt="Strefa Gola">';
+  $('video').appendChild(loading);
+
+  const holder=document.createElement('div');
+  holder.id='ytplayer';
+  holder.className='yt-frame-wrap';
+
+  const iframe=document.createElement('iframe');
+  iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+
+    '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin='+
+    encodeURIComponent(location.origin);
+  iframe.title='Transmisja';
+  iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
+  iframe.setAttribute('allowfullscreen','');
+  iframe.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+
+  const shield=document.createElement('div');
+  shield.className='yt-click-shield';
+  shield.setAttribute('aria-hidden','true');
+
+  holder.appendChild(iframe);
+  holder.appendChild(shield);
+  $('video').appendChild(holder);
+
+  player=iframe;
+  playerStarted=true;
+
+  const started=Date.now();
+  let revealed=false;
+
+  const reveal=()=>{
+    if(revealed)return;
+    const elapsed=Date.now()-started;
+    const remaining=Math.max(0,7000-elapsed);
+    setTimeout(()=>{
+      if(revealed)return;
+      revealed=true;
+      const l=$('streamLoading');
+      if(l){
+        l.classList.add('hide');
+        setTimeout(()=>l.remove(),350);
+      }
+    },remaining);
+  };
+
+  iframe.addEventListener('load',()=>{
+    setTimeout(()=>youtubeCommand('playVideo'),150);
+    $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+    reveal();
+  });
+
+  // Same long branded loader on desktop and mobile.
+  setTimeout(reveal,7000);
+}
+
+function youtubeCommand(command){
+  if(!player||!player.contentWindow)return;
+  try{
+    player.contentWindow.postMessage(JSON.stringify({
+      event:'command',
+      func:command,
+      args:[]
+    }),'https://www.youtube-nocookie.com');
+  }catch(e){}
+}
+
+function togglePlay(){
+  if(!player)return;
+  const icon=$('playBtn').querySelector('i');
+  const paused=icon && icon.classList.contains('fa-pause');
+  youtubeCommand(paused?'pauseVideo':'playVideo');
+  $('playBtn').innerHTML=paused
+    ?'<i class="fa-solid fa-play"></i>'
+    :'<i class="fa-solid fa-pause"></i>';
+}
+
+function toggleMute(){
+  if(!player)return;
+  const icon=$('muteIcon');
+  const muted=icon.classList.contains('fa-volume-xmark');
+  youtubeCommand(muted?'unMute':'mute');
+  icon.className=muted
+    ?'fa-solid fa-volume-high'
+    :'fa-solid fa-volume-xmark';
+}
+
+async function fullscreen(){
+  const v=$('video');
+  const native=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  const fallback=v.classList.contains('mobile-fullscreen');
+
+  if(native||fallback){
+    try{
+      if(document.fullscreenElement&&document.exitFullscreen) await document.exitFullscreen();
+      else if(document.webkitFullscreenElement&&document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }catch(e){}
+    v.classList.remove('mobile-fullscreen');
+    document.body.classList.remove('player-fullscreen');
+    return;
+  }
+
+  document.body.classList.add('player-fullscreen');
+
+  try{
+    if(v.requestFullscreen){
+      await v.requestFullscreen({navigationUI:'hide'});
       return;
     }
-    var embed = toEmbedUrl(url);
-    if (embed) {
-      player.src = embed;
-      player.style.display = 'block';       // POKAZUJE odtwarzacz
-      placeholder.style.display = 'none';    // UKRYWA placeholder
-      streamInfo.innerHTML = 'Teraz oglądasz transmisję <span class="live-badge">LIVE</span>';
-    } else {
-      streamInfo.textContent = 'Nieprawidłowy link YouTube.';
+    if(v.webkitRequestFullscreen){
+      v.webkitRequestFullscreen();
+      return;
     }
+  }catch(e){}
+
+  v.classList.add('mobile-fullscreen');
+}
+
+document.addEventListener('fullscreenchange',()=>{
+  const v=$('video');
+  if(document.fullscreenElement){
+    v.classList.remove('mobile-fullscreen');
+    document.body.classList.add('player-fullscreen');
+  }else if(!v.classList.contains('mobile-fullscreen')){
+    document.body.classList.remove('player-fullscreen');
+  }
+});
+
+document.addEventListener('webkitfullscreenchange',()=>{
+  const v=$('video');
+  if(document.webkitFullscreenElement){
+    v.classList.remove('mobile-fullscreen');
+    document.body.classList.add('player-fullscreen');
+  }else if(!v.classList.contains('mobile-fullscreen')){
+    document.body.classList.remove('player-fullscreen');
+  }
+});
+
+function loadStreams(){try{if(!window.db)throw new Error('Firebase DB unavailable');const snap=await window.db.collection('streams').get();streams={};snap.forEach(d=>streams[d.id]=d.data());}catch(e){console.error(e);toast('Nie udało się pobrać transmisji.')}renderLeagues();if(!activeLeague){activeLeague=Object.keys(L)[0];renderLeagues()}renderStream();if(document.querySelector('#adminContent').style.display==='block')renderAdmin()}
+function openAdmin(){
+  const panel=$('adminPanel');
+  if(!panel)return;
+  panel.classList.add('open');
+  document.body.style.overflow='hidden';
+  if(window.auth && window.auth.currentUser) showAdmin();
+}
+function closeAdmin(){
+  const panel=$('adminPanel');
+  if(panel)panel.classList.remove('open');
+  document.body.style.overflow='';
+}
+async function login(){
+  const e=$('email').value.trim();
+  const p=$('password').value;
+  const msg=$('loginMsg');
+  msg.style.color='#ff6b6b';
+  msg.textContent='';
+
+  if(!e || !p){
+    msg.textContent='Wpisz email i hasło.';
+    return;
+  }
+  if(!window.firebase || !window.auth){
+    msg.textContent='Firebase nie został załadowany. Sprawdź firebase-config.js.';
+    return;
   }
 
-  function stopStream() {
-    player.src = 'about:blank';
-    player.style.display = 'none';
-    placeholder.style.display = 'flex';
-    streamInfo.textContent = 'Wybierz ligę, aby przełączyć transmisję.';
+  try{
+    await window.auth.signInWithEmailAndPassword(e,p);
+    msg.textContent='';
+    showAdmin();
+  }catch(err){
+    console.error('Firebase login error:',err);
+    const code=err && err.code ? err.code : '';
+    const messages={
+      'auth/invalid-credential':'Nieprawidłowy email lub hasło.',
+      'auth/invalid-email':'Podany email ma nieprawidłowy format.',
+      'auth/user-not-found':'Takie konto nie istnieje w Firebase Authentication.',
+      'auth/wrong-password':'Nieprawidłowe hasło.',
+      'auth/user-disabled':'To konto zostało wyłączone w Firebase.',
+      'auth/operation-not-allowed':'Logowanie Email/Hasło nie jest włączone w Firebase Authentication.',
+      'auth/too-many-requests':'Za dużo prób logowania. Spróbuj ponownie później.',
+      'auth/network-request-failed':'Błąd połączenia z Firebase.'
+    };
+    msg.textContent=messages[code] || ('Błąd logowania: '+(code || 'nieznany błąd'));
   }
-
-  // =============================================
-  // PEŁNY EKRAN — NAPRAWIONE (z prefixami)
-  // =============================================
-  function toggleFullscreen() {
-    var elem = playerWrapper;
-    if (!document.fullscreenElement &&
-        !document.webkitFullscreenElement &&
-        !document.mozFullScreenElement &&
-        !document.msFullscreenElement) {
-      // Wchodzimy w pełny ekran
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      } else if (elem.mozRequestFullScreen) {
-        elem.mozRequestFullScreen();
-      } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-      }
-    } else {
-      // Wychodzimy z pełnego ekranu
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    }
+}
+function showAdmin(){
+  $('loginBox').style.display='none';
+  $('adminContent').style.display='block';
+  renderAdmin();
+}
+function renderAdmin(){
+  $('adminGrid').innerHTML=Object.entries(L).map(([k,v])=>{
+    const s=streams[k]||{};
+    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link YouTube</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://youtube.com/watch?v=..."><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
+  }).join('');
+}
+async function save(k){
+  if(!window.auth || !window.auth.currentUser)return toast('Najpierw się zaloguj.');
+  if(!window.db)return toast('Firebase nie jest skonfigurowany.');
+  const url=$('u_'+k).value.trim(),id=getId(url),active=$('a_'+k).checked;
+  if(active&&!id)return toast('Podaj poprawny link YouTube.');
+  try{
+    await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
+    toast('Transmisja zapisana.');
+    if(activeLeague===k)renderStream();
+  }catch(e){console.error(e);toast('Błąd zapisu. Sprawdź reguły Firebase.')}
+}
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[m]))}
+if(window.auth) window.auth.onAuthStateChanged(u=>{
+  if(u && $('adminPanel').classList.contains('open'))showAdmin();
+});
+function handleAdminShortcut(e){
+  const key=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey) && (key==='m'||e.code==='KeyM')){
+    e.preventDefault();
+    e.stopPropagation();
+    openAdmin();
   }
-
-  // =============================================
-  // MINIMALIZACJA — NAPRAWIONE (przełącza klasę CSS)
-  // =============================================
-  function toggleMinimize() {
-    playerWrapper.classList.toggle('minimized');
+}
+document.addEventListener('keydown',handleAdminShortcut,true);
+document.addEventListener('click',e=>{
+  const picker=$('mobilePicker');
+  if(picker && !picker.contains(e.target)) picker.classList.remove('open');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && document.activeElement && (document.activeElement.id==='email'||document.activeElement.id==='password')){
+    e.preventDefault();
+    login();
   }
+});
 
-  // =============================================
-  // PANEL REDAKCJI
-  // =============================================
-  var ADMIN_PASS = "admin123";
-
-  function authenticate() {
-    var pass = document.getElementById('adminPass').value;
-    var msg  = document.getElementById('authMsg');
-    if (pass === ADMIN_PASS) {
-      document.getElementById('adminPanel').style.display = 'block';
-      msg.className = 'msg success';
-      msg.textContent = 'Zalogowano pomyślnie.';
-      loadUrlsFromFirebase();
-    } else {
-      msg.className = 'msg error';
-      msg.textContent = 'Nieprawidłowe hasło.';
-    }
+let mobileAdminTaps=0,mobileAdminTimer=null;
+const mobileTrigger=document.createElement('button');
+mobileTrigger.type='button';
+mobileTrigger.setAttribute('aria-hidden','true');
+mobileTrigger.setAttribute('tabindex','-1');
+mobileTrigger.style.cssText='position:fixed;right:0;bottom:0;width:76px;height:76px;z-index:9999;background:transparent;border:0;padding:0;opacity:0;';
+document.body.appendChild(mobileTrigger);
+mobileTrigger.addEventListener('click',()=>{
+  mobileAdminTaps++;
+  clearTimeout(mobileAdminTimer);
+  if(mobileAdminTaps>=5){
+    mobileAdminTaps=0;
+    openAdmin();
   }
+  mobileAdminTimer=setTimeout(()=>mobileAdminTaps=0,1500);
+});
 
-  function saveUrl(league) {
-    var inputId = 'url' + league.charAt(0).toUpperCase() + league.slice(1);
-    var url = document.getElementById(inputId).value;
-    db.ref('streams/' + league).set(url)
-      .then(function() {
-        var msg = document.getElementById('saveMsg');
-        msg.className = 'msg success';
-        msg.textContent = 'Zapisano link dla ' + league;
-        setTimeout(function(){ msg.className = 'msg'; }, 3000);
-      })
-      .catch(function(err) {
-        var msg = document.getElementById('saveMsg');
-        msg.className = 'msg error';
-        msg.textContent = 'Błąd: ' + err.message;
-      });
-  }
-
-  function loadUrlsFromFirebase() {
-    db.ref('streams').on('value', function(snap) {
-      var data = snap.val() || {};
-      document.getElementById('urlLiga1').value = data.liga1 || '';
-      document.getElementById('urlLiga2').value = data.liga2 || '';
-      document.getElementById('urlLiga3').value = data.liga3 || '';
-    });
-  }
-
-  // =============================================
-  // ZMIANA LIGI
-  // =============================================
-  document.getElementById('leagueSelect').addEventListener('change', function() {
-    var league = this.value;
-    var streamSelect = document.getElementById('streamSelect');
-    streamSelect.innerHTML = '<option value="">Wybierz transmisję</option>';
-    if (!league) return;
-    db.ref('streams/' + league).once('value').then(function(snap) {
-      var url = snap.val();
-      if (url) {
-        var opt = document.createElement('option');
-        opt.value = url;
-        opt.textContent = 'Transmisja ' + league;
-        streamSelect.appendChild(opt);
-      }
-    });
-  });
-</script>
-
+activeLeague=Object.keys(L)[0];loadStreams();</script>
 </body>
 </html>
