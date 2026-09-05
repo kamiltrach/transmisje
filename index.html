@@ -216,7 +216,7 @@ body.player-fullscreen{
   z-index:5!important;
 }
 
-/* ===== NOWE STYLE DLA MINIMALIZACJI ===== */
+/* ===== STYLE DLA MINIMALIZACJI ===== */
 .video.player-minimized {
   position: fixed !important;
   bottom: 20px !important;
@@ -266,7 +266,6 @@ body.player-fullscreen{
       <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
-      <!-- DODANO PRZYCISK MINIMALIZACJI -->
       <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
       <button id="fullscreenBtn" class="control" onclick="fullscreen()" title="Pełny ekran"><i class="fa-solid fa-expand"></i></button>
     </div>
@@ -333,10 +332,11 @@ function removePlayer(){
   const p=$('ytplayer'); if(p)p.remove();
   const l=$('streamLoader'); if(l)l.remove();
   player=null;
-  window.__ytPlayer = null; // NAPRAWA: czyszczenie referencji przy zmianie
+  window.__ytPlayer = null;
 }
 
 function renderStream(){
+  if (!activeLeague) activeLeague = Object.keys(L)[0];
   const s=streams[activeLeague];
   $('streamTitle').textContent=s?.title||L[activeLeague]||'Transmisja';
   $('sideInfo').textContent=s?.active&&s.videoId?'Transmisja: '+(s.title||L[activeLeague]):'Brak aktywnej transmisji dla tej ligi.';
@@ -403,13 +403,12 @@ function createPlayer(id){
   };
 
   function startYT(){
-    if(!window.YT || !YT.Player){
+    if(!window.YT || !window.YT.Player){
       setTimeout(startYT,150);
       return;
     }
-
     try{
-      const yt=new YT.Player(iframe,{
+      const yt=new window.YT.Player(iframe,{
         videoId:id,
         playerVars:{
           autoplay:1,
@@ -423,18 +422,16 @@ function createPlayer(id){
         },
         events:{
           onReady:function(e){
-            window.__ytPlayer = e.target; // NAPRAWA: pewne przypisanie globalnego obiektu API
+            window.__ytPlayer = e.target;
             try{ e.target.mute(); }catch(x){}
             try{ e.target.playVideo(); }catch(x){}
             setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
             setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1000);
             setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
-
             setTimeout(()=>{
               try{ e.target.unMute(); }catch(x){}
               try{ e.target.playVideo(); }catch(x){}
             },800);
-
             $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
             $('muteIcon').className='fa-solid fa-volume-high';
             reveal();
@@ -451,17 +448,32 @@ function createPlayer(id){
           },
           onError: function(e) {
             console.error("YouTube Player Error:", e);
-            reveal(); // Ukryj loader nawet w przypadku błędu, aby nie zawiesić UI
+            reveal(); 
+            $('placeholder').style.display = 'flex';
+            $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
+            $('placeholder').querySelector('p').textContent = 'Film może być zablokowany do osadzania lub link jest nieprawidłowy.';
           }
         }
       });
     }catch(err){
-      console.error(err);
+      console.error("YT Player init error:", err);
+      reveal();
     }
   }
-
   startYT();
   setTimeout(reveal,7000);
+  
+  // Fallback na wypadek całkowitego zawieszenia API
+  setTimeout(() => {
+    if (!window.__ytPlayer) {
+      console.warn("YouTube API failed to initialize player.");
+      $('placeholder').style.display = 'flex';
+      $('placeholder').querySelector('h2').textContent = 'Błąd odtwarzacza';
+      $('placeholder').querySelector('p').textContent = 'Nie udało się załadować transmisji. Sprawdź link lub odśwież stronę.';
+      const l=$('streamLoader');
+      if(l) l.remove();
+    }
+  }, 10000);
 }
 
 function youtubeCommand(command){
@@ -504,7 +516,7 @@ function setupYouTubeLikeControls(){
 }
 
 function togglePlay(){
-  if(!window.__ytPlayer) return; // NAPRAWA: sprawdzenie czy API jest gotowe
+  if(!window.__ytPlayer) return;
   const icon=$('playBtn').querySelector('i');
   const playing = icon && icon.classList.contains('fa-pause');
   
@@ -536,7 +548,6 @@ function setFullscreenIcon(active){
   b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
 }
 
-// ===== NOWA FUNKCJA MINIMALIZACJI =====
 function minimizePlayer() {
   const v = $('video');
   if (!v) return;
@@ -545,7 +556,6 @@ function minimizePlayer() {
   if (isMinimized) {
     v.classList.remove('player-minimized');
   } else {
-    // Wyjdź z pełnego ekranu, jeśli jest aktywny
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
     }
@@ -570,7 +580,7 @@ async function fullscreen(){
   }catch(e){}
 
   v.classList.add('player-fs');
-  v.classList.remove('player-minimized'); // Wyłącz minimalizację przy wejściu w pełny ekran
+  v.classList.remove('player-minimized');
   document.body.classList.add('player-fullscreen');
   document.body.style.overflow='hidden';
   setFullscreenIcon(true);
@@ -632,13 +642,21 @@ document.addEventListener('keydown',e=>{
     if(v && (v.classList.contains('player-fs') || v.classList.contains('player-minimized'))){
       e.preventDefault();
       if(v.classList.contains('player-minimized')) {
-        minimizePlayer(); // Przy ESC zminimalizowany wraca do normalnego rozmiaru
+        minimizePlayer();
       } else {
         exitPlayerFullscreen();
       }
     }
   }
 });
+
+// NAPRAWA: Lepsze wykrywanie ID z różnych formatów linków YouTube
+function getId(url) {
+  if (!url) return '';
+  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})/;
+  const match = url.match(regExp);
+  return match ? match[1] : '';
+}
 
 async function loadStreams(){
   try{
@@ -666,6 +684,7 @@ async function loadStreams(){
 
   if(document.querySelector('#adminContent').style.display==='block')renderAdmin();
 }
+
 function openAdmin(){
   const panel=$('adminPanel');
   if(!panel)return;
@@ -725,23 +744,28 @@ function renderAdmin(){
     return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link YouTube</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://youtube.com/watch?v=..."><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
   }).join('');
 }
+
 async function save(k){
   if(!window.auth || !window.auth.currentUser)return toast('Najpierw się zaloguj.');
   if(!window.db)return toast('Firebase nie jest skonfigurowany.');
   const url=$('u_'+k).value.trim(),id=getId(url),active=$('a_'+k).checked;
-  if(active&&!id)return toast('Podaj poprawny link YouTube.');
+  if(active&&!id)return toast('Podaj poprawny link YouTube (np. https://youtube.com/watch?v=...).');
   try{
     await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
     toast('Transmisja zapisana.');
-    if(activeLeague===k)renderStream();
+    
+    // NAPRAWA: Jeśli zapisujemy aktywną transmisję, natychmiast ją wyświetl
+    if(active){
+      activeLeague = k;
+      renderLeagues();
+      renderStream();
+    }
   }catch(e){console.error(e);toast('Błąd zapisu. Sprawdź reguły Firebase.')}
 }
+
 function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[m]))}
-function getId(url){
-  const m=url.match(/(?:v=|\/)([0-9A-Za-z_-]{11}).*/);
-  return m?m[1]:'';
-}
+
 if(window.auth) window.auth.onAuthStateChanged(u=>{
   if(u && $('adminPanel').classList.contains('open'))showAdmin();
 });
