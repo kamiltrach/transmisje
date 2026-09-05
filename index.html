@@ -371,12 +371,19 @@ function createPlayer(channel){
       player.setVolume(1);
       player.setMuted(true);
       $('muteIcon').className='fa-solid fa-volume-xmark';
+      streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       reveal();
     });
     player.addEventListener(Twitch.Player.PLAY,()=>{
+      streamPlaying=true;
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       reveal();
+      playBusy=false;
+    });
+    player.addEventListener(Twitch.Player.PAUSE,()=>{
+      streamPlaying=false;
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       playBusy=false;
     });
     setTimeout(reveal,7000);
@@ -417,18 +424,16 @@ function setupYouTubeLikeControls(){
 }
 
 let playBusy=false;
+let streamPlaying=false;
 function togglePlay(){
   if(!player || playBusy)return;
   try{
     playBusy=true;
-    const paused=player.getPaused();
-    if(paused){
-      // The click is a user gesture: enable audio and start only once.
+    if(!streamPlaying){
       player.setVolume(1);
       player.setMuted(false);
       player.play();
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      $('muteIcon').className='fa-solid fa-volume-high';
     }else{
       player.pause();
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
@@ -436,7 +441,7 @@ function togglePlay(){
   }catch(e){
     console.error(e);
   }finally{
-    setTimeout(()=>playBusy=false,500);
+    setTimeout(()=>playBusy=false,350);
   }
 }
 function toggleMute(){
