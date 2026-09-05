@@ -240,7 +240,7 @@ body.player-fullscreen{
   height: 100% !important;
 }
 
-/* NAPRAWA: Lepszy fullscreen na telefonie po obróceniu */
+/* Lepszy fullscreen na telefonie po obróceniu */
 @media (max-width:700px) and (orientation:landscape){
   .video.player-fs{
     width:100vw!important;
@@ -288,8 +288,8 @@ body.player-fullscreen{
     </div>
     <div class="controls">
       <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
-      <!-- NAPRAWA: Domyślna ikona to przekreślony głośnik (wyciszony) -->
-      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
+      <!-- NAPRAWA: Domyślnie ikona głośnika włączona -->
+      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
       <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
@@ -480,11 +480,8 @@ function createPlayer(id){
           console.log('[YT] Player ready');
           window.__ytPlayer = e.target;
           
-          // NAPRAWA: Natychmiastowe wyciszenie i odtwarzanie
-          try{ e.target.mute(); }catch(x){}
           try{ e.target.playVideo(); }catch(x){}
           
-          // Wielokrotne próby odtwarzania
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },100);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },600);
@@ -492,12 +489,20 @@ function createPlayer(id){
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1500);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
 
-          // NAPRAWA: Ikona głośności - domyślnie przekreślona (wyciszony)
+          // NAPRAWA: Domyślnie włącz dźwięk
+          setTimeout(()=>{
+            try{ 
+              e.target.unMute(); 
+              e.target.setVolume(100);
+              e.target.playVideo();
+            }catch(x){}
+          }, 500);
+
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-          $('muteIcon').className='fa-solid fa-volume-xmark';
+          // NAPRAWA: Domyślnie ikona głośnika włączona
+          $('muteIcon').className='fa-solid fa-volume-high';
           reveal();
           
-          // Automatyczne wznawianie co 3 sekundy
           resumeTimer = setInterval(() => {
             if(window.__ytPlayer){
               try{
@@ -592,7 +597,6 @@ function togglePlay(){
   $('playBtn').innerHTML=playing?'<i class="fa-solid fa-play"></i>':'<i class="fa-solid fa-pause"></i>';
 }
 
-// NAPRAWA: Poprawna obsługa ikony głośności
 function toggleMute(){
   if(!window.__ytPlayer)return;
   const icon=$('muteIcon');
@@ -655,7 +659,6 @@ async function fullscreen(){
   document.body.style.overflow='hidden';
   setFullscreenIcon(true);
 
-  // NAPRAWA: Wymuszenie orientacji landscape na telefonie
   try{
     if(screen.orientation && screen.orientation.lock){
       await screen.orientation.lock('landscape');
