@@ -9,105 +9,64 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root{--navy:#0b162c;--green:#7ed321;--gold:#f5a623;--white:#fff;--muted:#8b9bb4;--border:rgba(255,255,255,.08);--glass:rgba(19,34,64,.72);--radius:18px;--glow:rgba(126,211,33,.25)}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);}color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%),repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(255,255,255,.012) 120px,rgba(255,255,255,.012) 240px)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%),repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(255,255,255,.012) 120px,rgba(255,255,255,.012) 240px)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
 .topbar{height:76px;position:fixed;inset:0 0 auto;z-index:20;background:rgba(11,22,44,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:0 4%}
 .brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand:visited,.brand:hover,.brand:active{color:#fff;text-decoration:none}.brand img{height:46px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;font-weight:700;margin-top:4px;line-height:1;text-transform:uppercase}
 .admin-btn{height:40px;width:40px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);color:var(--muted);transition:.2s}.admin-btn:hover{color:var(--green);border-color:rgba(126,211,33,.35)}
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.eyebrow{color:var(--green);font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.hero p{color:var(--muted);max-width:520px;margin:10px auto 0;font-size:.95rem}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
-.leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}.mobile-stream-picker{display:none}
-.player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}.video{position:relative;aspect-ratio:16/9;min-height:330px;background:radial-gradient(circle at 50% 40%,#182a49,#050b15 65%);display:flex;align-items:center;justify-content:center}.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}.yt-frame-wrap{position:absolute;inset:0;z-index:2;background:#050b15;overflow:hidden}.yt-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}.yt-click-shield{position:absolute;inset:0;z-index:3;background:transparent;cursor:default;touch-action:none}.stream-loading{position:absolute;inset:0;z-index:99;display:grid;place-items:center;background:#050b15;transition:opacity .35s ease}.stream-loading.hide{opacity:0;pointer-events:none}.stream-loading img{width:104px;height:auto;max-height:88px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,.55))}.stream-loading .loader-ring{position:absolute;width:144px;height:144px;border:2px solid rgba(126,211,33,.15);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.watermark{position:absolute;right:24px;top:20px;z-index:6;background:rgba(11,22,44,.68);padding:11px 13px;border-radius:14px;backdrop-filter:blur(8px);box-shadow:0 8px 25px #0005}.watermark img{height:52px;width:auto;display:block}.yt-click-shield{touch-action:none}.video-placeholder{text-align:center;color:var(--muted);z-index:5;padding:24px}.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}.video-placeholder h2{color:#fff;font-size:1.25rem}.video-placeholder p{font-size:.78rem;margin-top:5px}.watch-btn{display:inline-flex;align-items:center;gap:9px;margin-top:18px;padding:13px 18px;border-radius:12px;background:var(--green);color:var(--navy);font-size:.75rem;font-weight:800;text-transform:uppercase;box-shadow:0 10px 30px var(--glow)}.loading{color:var(--green)}.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.98);border-top:1px solid var(--border)}.control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}.stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}.yt-cover{position:absolute;inset:0;z-index:3;background:linear-gradient(180deg,rgba(7,16,31,.12),rgba(7,16,31,.82));display:grid;place-items:center}.yt-cover.hidden{display:none}
+.leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
+.player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}.video{position:relative;aspect-ratio:16/9;min-height:330px;background:radial-gradient(circle at 50% 40%,#182a49,#050b15 65%);display:flex;align-items:center;justify-content:center}.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}.watermark{position:absolute;right:20px;top:18px;z-index:4;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px)}.watermark img{height:34px;width:auto;display:block}.video-placeholder{text-align:center;color:var(--muted);z-index:1}.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}.video-placeholder h2{color:#fff;font-size:1.25rem}.video-placeholder p{font-size:.78rem;margin-top:5px}.loading{color:var(--green)}.controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.98);border-top:1px solid var(--border)}.control{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);color:#c9d2df}.control:hover{background:rgba(126,211,33,.12);color:var(--green)}.stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.controls .spacer{flex:1}.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}.status i{color:var(--green);font-size:.45rem}
 .info{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}.panel{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:20px}.panel h3{font-size:1rem;margin-bottom:8px}.panel p{font-size:.78rem;color:var(--muted)}.schedule-empty{min-height:120px;display:grid;place-items:center;text-align:center}.schedule-empty i{font-size:1.5rem;color:var(--green);margin-bottom:8px}.schedule-empty p{font-size:.74rem}
 .admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}.admin-panel.open{display:block}.admin-box{max-width:720px;margin:0 auto}.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}.admin-card h3{font-size:.88rem;margin-bottom:12px}.field{display:block;font-size:.65rem;color:var(--muted);margin:9px 0 5px}.field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}.save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}.check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}.login-box{max-width:720px;margin:0 auto;text-align:center}.login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}.login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}.login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
 .secret-trigger{position:fixed;bottom:0;right:0;width:70px;height:70px;z-index:999;cursor:default}
 .toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 15px;border-radius:11px;background:#132240;border:1px solid var(--border);font-size:.75rem;display:none}.toast.show{display:block}
 footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
+@media(max-width:700px){.topbar{height:68px}.brand-title{font-size:1rem}.brand-sub{font-size:.5rem;letter-spacing:2px}main{padding-top:92px}.hero{align-items:start;flex-direction:column}.live-dot{align-self:flex-start}.video{min-height:220px}.info{grid-template-columns:1fr}.watermark{right:12px;top:12px}.watermark img{height:27px}.controls{height:56px}.stream-title{max-width:145px}}
+
+.mobile-stream-picker{display:none}
+.yt-frame-wrap{position:absolute;inset:0;z-index:2;background:#050b15;overflow:hidden}
+.yt-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:none}
+.yt-click-shield{position:absolute;inset:0;z-index:3;background:transparent;touch-action:none}
+.stream-loading{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#050b15;transition:opacity .35s ease}
+.stream-loading.hide{opacity:0;pointer-events:none}
+.stream-loading img{width:92px;height:auto;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))}
+.stream-loading .loader-ring{position:absolute;width:126px;height:126px;border:2px solid rgba(126,211,33,.16);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.video.mobile-fullscreen{position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100dvh!important;max-width:none!important;min-height:0!important;aspect-ratio:auto!important;border-radius:0!important;background:#000!important}
+.video.mobile-fullscreen .yt-frame-wrap,.video:fullscreen .yt-frame-wrap,.video:-webkit-full-screen .yt-frame-wrap{inset:0}
+.video.mobile-fullscreen .yt-frame-wrap iframe,.video:fullscreen .yt-frame-wrap iframe,.video:-webkit-full-screen .yt-frame-wrap iframe{width:100%!important;height:100%!important}
+.video.mobile-fullscreen .controls,.video:fullscreen .controls,.video:-webkit-full-screen .controls{position:absolute;left:0;right:0;bottom:0;z-index:30;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.video.mobile-fullscreen .watermark,.video:fullscreen .watermark,.video:-webkit-full-screen .watermark{z-index:31;top:max(12px,env(safe-area-inset-top));right:12px}
+body.player-fullscreen{overflow:hidden!important;overscroll-behavior:none}
+
 @media(max-width:700px){
-.topbar{height:68px}.brand-title{font-size:1rem}.brand-sub{font-size:.5rem;letter-spacing:2px}
-main{padding:88px 12px 35px}.hero{align-items:start;flex-direction:column;padding:1.8rem 0 1.1rem}.live-dot{align-self:flex-start}
-.leagues{display:none}.mobile-stream-picker{display:block;position:relative;margin:0 0 14px}.mobile-picker-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid var(--border);font-size:.78rem;font-weight:800}.mobile-picker-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mobile-picker-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 7px);z-index:30;padding:7px;background:rgba(11,22,44,.98);border:1px solid var(--border);border-radius:14px;box-shadow:0 20px 50px #0008;max-height:55vh;overflow:auto}.mobile-stream-picker.open .mobile-picker-menu{display:block}.mobile-picker-option{width:100%;text-align:left;padding:12px 13px;border-radius:10px;background:transparent;color:#c9d2df;font-size:.74rem;font-weight:700}.mobile-picker-option.active{background:rgba(126,211,33,.14);color:var(--green)}
-.video{min-height:0;aspect-ratio:16/9;border-radius:0;overflow:hidden}.video.mobile-fullscreen{
-  position:fixed!important;
-  inset:0!important;
-  z-index:99999!important;
-  width:100vw!important;
-  height:100svh!important;
-  max-width:none!important;
-  min-height:0!important;
-  aspect-ratio:auto!important;
-  border-radius:0!important;
-  background:#000!important;
+  .topbar{height:68px}
+  .brand-title{font-size:1rem}
+  .brand-sub{font-size:.5rem;letter-spacing:2px}
+  main{padding:92px 12px 35px}
+  .hero{align-items:flex-start;flex-direction:column;padding:1.8rem 0 1.2rem}
+  .live-dot{align-self:flex-start}
+  .leagues{display:none}
+  .mobile-stream-picker{display:block;position:relative;margin:0 0 14px}
+  .mobile-picker-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid var(--border);font-size:.78rem;font-weight:800}
+  .mobile-picker-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mobile-picker-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 7px);z-index:50;padding:7px;background:rgba(11,22,44,.99);border:1px solid var(--border);border-radius:14px;box-shadow:0 20px 50px #0008;max-height:55vh;overflow:auto}
+  .mobile-stream-picker.open .mobile-picker-menu{display:block}
+  .mobile-picker-option{width:100%;text-align:left;padding:12px 13px;border-radius:10px;background:transparent;color:#c9d2df;font-size:.74rem;font-weight:700}
+  .mobile-picker-option.active{background:rgba(126,211,33,.14);color:var(--green)}
+  .video{min-height:0;aspect-ratio:16/9}
+  .watermark{right:12px;top:10px;padding:8px 10px;border-radius:11px}
+  .watermark img{height:42px}
+  .controls{height:58px;padding:0 9px;gap:6px}
+  .control{width:40px;height:40px;flex:0 0 40px;-webkit-tap-highlight-color:transparent}
+  .stream-title{max-width:120px;font-size:.7rem}
+  .status{display:none}
+  .video-placeholder{padding:16px}
+  .video-placeholder h2{font-size:1.05rem}
+  .video-placeholder p{font-size:.7rem}
+  .watch-btn{display:inline-flex;align-items:center;gap:9px;margin-top:18px;padding:11px 15px;border-radius:12px;background:var(--green);color:var(--navy);font-size:.7rem;font-weight:800;text-transform:uppercase;box-shadow:0 10px 30px var(--glow)}
 }
-.video.mobile-fullscreen .yt-frame-wrap,
-.video:fullscreen .yt-frame-wrap,
-.video:-webkit-full-screen .yt-frame-wrap{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  background:#000;
-}
-.video.mobile-fullscreen .yt-frame-wrap iframe,
-.video:fullscreen .yt-frame-wrap iframe,
-.video:-webkit-full-screen .yt-frame-wrap iframe{
-  position:absolute;
-  inset:0;
-  width:100%!important;
-  height:100%!important;
-}
-.video.mobile-fullscreen .watermark,
-.video:fullscreen .watermark,
-.video:-webkit-full-screen .watermark{
-  top:max(12px,env(safe-area-inset-top));
-  right:12px;
-  z-index:30;
-}
-.video.mobile-fullscreen .controls,
-.video:fullscreen .controls,
-.video:-webkit-full-screen .controls{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  z-index:40;
-  padding-bottom:max(8px,env(safe-area-inset-bottom));
-}
-.video.mobile-fullscreen .yt-click-shield,
-.video:fullscreen .yt-click-shield,
-.video:-webkit-full-screen .yt-click-shield{
-  inset:0;
-}
-.video:fullscreen,.video:-webkit-full-screen{
-  width:100vw!important;
-  height:100vh!important;
-  max-width:none!important;
-  min-height:0!important;
-  aspect-ratio:auto!important;
-  border-radius:0;
-  background:#000;
-  display:block;
-}
-body.player-fullscreen{
-  overflow:hidden!important;
-  overscroll-behavior:none;
-}.watermark{right:10px;top:9px;padding:7px 9px;border-radius:10px}.watermark img{height:44px}
-@media (orientation:landscape) and (max-width:900px){
-  main{padding:76px 10px 20px}
-  .hero{display:none}
-  .mobile-stream-picker{margin-bottom:8px}
-  .player-card{border-radius:14px}
-  .video{width:100%;aspect-ratio:16/9;min-height:0}
-  .watermark{right:12px;top:10px}
-  .watermark img{height:38px}
-  .controls{height:54px}
-}
-  .hero{display:none}
-  .mobile-stream-picker{margin-bottom:8px}
-  .player-card{border-radius:14px}
-  .video{width:100%;aspect-ratio:16/9;min-height:0}
-  .watermark{right:12px;top:10px}.watermark img{height:38px}
-  .controls{height:54px}
-}.controls{height:58px;padding:0 8px;gap:6px;touch-action:manipulation;position:relative;z-index:25}.control{width:40px;height:40px;flex:0 0 40px;-webkit-tap-highlight-color:transparent}.stream-title{max-width:110px;font-size:.68rem}.status{display:none}.video-placeholder{padding:16px}.video-placeholder h2{font-size:1.05rem}.video-placeholder p{font-size:.7rem}.watch-btn{padding:11px 14px;font-size:.68rem}
-}
+
 </style>
 </head>
 <body>
@@ -166,24 +125,50 @@ body.player-fullscreen{
 </main>
 <footer>© Strefa Gola • Podkarpackie transmisje</footer>
 <div id="toast" class="toast"></div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,player=null,ytReady=false,playerStarted=false;
+let streams={},activeLeague=null,player=null,playerStarted=false;
 const $=id=>document.getElementById(id);
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 function renderLeagues(){
-  $('leagues').innerHTML=Object.entries(L).map(([k,v])=>`<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`).join('');
-  $('mobilePicker').innerHTML=`<button class="mobile-picker-btn" onclick="toggleMobilePicker()"><span><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:8px"></i>${L[activeLeague]||'Wybierz transmisję'}</span><i class="fa-solid fa-chevron-down"></i></button><div class="mobile-picker-menu">${Object.entries(L).map(([k,v])=>`<button class="mobile-picker-option ${k===activeLeague?'active':''}" onclick="selectLeague('${k}');closeMobilePicker()">${v}</button>`).join('')}</div>`;
-} 
-function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open') }
-function closeMobilePicker(){ $('mobilePicker').classList.remove('open') }
-function getId(u){if(!u)return'';u=u.trim();let m=u.match(/(?:v=|youtu\.be\/|youtube\.com\/(?:embed\/|live\/))([A-Za-z0-9_-]{11})/);return m?m[1]:(/^[A-Za-z0-9_-]{11}$/.test(u)?u:'')}
-function selectLeague(k){activeLeague=k;renderLeagues();renderStream()}
+  $('leagues').innerHTML=Object.entries(L).map(([k,v])=>
+    `<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`
+  ).join('');
+
+  $('mobilePicker').innerHTML=
+    `<button type="button" class="mobile-picker-btn" onclick="toggleMobilePicker()">
+      <span><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:8px"></i>${L[activeLeague]||'Wybierz transmisję'}</span>
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <div class="mobile-picker-menu">
+      ${Object.entries(L).map(([k,v])=>
+        `<button type="button" class="mobile-picker-option ${k===activeLeague?'active':''}" onclick="selectLeague('${k}');closeMobilePicker()">${v}</button>`
+      ).join('')}
+    </div>`;
+}
+
+function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open'); }
+function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
+
+function selectLeague(k){
+  activeLeague=k;
+  renderLeagues();
+  renderStream();
+}
+
+function clearPlayer(){
+  const old=$('ytplayer');
+  if(old) old.remove();
+  const loading=$('streamLoading');
+  if(loading) loading.remove();
+  player=null;
+  playerStarted=false;
+}
+
 function renderStream(){
   const s=streams[activeLeague];
   $('streamTitle').textContent=s?.title||L[activeLeague]||'Transmisja';
@@ -191,26 +176,22 @@ function renderStream(){
     ?'Transmisja: '+(s.title||L[activeLeague])
     :'Brak aktywnej transmisji dla tej ligi.';
 
-  if(player){ player=null; playerStarted=false; }
-  const old=$('ytplayer'); if(old) old.remove();
-  const oldLoading=$('streamLoading'); if(oldLoading) oldLoading.remove();
-
+  clearPlayer();
   $('placeholder').style.display='block';
+
+  let oldBtn=$('placeholder').querySelector('.watch-btn');
+  if(oldBtn) oldBtn.remove();
 
   if(!s?.active||!s.videoId){
     $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
     $('placeholder').querySelector('p').textContent=s
       ?'Administrator nie ustawił jeszcze aktywnej transmisji.'
       :'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
-    const oldBtn=$('placeholder').querySelector('.watch-btn');
-    if(oldBtn)oldBtn.remove();
     return;
   }
 
   $('placeholder').querySelector('h2').textContent=s.title||L[activeLeague]||'Transmisja';
   $('placeholder').querySelector('p').textContent='Transmisja jest gotowa do odtworzenia.';
-  const oldBtn=$('placeholder').querySelector('.watch-btn');
-  if(oldBtn)oldBtn.remove();
 
   const btn=document.createElement('button');
   btn.className='watch-btn';
@@ -223,10 +204,7 @@ function renderStream(){
 }
 
 function createPlayer(id){
-  const old=$('ytplayer');
-  if(old) old.remove();
-  const oldLoading=$('streamLoading');
-  if(oldLoading) oldLoading.remove();
+  clearPlayer();
 
   const loading=document.createElement('div');
   loading.id='streamLoading';
@@ -240,7 +218,7 @@ function createPlayer(id){
 
   const iframe=document.createElement('iframe');
   iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+
-    '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&enablejsapi=1&disablekb=1&fs=0&origin='+
+    '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin='+
     encodeURIComponent(location.origin);
   iframe.title='Transmisja';
   iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
@@ -254,54 +232,47 @@ function createPlayer(id){
   holder.appendChild(iframe);
   holder.appendChild(shield);
   $('video').appendChild(holder);
+
   player=iframe;
   playerStarted=true;
 
-  let loadedAt=0;
+  const started=Date.now();
   let revealed=false;
 
-  const hideLoading=()=>{
+  const reveal=()=>{
     if(revealed)return;
-    const now=Date.now();
-    const wait=Math.max(0,8000-(now-loadedAt));
+    const elapsed=Date.now()-started;
+    const remaining=Math.max(0,7000-elapsed);
     setTimeout(()=>{
       if(revealed)return;
       revealed=true;
       const l=$('streamLoading');
-      if(!l)return;
-      l.classList.add('hide');
-      setTimeout(()=>l.remove(),450);
-    },wait);
+      if(l){
+        l.classList.add('hide');
+        setTimeout(()=>l.remove(),350);
+      }
+    },remaining);
   };
 
   iframe.addEventListener('load',()=>{
-    loadedAt=Date.now();
-    setTimeout(()=>{
-      youtubeCommand('playVideo');
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-    },150);
-    hideLoading();
+    setTimeout(()=>youtubeCommand('playVideo'),150);
+    $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+    reveal();
   });
 
-  // Even on very slow/odd mobile WebViews, keep the branded screen long enough
-  // to hide the initial YouTube player chrome.
-  setTimeout(()=>{
-    if(!loadedAt) loadedAt=Date.now();
-    hideLoading();
-  },8000);
+  // Same long branded loader on desktop and mobile.
+  setTimeout(reveal,7000);
 }
 
 function youtubeCommand(command){
-  if(!player || !player.contentWindow)return;
+  if(!player||!player.contentWindow)return;
   try{
     player.contentWindow.postMessage(JSON.stringify({
       event:'command',
       func:command,
       args:[]
     }),'https://www.youtube-nocookie.com');
-  }catch(e){
-    console.warn('YouTube command failed:',e);
-  }
+  }catch(e){}
 }
 
 function togglePlay(){
@@ -309,24 +280,30 @@ function togglePlay(){
   const icon=$('playBtn').querySelector('i');
   const paused=icon && icon.classList.contains('fa-pause');
   youtubeCommand(paused?'pauseVideo':'playVideo');
-  $('playBtn').innerHTML=paused?'<i class="fa-solid fa-play"></i>':'<i class="fa-solid fa-pause"></i>';
+  $('playBtn').innerHTML=paused
+    ?'<i class="fa-solid fa-play"></i>'
+    :'<i class="fa-solid fa-pause"></i>';
 }
+
 function toggleMute(){
   if(!player)return;
   const icon=$('muteIcon');
   const muted=icon.classList.contains('fa-volume-xmark');
   youtubeCommand(muted?'unMute':'mute');
-  icon.className=muted?'fa-solid fa-volume-high':'fa-solid fa-volume-xmark';
+  icon.className=muted
+    ?'fa-solid fa-volume-high'
+    :'fa-solid fa-volume-xmark';
 }
+
 async function fullscreen(){
   const v=$('video');
   const native=!!(document.fullscreenElement||document.webkitFullscreenElement);
   const fallback=v.classList.contains('mobile-fullscreen');
 
-  if(native || fallback){
+  if(native||fallback){
     try{
-      if(document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
-      else if(document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+      if(document.fullscreenElement&&document.exitFullscreen) await document.exitFullscreen();
+      else if(document.webkitFullscreenElement&&document.webkitExitFullscreen) document.webkitExitFullscreen();
     }catch(e){}
     v.classList.remove('mobile-fullscreen');
     document.body.classList.remove('player-fullscreen');
@@ -335,7 +312,6 @@ async function fullscreen(){
 
   document.body.classList.add('player-fullscreen');
 
-  // Desktop + Android: use the browser's real fullscreen mode.
   try{
     if(v.requestFullscreen){
       await v.requestFullscreen({navigationUI:'hide'});
@@ -345,19 +321,14 @@ async function fullscreen(){
       v.webkitRequestFullscreen();
       return;
     }
-  }catch(e){
-    console.warn('Fullscreen API:',e);
-  }
+  }catch(e){}
 
-  // iPhone/iPad Safari fallback: use a viewport-filling player instead of
-  // forcing a rotation that Safari may not support.
   v.classList.add('mobile-fullscreen');
 }
 
 document.addEventListener('fullscreenchange',()=>{
-  const active=!!document.fullscreenElement;
   const v=$('video');
-  if(active){
+  if(document.fullscreenElement){
     v.classList.remove('mobile-fullscreen');
     document.body.classList.add('player-fullscreen');
   }else if(!v.classList.contains('mobile-fullscreen')){
@@ -366,9 +337,8 @@ document.addEventListener('fullscreenchange',()=>{
 });
 
 document.addEventListener('webkitfullscreenchange',()=>{
-  const active=!!document.webkitFullscreenElement;
   const v=$('video');
-  if(active){
+  if(document.webkitFullscreenElement){
     v.classList.remove('mobile-fullscreen');
     document.body.classList.add('player-fullscreen');
   }else if(!v.classList.contains('mobile-fullscreen')){
@@ -461,8 +431,11 @@ function handleAdminShortcut(e){
   }
 }
 document.addEventListener('keydown',handleAdminShortcut,true);
+document.addEventListener('click',e=>{
+  const picker=$('mobilePicker');
+  if(picker && !picker.contains(e.target)) picker.classList.remove('open');
+});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') closeMobilePicker();
   if(e.key==='Enter' && document.activeElement && (document.activeElement.id==='email'||document.activeElement.id==='password')){
     e.preventDefault();
     login();
