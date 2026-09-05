@@ -445,10 +445,15 @@ function createPlayer(id){
 }
 
 function youtubeCommand(command){
-  if(!player||!player.contentWindow)return;
+  if(!window.__ytPlayer)return;
   try{
-    player.contentWindow.postMessage(JSON.stringify({event:'command',func:command,args:[]}), 'https://www.youtube-nocookie.com');
-  }catch(e){}
+    if(command==='playVideo') window.__ytPlayer.playVideo();
+    else if(command==='pauseVideo') window.__ytPlayer.pauseVideo();
+    else if(command==='mute') window.__ytPlayer.mute();
+    else if(command==='unMute') window.__ytPlayer.unMute();
+  }catch(e){
+    console.error('YouTube command error:',e);
+  }
 }
 
 function setupYouTubeLikeControls(){
@@ -520,20 +525,12 @@ async function fullscreen(){
     return;
   }
 
-  /* Najpierw prawdziwy fullscreen przeglądarki. Dzięki temu na telefonie
-     znika pasek Safari, jeśli dana wersja iOS go obsługuje. */
   try{
     if(v.requestFullscreen){
       await v.requestFullscreen();
-      v.classList.add('player-fs');
-      document.body.classList.add('player-fullscreen');
-      document.body.style.overflow='hidden';
-      setFullscreenIcon(true);
-      return;
     }
   }catch(e){}
 
-  /* Fallback dla przeglądarek bez Fullscreen API. */
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   document.body.style.overflow='hidden';
@@ -559,21 +556,22 @@ async function exitPlayerFullscreen(){
   v.classList.remove('player-fs','landscape-player','show-controls','controls-hidden');
   document.body.classList.remove('player-fullscreen');
   document.body.style.overflow='';
+  setFullscreenIcon(false);
 
   try{
     if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
   }catch(e){}
-
-  setFullscreenIcon(false);
 }
 
 function syncFullscreenState(){
   const v=$('video');
   if(!v)return;
-
-  const active=v.classList.contains('player-fs');
+  const active=!!document.fullscreenElement || v.classList.contains('player-fs');
   document.body.classList.toggle('player-fullscreen',active);
-  if(!active)document.body.style.overflow='';
+  if(!active){
+    v.classList.remove('player-fs','landscape-player','show-controls','controls-hidden');
+    document.body.style.overflow='';
+  }
   setFullscreenIcon(active);
 }
 
