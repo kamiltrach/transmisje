@@ -15,37 +15,36 @@
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
 .leagues{display:flex;gap:8px;overflow:auto;padding:4px 2px 13px;scrollbar-width:none}.leagues::-webkit-scrollbar{display:none}.league{white-space:nowrap;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.74rem;font-weight:700;transition:.2s}.league:hover{color:#fff;background:rgba(255,255,255,.07)}.league.active{background:var(--green);border-color:var(--green);color:var(--navy);box-shadow:0 0 22px var(--glow)}
 
-/* ODTWARZACZ I PUNKTOWE MASKI */
+/* ODTWARZACZ Z WINIETAMI GRADIENTOWYMI */
 .player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
 .yt-wrap iframe{width:100%;height:100%;border:0;display:block;pointer-events:none!important;-webkit-user-select:none;user-select:none;}
 
-/* MASKI PRZYKRYWAJĄCE NATYWNE GUI YOUTUBE (BEZ ZMIANY KADRU WIDEO) */
-.yt-mask-top {
+/* PŁYNNE ELEGANCKIE WINIETY */
+.yt-vignette-top {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 62px;
-  background: linear-gradient(180deg, rgba(7, 16, 31, 0.98) 50%, rgba(7, 16, 31, 0));
+  height: 80px;
+  background: linear-gradient(180deg, rgba(7, 16, 31, 0.95) 0%, rgba(7, 16, 31, 0.4) 60%, transparent 100%);
   z-index: 6;
   pointer-events: none;
 }
-.yt-mask-bottom {
+.yt-vignette-bottom {
   position: absolute;
   bottom: 0;
+  left: 0;
   right: 0;
-  width: 140px;
-  height: 50px;
-  background: rgba(7, 16, 31, 0.95);
+  height: 80px;
+  background: linear-gradient(0deg, rgba(7, 16, 31, 0.95) 0%, rgba(7, 16, 31, 0.4) 60%, transparent 100%);
   z-index: 6;
   pointer-events: none;
-  border-top-left-radius: 12px;
 }
 
-/* PRZEZROCZYSTA TARCZA - ODBIERA KLIKNIĘCIA MOŻLIWE DLA YT */
+/* PRZEZROCZYSTA TARCZA ODBIERAJĄCA DOTYK */
 .yt-shield{position:absolute;inset:0;z-index:7;background:transparent;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 
 .watermark{position:absolute;right:20px;top:18px;z-index:10;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
@@ -65,7 +64,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
 @keyframes sgSpin{to{transform:rotate(360deg)}}
 
-/* PEŁNY EKRAN UNIFIKACJA */
+/* PEŁNY EKRAN */
 .video:fullscreen,
 .video:-webkit-full-screen,
 .video.player-fs {
@@ -165,7 +164,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
       <div id="placeholder" class="video-placeholder"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><h2>Wybierz ligę</h2><p>Wybierz transmisję powyżej, aby rozpocząć oglądanie.</p></div>
       <div class="watermark"><img src="logo.png" alt="Strefa Gola"></div>
       
-      <!-- PASEK STEROWANIA WEWNĄTRZ VIDEO -->
+      <!-- PASEK STEROWANIA -->
       <div class="controls" id="playerControls">
         <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
         <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
@@ -297,14 +296,14 @@ function createPlayer(id){
   innerDiv.id='ytframe';
   wrap.appendChild(innerDiv);
 
-  /* MASKI ZASŁANIAJĄCE TYTUŁ ORAZ PRZYCISK YOUTUBE */
-  const topMask=document.createElement('div');
-  topMask.className='yt-mask-top';
-  wrap.appendChild(topMask);
+  /* ELEGANCKIE WINIETY GRADIENTOWE ZAMIAST CZARNYCH PASÓW */
+  const topVignette=document.createElement('div');
+  topVignette.className='yt-vignette-top';
+  wrap.appendChild(topVignette);
 
-  const bottomMask=document.createElement('div');
-  bottomMask.className='yt-mask-bottom';
-  wrap.appendChild(bottomMask);
+  const bottomVignette=document.createElement('div');
+  bottomVignette.className='yt-vignette-bottom';
+  wrap.appendChild(bottomVignette);
 
   /* PRZEZROCZYSTA TARCZA ODBIERAJĄCA DOTYK */
   const shield=document.createElement('div');
@@ -350,14 +349,12 @@ function createPlayer(id){
           }, 3000);
         },
         onStateChange:function(e){
-          // e.data === 1 OZNACZA, ŻE WIDEO FIZYCZNIE WYSTARTOWAŁO
           if(e.data === 1){
             $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
             if(!loaderTimer){
-              // ZDJĘCIE LOAERA DOPIERO 2.5s PO WYSTARTOWANIU STRUMIENIA
               loaderTimer = setTimeout(() => {
                 hideLoader();
-              }, 2500);
+              }, 2000);
             }
           }
         },
@@ -369,7 +366,6 @@ function createPlayer(id){
     triggerAutoReload();
   }
 
-  // ZAPASOWY TIMER LOAERA GDYBY API ZABLOKOWAŁO EVENT STATE
   setTimeout(() => {
     if($('streamLoader')) hideLoader();
   }, 7000);
@@ -575,7 +571,7 @@ async function save(k){
     if(active){ activeLeague = k; renderLeagues(); renderStream(); }
   }catch(e){toast('Błąd zapisu.')}
 }
-function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&quot;","\'":"&#39;"}[m]))}
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[m]))}
 function getId(url) {
   if (!url) return '';
   const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})/);
@@ -586,7 +582,6 @@ if(window.auth) window.auth.onAuthStateChanged(u=>{ if(u && $('adminPanel').clas
 document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&(e.key==='m'||e.code==='KeyM')){ e.preventDefault(); openAdmin(); } });
 document.addEventListener('click',e=>{ if($('mobilePicker') && !$('mobilePicker').contains(e.target))$('mobilePicker').classList.remove('open'); });
 
-/* UKRYTY PRZYCISK MOBILNY - 5 KLIKNIĘĆ W PRAWY DOLNY RÓG PROWADZI DO ADMINA */
 let mobileAdminTaps=0,mobileAdminTimer=null;
 const mobileTrigger=document.createElement('button');
 mobileTrigger.type='button';
