@@ -172,6 +172,25 @@ body.player-fullscreen{
 .video .controls{
   transition:opacity .18s ease, transform .18s ease!important;
 }
+
+@media (max-width:700px){
+  .video.player-fs,
+  .video.player-fs .yt-wrap,
+  .video.player-fs .yt-wrap iframe{
+    width:100vw!important;
+    height:100dvh!important;
+    max-width:none!important;
+    max-height:none!important;
+  }
+  .video.player-fs{
+    position:fixed!important;
+    left:0!important;
+    top:0!important;
+    right:0!important;
+    bottom:0!important;
+    z-index:9999!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -624,6 +643,35 @@ loadStreams().then(()=>{
       createPlayer(s.videoId);
     },120);
   }
-});</script>
+});
+/* MOBILE ROTATION — fullscreen follows landscape orientation */
+(function(){
+  function vbox(){ return document.getElementById('video'); }
+
+  function syncRotation(){
+    const v = vbox();
+    if(!v) return;
+    const landscape = window.innerWidth > window.innerHeight;
+    const active = !!document.fullscreenElement || v.classList.contains('player-fs');
+
+    if(active && landscape){
+      v.classList.add('landscape-player');
+    }else{
+      v.classList.remove('landscape-player');
+    }
+  }
+
+  window.addEventListener('orientationchange', function(){
+    setTimeout(syncRotation, 150);
+  }, {passive:true});
+
+  window.addEventListener('resize', function(){
+    setTimeout(syncRotation, 50);
+  }, {passive:true});
+
+  document.addEventListener('fullscreenchange', syncRotation);
+  document.addEventListener('DOMContentLoaded', syncRotation);
+})();
+</script>
 </body>
 </html>
