@@ -260,7 +260,7 @@ document.addEventListener('webkitfullscreenchange',()=>{
   else if(!v.classList.contains('player-fs'))document.body.classList.remove('player-fullscreen');
 });
 
-function loadStreams(){try{if(!window.db)throw new Error('Firebase DB unavailable');const snap=await window.db.collection('streams').get();streams={};snap.forEach(d=>streams[d.id]=d.data());}catch(e){console.error(e);toast('Nie udało się pobrać transmisji.')}renderLeagues();if(!activeLeague){activeLeague=Object.keys(L)[0];renderLeagues()}renderStream();if(document.querySelector('#adminContent').style.display==='block')renderAdmin()}
+async function loadStreams(){try{if(!window.db)throw new Error('Firebase DB unavailable');const snap=await window.db.collection('streams').get();streams={};snap.forEach(d=>streams[d.id]=d.data());}catch(e){console.error(e);toast('Nie udało się pobrać transmisji.')}if(!activeLeague)activeLeague=Object.keys(L)[0];renderLeagues();renderStream();if(document.querySelector('#adminContent').style.display==='block')renderAdmin()}
 function openAdmin(){
   const panel=$('adminPanel');
   if(!panel)return;
@@ -338,10 +338,13 @@ if(window.auth) window.auth.onAuthStateChanged(u=>{
 });
 function handleAdminShortcut(e){
   const key=(e.key||'').toLowerCase();
-  if((e.ctrlKey||e.metaKey) && (key==='m'||e.code==='KeyM')){
+  const isModifier=e.ctrlKey||e.metaKey;
+  const isM=key==='m'||e.code==='KeyM';
+  if(isModifier && isM){
     e.preventDefault();
-    e.stopPropagation();
+    e.stopImmediatePropagation();
     openAdmin();
+    return false;
   }
 }
 document.addEventListener('keydown',handleAdminShortcut,true);
