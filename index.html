@@ -371,11 +371,13 @@ function createPlayer(channel){
       player.setVolume(1);
       player.setMuted(true);
       $('muteIcon').className='fa-solid fa-volume-xmark';
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      player.play();
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       reveal();
     });
-    player.addEventListener(Twitch.Player.PLAY,()=>reveal());
+    player.addEventListener(Twitch.Player.PLAY,()=>{
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      reveal();
+    });
     setTimeout(reveal,7000);
   }catch(e){
     console.error(e);
