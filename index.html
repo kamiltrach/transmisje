@@ -239,6 +239,29 @@ body.player-fullscreen{
   width: 100% !important;
   height: 100% !important;
 }
+
+/* NAPRAWA: Lepszy fullscreen na telefonie po obróceniu */
+@media (max-width:700px) and (orientation:landscape){
+  .video.player-fs{
+    width:100vw!important;
+    height:100vh!important;
+    max-height:100vh!important;
+  }
+  .video.player-fs .yt-wrap,
+  .video.player-fs .yt-wrap iframe{
+    width:100vw!important;
+    height:100vh!important;
+  }
+  .video.player-fs .controls{
+    height:50px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  .video.player-fs .control{
+    width:36px!important;
+    height:36px!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -265,7 +288,8 @@ body.player-fullscreen{
     </div>
     <div class="controls">
       <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
-      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
+      <!-- NAPRAWA: Domyślna ikona to przekreślony głośnik (wyciszony) -->
+      <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
       <button class="control" onclick="minimizePlayer()" title="Minimalizuj"><i class="fa-solid fa-window-restore"></i></button>
@@ -307,11 +331,10 @@ body.player-fullscreen{
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
 let streams={},activeLeague=null,player=null,ytReady=false;
 let pendingVideoId = null;
-let resumeTimer = null; // NAPRAWA: timer do automatycznego wznawiania
+let resumeTimer = null;
 const $=id=>document.getElementById(id);
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 
-// ===== KLUCZOWA NAPRAWA: YouTube IFrame API wymaga tej funkcji =====
 window.onYouTubeIframeAPIReady = function() {
   console.log('[YT] API ready');
   ytReady = true;
@@ -380,7 +403,6 @@ function renderStream(){
 function createPlayer(id){
   removePlayer();
   
-  // Jeśli API nie jest jeszcze gotowe, zapamiętaj videoId i poczekaj
   if(!ytReady || !window.YT || !window.YT.Player){
     console.log('[YT] API not ready, waiting...');
     pendingVideoId = id;
@@ -410,8 +432,6 @@ function createPlayer(id){
   loader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Strefa Gola">';
   $('video').appendChild(loader);
 
-  // NAPRAWA KLUCZOWA: tworzymy DIV (nie iframe), a YouTube sam stworzy iframe wewnątrz
-  // Dzięki temu YouTube Player API działa poprawnie i nie traci referencji
   const wrap=document.createElement('div');
   wrap.id='ytplayer';
   wrap.className='yt-wrap';
@@ -426,7 +446,7 @@ function createPlayer(id){
   wrap.appendChild(shield);
   
   $('video').appendChild(wrap);
-  player=wrap; // Teraz player to div, nie iframe - YouTube sam stworzy iframe wewnątrz
+  player=wrap;
 
   const started=Date.now();
   let done=false;
@@ -460,33 +480,28 @@ function createPlayer(id){
           console.log('[YT] Player ready');
           window.__ytPlayer = e.target;
           
-          // Wymuszenie odtwarzania - wielokrotne próby
+          // NAPRAWA: Natychmiastowe wyciszenie i odtwarzanie
           try{ e.target.mute(); }catch(x){}
           try{ e.target.playVideo(); }catch(x){}
           
-          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },200);
-          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },500);
+          // Wielokrotne próby odtwarzania
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },100);
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },600);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1000);
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1500);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
-          
-          // Próba włączenia dźwięku po interakcji
-          setTimeout(()=>{
-            try{ e.target.unMute(); }catch(x){}
-            try{ e.target.setVolume(100); }catch(x){}
-            try{ e.target.playVideo(); }catch(x){}
-          },1200);
 
+          // NAPRAWA: Ikona głośności - domyślnie przekreślona (wyciszony)
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
           $('muteIcon').className='fa-solid fa-volume-xmark';
           reveal();
           
-          // NAPRAWA KLUCZOWA: automatyczne wznawianie co 3 sekundy
-          // YouTube LIVE czasem samoczynnie pauzuje - to wymusza odtwarzanie
+          // Automatyczne wznawianie co 3 sekundy
           resumeTimer = setInterval(() => {
             if(window.__ytPlayer){
               try{
                 const state = window.__ytPlayer.getPlayerState();
-                // -1=unstarted, 0=ended, 2=paused, 5=cued - wszystkie wymagają playVideo()
                 if(state === -1 || state === 0 || state === 2 || state === 5){
                   console.log('[YT] Resuming playback, state:', state);
                   window.__ytPlayer.playVideo();
@@ -497,7 +512,6 @@ function createPlayer(id){
         },
         onStateChange:function(e){
           console.log('[YT] State:', e.data);
-          // 0=ENDED, 2=PAUSED, 5=CUED - wznów odtwarzanie
           if(e.data === 0 || e.data === 2 || e.data === 5){
             setTimeout(() => {
               if(window.__ytPlayer){
@@ -505,7 +519,7 @@ function createPlayer(id){
               }
             }, 100);
           }
-          if(e.data===1){ // PLAYING
+          if(e.data===1){
             $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
             reveal();
           }
@@ -577,13 +591,27 @@ function togglePlay(){
   youtubeCommand(playing?'pauseVideo':'playVideo');
   $('playBtn').innerHTML=playing?'<i class="fa-solid fa-play"></i>':'<i class="fa-solid fa-pause"></i>';
 }
+
+// NAPRAWA: Poprawna obsługa ikony głośności
 function toggleMute(){
   if(!window.__ytPlayer)return;
   const icon=$('muteIcon');
-  const muted=icon.classList.contains('fa-volume-xmark');
-  youtubeCommand(muted?'unMute':'mute');
-  icon.className=muted?'fa-solid fa-volume-high':'fa-solid fa-volume-xmark';
+  const isMuted = icon.classList.contains('fa-volume-xmark');
+  
+  try {
+    if (isMuted) {
+      window.__ytPlayer.unMute();
+      window.__ytPlayer.playVideo();
+      icon.className='fa-solid fa-volume-high';
+    } else {
+      window.__ytPlayer.mute();
+      icon.className='fa-solid fa-volume-xmark';
+    }
+  } catch(e) {
+    console.error('[YT] Mute error:', e);
+  }
 }
+
 function setFullscreenIcon(active){
   const b=$('fullscreenBtn');
   if(!b)return;
@@ -627,11 +655,14 @@ async function fullscreen(){
   document.body.style.overflow='hidden';
   setFullscreenIcon(true);
 
+  // NAPRAWA: Wymuszenie orientacji landscape na telefonie
   try{
     if(screen.orientation && screen.orientation.lock){
       await screen.orientation.lock('landscape');
     }
-  }catch(e){}
+  }catch(e){
+    console.log('[FS] Orientation lock not supported');
+  }
 }
 
 async function exitPlayerFullscreen(){
