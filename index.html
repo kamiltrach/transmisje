@@ -369,6 +369,8 @@ function createPlayer(channel){
     player.addEventListener(Twitch.Player.READY,()=>{
       player.setVolume(1);
       player.setMuted(false);
+      $('muteIcon').className='fa-solid fa-volume-high';
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       player.play();
       reveal();
     });
@@ -413,19 +415,19 @@ function setupYouTubeLikeControls(){
 function togglePlay(){
   if(!player)return;
   try{
-    if(typeof player.isPaused==='function' && player.isPaused()){
+    if(player.getPaused && player.getPaused()){
       player.play();
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
     }else{
       player.pause();
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
     }
-  }catch(e){}
+  }catch(e){console.error(e);}
 }
 function toggleMute(){
   if(!player)return;
   try{
-    const muted=typeof player.getMuted==='function' ? player.getMuted() : false;
+    const muted=player.getMuted();
     if(muted){
       player.setMuted(false);
       player.setVolume(1);
@@ -434,7 +436,7 @@ function toggleMute(){
       player.setMuted(true);
       $('muteIcon').className='fa-solid fa-volume-xmark';
     }
-  }catch(e){}
+  }catch(e){console.error(e);}
 }
 function setFullscreenIcon(active){
   const b=$('fullscreenBtn');
