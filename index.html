@@ -196,6 +196,7 @@ function renderStream(){
   $('sideInfo').textContent=s?.active&&s.videoId?'Transmisja: '+(s.title||L[activeLeague]):'Brak aktywnej transmisji dla tej ligi.';
   removePlayer();
   $('placeholder').style.display='block';
+  $('muteIcon').className='fa-solid fa-volume-xmark'; // Reset ikony dźwięku
 
   if(!s?.active||!s.videoId){
     $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
@@ -236,7 +237,7 @@ function createPlayer(channelName){
       height: "100%",
       channel: channelName,
       autoplay: true,
-      muted: true, // Wymuszone wyciszenie by autoplay przeszedł
+      muted: true, // Zawsze wyciszone na start dla autostartu
       controls: false,
       parent: [window.location.hostname || "localhost"]
     });
@@ -245,10 +246,6 @@ function createPlayer(channelName){
 
     player.addEventListener(Twitch.Player.PLAYING, function() {
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      // Przywrócenie prawidłowej ikony po starcie (zgodnie z faktycznym stanem API)
-      if(player.getMuted()) {
-         $('muteIcon').className='fa-solid fa-volume-xmark';
-      }
     });
 
     player.addEventListener(Twitch.Player.PAUSE, function() {
@@ -263,6 +260,12 @@ function createPlayer(channelName){
 function handleShieldClick(){
   if(window.__customPlayer){
     try{
+      // Kliknięcie wideo zawsze aktywuje pełny dźwięk
+      if(window.__customPlayer.getMuted() || window.__customPlayer.getVolume() === 0){
+        window.__customPlayer.setMuted(false);
+        window.__customPlayer.setVolume(1.0);
+        $('muteIcon').className='fa-solid fa-volume-high';
+      }
       if(window.__customPlayer.isPaused()){
         window.__customPlayer.play();
       }
@@ -306,8 +309,9 @@ function toggleMute(){
   if(!window.__customPlayer)return;
   const icon=$('muteIcon');
   try {
-    if (window.__customPlayer.getMuted()) {
+    if (window.__customPlayer.getMuted() || window.__customPlayer.getVolume() === 0) {
       window.__customPlayer.setMuted(false);
+      window.__customPlayer.setVolume(1.0); // Zawsze 100% po włączeniu
       icon.className='fa-solid fa-volume-high';
     } else {
       window.__customPlayer.setMuted(true);
@@ -340,26 +344,21 @@ async function fullscreen(){
   const v=$('video');
   if(!v)return;
 
-  // Jeśli jest już na pełnym ekranie, wyjdź
   if(v.classList.contains('player-fs') || document.fullscreenElement){
     await exitPlayerFullscreen();
     return;
   }
 
   v.classList.remove('player-minimized');
-
-  // Niezawodny CSS fullscreen (rozwiązuje problemy z mobilnymi i obracaniem)
   v.classList.add('player-fs');
   document.body.classList.add('player-fullscreen');
   setFullscreenIcon(true);
   handleUserActivity();
 
-  // Próba natywnego API (dla zniknięcia paska przeglądarki na Androidzie/PC)
   const el = document.documentElement;
   let req = el.requestFullscreen || el.webkitRequestFullscreen;
   if (req) { try { await req.call(el); } catch(e) {} }
 
-  // Próba wymuszenia orientacji poziomej
   try{ if(screen.orientation?.lock) screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
 }
 
