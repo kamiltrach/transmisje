@@ -44,7 +44,6 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
   cursor:default;
 }
 
-
 .video.player-fs:fullscreen{
   width:100vw!important;
   height:100vh!important;
@@ -145,7 +144,6 @@ body.player-fullscreen{
   .stream-title{max-width:125px;font-size:.68rem}
   .status{display:none}
 }
-
 
 @media (max-width:700px){
   .video.player-fs{
@@ -483,13 +481,13 @@ function createPlayer(id){
           try{ e.target.unMute(); }catch(x){}
           try{ e.target.playVideo(); }catch(x){}
           
-          // Wielokrotne próby odtwarzania
+          // Automatyczne pauzowanie i wznawianie - upewnia się, że live "zaskoczy"
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },100);
           setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },300);
-          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },600);
-          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1000);
-          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1500);
-          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2000);
+          setTimeout(()=>{ try{ e.target.pauseVideo(); }catch(x){} },700);  // Automatyczna pauza
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1200); // Automatyczne odpauzowanie
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },1700);
+          setTimeout(()=>{ try{ e.target.playVideo(); }catch(x){} },2200);
 
           // Ikona głośności - domyślnie włączona
           $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
