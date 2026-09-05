@@ -345,26 +345,40 @@ function createPlayer(channel){
   const wrap=document.createElement('div');
   wrap.id='twitchplayer';
   wrap.className='yt-wrap';
-
-  const iframe=document.createElement('iframe');
-  iframe.id='twitchframe';
-  iframe.title='Transmisja';
-  const parent=location.hostname||'localhost';
-  iframe.src='https://player.twitch.tv/?channel='+encodeURIComponent(channel)+'&parent='+encodeURIComponent(parent)+'&autoplay=true';
-  iframe.allow='autoplay; fullscreen; picture-in-picture';
-  iframe.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
-  iframe.setAttribute('allowfullscreen','true');
-
-  wrap.appendChild(iframe);
   $('video').appendChild(wrap);
-  player=iframe;
 
-  const reveal=()=>{
+  const parent=location.hostname||'localhost';
+
+  try{
+    player=new Twitch.Player('twitchplayer',{
+      channel:channel,
+      parent:[parent],
+      autoplay:true,
+      muted:false,
+      controls:false
+    });
+
+    player.setVolume(1);
+    player.setMuted(false);
+
+    const reveal=()=>{
+      const l=$('streamLoader');
+      if(l){l.classList.add('hide');setTimeout(()=>l.remove(),350);}
+    };
+
+    player.addEventListener(Twitch.Player.READY,()=>{
+      player.setVolume(1);
+      player.setMuted(false);
+      player.play();
+      reveal();
+    });
+    player.addEventListener(Twitch.Player.PLAY,()=>reveal());
+    setTimeout(reveal,7000);
+  }catch(e){
+    console.error(e);
     const l=$('streamLoader');
-    if(l){l.classList.add('hide');setTimeout(()=>l.remove(),350);}
-  };
-  iframe.addEventListener('load',reveal,{once:true});
-  setTimeout(reveal,7000);
+    if(l)l.remove();
+  }
 }
 
 function setupYouTubeLikeControls(){
@@ -398,11 +412,29 @@ function setupYouTubeLikeControls(){
 
 function togglePlay(){
   if(!player)return;
-  toast('Sterowanie odtwarzaniem jest dostępne w odtwarzaczu.');
+  try{
+    if(typeof player.isPaused==='function' && player.isPaused()){
+      player.play();
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+    }else{
+      player.pause();
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+    }
+  }catch(e){}
 }
 function toggleMute(){
   if(!player)return;
-  toast('Głośność zmienisz w odtwarzaczu.');
+  try{
+    const muted=typeof player.getMuted==='function' ? player.getMuted() : false;
+    if(muted){
+      player.setMuted(false);
+      player.setVolume(1);
+      $('muteIcon').className='fa-solid fa-volume-high';
+    }else{
+      player.setMuted(true);
+      $('muteIcon').className='fa-solid fa-volume-xmark';
+    }
+  }catch(e){}
 }
 function setFullscreenIcon(active){
   const b=$('fullscreenBtn');
