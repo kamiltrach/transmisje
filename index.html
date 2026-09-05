@@ -132,66 +132,6 @@ body.player-fullscreen{
 
 
 /* Safe desktop league navigation refinement — does not alter layout structure */
-@media(min-width:901px){
-  .leagues{
-    justify-content:center;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-    overflow:visible;
-    padding:5px 4px 15px;
-  }
-  .leagues .league{
-    min-width:112px;
-    padding:10px 15px;
-    text-align:center;
-    border-radius:11px;
-    transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease;
-  }
-  .leagues .league:hover{transform:translateY(-1px)}
-  .leagues .league.active{box-shadow:0 7px 22px rgba(126,211,33,.18)}
-}
-
-
-/* PLAYER FIX */
-.video { overflow:hidden; }
-.video .controls { z-index:50 !important; pointer-events:auto !important; }
-.video .yt-wrap { z-index:2; }
-.video .yt-shield { z-index:3; pointer-events:auto; }
-.video.player-fs{
-  position:fixed!important;
-  inset:0!important;
-  width:100vw!important;
-  height:100vh!important;
-  max-width:none!important;
-  min-height:0!important;
-  margin:0!important;
-  border-radius:0!important;
-  aspect-ratio:auto!important;
-  z-index:2147483647!important;
-  overflow:hidden!important;
-}
-.video.player-fs .yt-wrap,
-.video.player-fs .yt-wrap iframe{
-  position:absolute!important;
-  inset:0!important;
-  width:100%!important;
-  height:100%!important;
-}
-.video.player-fs .controls{
-  position:absolute!important;
-  left:0!important;
-  right:0!important;
-  bottom:0!important;
-  z-index:60!important;
-  pointer-events:auto!important;
-}
-.video.player-fs .yt-shield{z-index:5!important}
-.video.player-fs .watermark{z-index:61!important}
-body.player-fullscreen{overflow:hidden!important}
-
-
-/* MOBILE PLAYER — fullscreen/minimize + rotation only */
 @media (max-width:700px){
   .video.player-fs{
     width:100vw!important;
@@ -201,32 +141,37 @@ body.player-fullscreen{overflow:hidden!important}
     inset:0!important;
     aspect-ratio:auto!important;
   }
-
   .video.player-fs .yt-wrap,
   .video.player-fs .yt-wrap iframe{
     width:100vw!important;
     height:100dvh!important;
     inset:0!important;
   }
-
   .video.player-fs .controls{
     height:64px!important;
     padding-left:10px!important;
     padding-right:10px!important;
     padding-bottom:max(8px,env(safe-area-inset-bottom))!important;
   }
-
   .video.player-fs .control{
     width:42px!important;
     height:42px!important;
     flex:0 0 42px!important;
   }
-
   .video.player-fs .stream-title{
     max-width:42vw!important;
   }
 }
 
+/* YOUTUBE-LIKE CONTROLS: visible on touch, auto-hide after inactivity */
+.video.controls-hidden .controls{
+  opacity:0!important;
+  pointer-events:none!important;
+  transform:translateY(8px)!important;
+}
+.video .controls{
+  transition:opacity .18s ease, transform .18s ease!important;
+}
 </style>
 </head>
 <body>
