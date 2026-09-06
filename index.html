@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strefa Gola — Transmisje</title>
+<title>Strefa Gola — Transmisje YouTube</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,7 @@
 .brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand:visited,.brand:hover,.brand:active{color:#fff;text-decoration:none}.brand img{height:46px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;font-weight:700;margin-top:4px;line-height:1;text-transform:uppercase}
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.eyebrow{color:var(--green);font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.hero p{color:var(--muted);max-width:520px;margin:10px auto 0;font-size:.95rem}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
 
-/* Ładne, nowoczesne zakładki lig */
+/* Zakładki lig */
 .leagues{display:flex;gap:10px;overflow:auto;padding:6px 2px 16px;scrollbar-width:none}
 .leagues::-webkit-scrollbar{display:none}
 .league{white-space:nowrap;padding:12px 18px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.76rem;font-weight:700;transition:all .25s ease}
@@ -29,6 +29,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}
 .video-placeholder h2{color:#fff;font-size:1.25rem}
 .video-placeholder p{font-size:.78rem;margin-top:5px}
+
 .controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.98);border-top:1px solid var(--border)}
 .video .controls{position:absolute;left:0;right:0;bottom:0;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s ease}
 .video.show-controls .controls{opacity:1;pointer-events:auto}
@@ -41,6 +42,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .controls .spacer{flex:1}
 .status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}
 .status i{color:var(--green);font-size:.45rem}
+
 .info{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}
 .panel{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:20px}
 .panel h3{font-size:1rem;margin-bottom:8px}
@@ -48,6 +50,7 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .schedule-empty{min-height:120px;display:grid;place-items:center;text-align:center}
 .schedule-empty i{font-size:1.5rem;color:var(--green);margin-bottom:8px}
 .schedule-empty p{font-size:.74rem}
+
 .admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}
 .admin-panel.open{display:block}
 .admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
@@ -57,10 +60,12 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);outline:0;background:rgba(0,0,0,.35);color:#fff;font-size:.8rem}
 .save{width:100%;margin-top:11px;padding:12px;border-radius:10px;background:var(--green);color:var(--navy);font-size:.72rem;font-weight:800;text-transform:uppercase}
 .check{font-size:.7rem;color:#c9d2df;display:flex;align-items:center;gap:7px;margin-top:9px}
+
 .login-box{max-width:720px;margin:0 auto;text-align:center}
 .login-box .lock{font-size:2rem;color:var(--green);margin-bottom:1rem}
 .login-box input{width:100%;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.35);color:#fff}
 .login-box button{width:100%;padding:16px;border-radius:12px;background:var(--green);color:var(--navy);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+
 .toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 15px;border-radius:11px;background:#132240;border:1px solid var(--border);font-size:.75rem;display:none}
 .toast.show{display:block}
 footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
@@ -71,6 +76,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 .stream-loader img{width:88px;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
 .stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
 @keyframes sgSpin{to{transform:rotate(360deg)}}
+
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
 .yt-wrap iframe{width:100%;height:100%;border:0;display:block}
 
@@ -114,7 +120,6 @@ body.player-fullscreen{overflow:hidden!important;width:100%!important;height:100
     <div class="live-dot"><i class="fa-solid fa-circle"></i> TRANSMISJE NA ŻYWO</div>
   </section>
   
-  <!-- Zakładki lig na górze -->
   <div id="leagues" class="leagues"></div>
   <div id="mobilePicker" class="mobile-stream-picker"></div>
 
@@ -124,7 +129,7 @@ body.player-fullscreen{overflow:hidden!important;width:100%!important;height:100
       <div class="watermark"><img src="logo.png" alt="Strefa Gola" onerror="this.style.display='none'"></div>
     </div>
     <div class="controls">
-      <button class="control" id="playBtn" onclick="togglePlay()" title="Odtwórz / pauza"><i class="fa-solid fa-play"></i></button>
+      <button class="control" id="playBtn" onclick="togglePlay()" title="Informacja"><i class="fa-solid fa-play"></i></button>
       <button class="control" onclick="toggleMute()" title="Dźwięk"><i id="muteIcon" class="fa-solid fa-volume-high"></i></button>
       <div class="stream-title" id="streamTitle">Brak wybranej transmisji</div><div class="spacer"></div>
       <div class="status"><i class="fa-solid fa-circle"></i><span>LIVE</span></div>
@@ -167,7 +172,7 @@ body.player-fullscreen{overflow:hidden!important;width:100%!important;height:100
 <script src="firebase-config.js"></script>
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,ytPlayer=null;
+let streams={},activeLeague=null;
 const $=id=>document.getElementById(id);
 
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
@@ -190,13 +195,11 @@ function selectLeague(k){
 function removePlayer(){
   const p=$('ytplayerwrap'); if(p)p.remove();
   const l=$('streamLoader'); if(l)l.remove();
-  ytPlayer=null;
 }
 
 function getYouTubeId(url){
   if(!url) return '';
   url = url.trim();
-  // Jeśli wpisano samo ID filmu (np. 11 znaków)
   if(/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
   try{
     const u = new URL(url);
@@ -246,7 +249,6 @@ function createPlayer(videoId){
   const wrap=document.createElement('div');
   wrap.id='ytplayerwrap';
   wrap.className='yt-wrap';
-  // Używamy bezpiecznego osadzania iframe YouTube z autoplay
   wrap.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   $('video').appendChild(wrap);
 
@@ -258,7 +260,7 @@ function createPlayer(videoId){
 
 let isMuted=false;
 function togglePlay(){
-  toast('Sterowanie odtwarzaczem bezpośrednio z poziomu YouTube.');
+  toast('Sterowanie odtwarzaczem odbywa się bezpośrednio z poziomu YouTube.');
 }
 
 function toggleMute(){
