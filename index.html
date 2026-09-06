@@ -406,11 +406,9 @@ function createPlayer(channel){
 
     player.addEventListener(Twitch.Player.READY,()=>{
       player.setVolume(1);
-      player.setMuted(false);
-      $('muteIcon').className='fa-solid fa-volume-high';
+      player.setMuted(true);
+      $('muteIcon').className='fa-solid fa-volume-xmark';
       reveal();
-      // Próba automatycznego startu. Jeżeli przeglądarka zablokuje audio,
-      // przycisk Odtwórz nadal pozwoli uruchomić LIVE po kliknięciu.
       try{ player.play(); }catch(e){ console.warn('Autoplay blocked:',e); }
     });
 
@@ -471,6 +469,20 @@ function setupYouTubeLikeControls(){
   // Desktop: movement over the player shows controls.
   v.addEventListener('mousemove',()=>{ if(v.classList.contains('player-fs')) show(); else show(); });
 
+  // A real user gesture anywhere on the player enables Twitch audio.
+  v.addEventListener('click',function(e){
+    if(e.target.closest('.controls')) return;
+    if(!player || streamPlaying) return;
+    try{
+      player.setVolume(1);
+      player.setMuted(false);
+      player.play();
+      streamPlaying=true;
+      $('muteIcon').className='fa-solid fa-volume-high';
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+    }catch(err){ console.warn('User gesture playback failed:',err); }
+  });
+
   // Touch: first tap shows controls, next tap hides them.
   v.addEventListener('touchstart',(e)=>{
     if(e.target.closest('.controls')) return;
@@ -520,9 +532,12 @@ function togglePlay(){
       player.setVolume(1);
       player.setMuted(false);
       player.play();
+      streamPlaying=true;
+      $('muteIcon').className='fa-solid fa-volume-high';
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
     }else{
       player.pause();
+      streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
     }
   }catch(e){
