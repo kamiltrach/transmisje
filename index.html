@@ -236,6 +236,56 @@ html,body{max-width:100%;overflow-x:hidden}
   }
 }
 </style>
+
+<style id="player-rebuild-css">
+.player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
+.video{position:relative;aspect-ratio:16/9;min-height:330px;background:#000;overflow:hidden}
+#twitchplayer{position:absolute;inset:0;width:100%;height:100%;z-index:2;background:#000}
+#twitchplayer iframe{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border:0!important;display:block!important}
+.stream-loader{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:#07101f;transition:opacity .25s ease}
+.stream-loader.hide{opacity:0;pointer-events:none}
+.stream-loader img{width:88px;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
+.stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
+@keyframes sgSpin{to{transform:rotate(360deg)}}
+
+.video-placeholder{position:absolute;inset:0;z-index:9;display:grid;place-content:center;text-align:center;color:var(--muted);padding:20px;background:radial-gradient(circle at 50% 40%,#182a49,#050b15 65%)}
+.video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}
+.video-placeholder h2{color:#fff;font-size:1.25rem}
+.video-placeholder p{font-size:.78rem;margin-top:5px}
+
+.watermark{position:absolute;right:20px;top:18px;z-index:12;background:rgba(11,22,44,.72);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px);pointer-events:none}
+.watermark img{height:34px;width:auto;display:block}
+
+.video > .controls{position:absolute;left:0;right:0;bottom:0;z-index:20;height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:linear-gradient(to top,rgba(5,10,20,.98),rgba(5,10,20,.88));border-top:1px solid var(--border);opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .18s ease,transform .18s ease}
+.video.show-controls > .controls,.video:hover > .controls{opacity:1;pointer-events:auto;transform:none}
+.video.controls-locked > .controls{opacity:1;pointer-events:auto;transform:none}
+.control{width:40px;height:40px;flex:0 0 40px;border-radius:10px;background:rgba(255,255,255,.07);color:#c9d2df}
+.control:hover{background:rgba(126,211,33,.12);color:var(--green)}
+.stream-title{font-size:.78rem;font-weight:700;margin-left:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.controls .spacer{flex:1}
+.status{font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.status i{color:var(--green);font-size:.45rem}
+
+.video.player-fs{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;min-height:0!important;margin:0!important;border-radius:0!important;z-index:2147483640!important;aspect-ratio:auto!important;background:#000}
+.video.player-fs #twitchplayer,.video.player-fs #twitchplayer iframe{width:100%!important;height:100%!important}
+.video.player-fs > .controls{z-index:2147483647!important}
+.video.player-fs .watermark{z-index:2147483646!important}
+body.player-fullscreen{overflow:hidden!important}
+
+@media(max-width:700px){
+  .video{min-height:0;aspect-ratio:16/9}
+  .video > .controls{height:58px;padding:0 8px;gap:6px}
+  .control{width:38px;height:38px;flex-basis:38px}
+  .stream-title{max-width:125px;font-size:.68rem}
+  .status{display:none}
+  .watermark{right:10px;top:10px;padding:7px 9px}
+  .watermark img{height:34px}
+  .video.player-fs > .controls{height:64px;padding-left:10px;padding-right:10px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+  .video.player-fs .control{width:42px;height:42px;flex-basis:42px}
+  .video.player-fs .stream-title{max-width:42vw}
+}
+</style>
+
 </head>
 <body>
 <header class="topbar">
@@ -297,34 +347,63 @@ html,body{max-width:100%;overflow-x:hidden}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+
 <script>
-const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,player=null,ytReady=false;
+const L={
+  iv_liga:'IV Liga Podkarpacka',
+  okr_jaroslaw:'Klasa Okręgowa Jarosław',
+  okr_krosno:'Klasa Okręgowa Krosno',
+  okr_rzeszow:'Klasa Okręgowa Rzeszów',
+  okr_debica:'Klasa Okręgowa Dębica',
+  okr_stalowa:'Klasa Okręgowa Stalowa Wola',
+  a_przeworsk:'A Klasa Przeworsk',
+  b_przeworsk:'B Klasa Przeworsk',
+  a_jaroslaw:'A Klasa Jarosław',
+  b_jaroslaw:'B Klasa Jarosław',
+  a_rzeszow:'A Klasa Rzeszów',
+  b_rzeszow:'B Klasa Rzeszów'
+};
+
+let streams={};
+let activeLeague=null;
+let player=null;
+let streamPlaying=false;
+let playerReady=false;
+let playBusy=false;
+let hideTimer=null;
+
 const $=id=>document.getElementById(id);
-function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
-function renderLeagues(){
-  $('leagues').innerHTML=Object.entries(L).map(([k,v])=>`<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`).join('');
-  const picker=$('mobilePicker');
-  picker.innerHTML=`<button type="button" class="mobile-picker-btn" onclick="toggleMobilePicker()"><span><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:7px"></i>${L[activeLeague]||'Wybierz transmisję'}</span><i class="fa-solid fa-chevron-down"></i></button><div class="mobile-picker-menu">${Object.entries(L).map(([k,v])=>`<button type="button" class="mobile-picker-option ${k===activeLeague?'active':''}" onclick="selectLeague('${k}');closeMobilePicker()">${v}</button>`).join('')}</div>`;
-}
-function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open'); }
-function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
-function selectLeague(k){
-  activeLeague=k;
-  renderLeagues();
-  renderStream();
+
+function toast(t){
+  $('toast').textContent=t;
+  $('toast').classList.add('show');
+  setTimeout(()=>$('toast').classList.remove('show'),2600);
 }
 
-function removePlayer(){
-  const p=$('twitchplayer'); if(p)p.remove();
-  const l=$('streamLoader'); if(l)l.remove();
-  player=null;
+function renderLeagues(){
+  $('leagues').innerHTML=Object.entries(L).map(([k,v])=>
+    `<button class="league ${k===activeLeague?'active':''}" onclick="selectLeague('${k}')">${v}</button>`
+  ).join('');
+
+  $('mobilePicker').innerHTML=
+    `<button type="button" class="mobile-picker-btn" onclick="toggleMobilePicker()">
+      <span><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:7px"></i>${L[activeLeague]||'Wybierz transmisję'}</span>
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <div class="mobile-picker-menu">
+      ${Object.entries(L).map(([k,v])=>
+        `<button type="button" class="mobile-picker-option ${k===activeLeague?'active':''}" onclick="selectLeague('${k}');closeMobilePicker()">${v}</button>`
+      ).join('')}
+    </div>`;
 }
+
+function toggleMobilePicker(){ $('mobilePicker').classList.toggle('open'); }
+function closeMobilePicker(){ $('mobilePicker').classList.remove('open'); }
 
 function getChannel(url){
   try{
     const u=new URL(url);
-    if(!/twitch\.tv$/i.test(u.hostname) && !/\.twitch\.tv$/i.test(u.hostname))return '';
+    if(!/^(www\.)?twitch\.tv$/i.test(u.hostname) && !/\.twitch\.tv$/i.test(u.hostname)) return '';
     return u.pathname.split('/').filter(Boolean)[0]||'';
   }catch(e){
     const m=String(url||'').match(/twitch\.tv\/([^/?#]+)/i);
@@ -332,43 +411,76 @@ function getChannel(url){
   }
 }
 
-function renderStream(){
-  const s=streams[activeLeague];
-  $('streamTitle').textContent=s?.title||L[activeLeague]||'Transmisja';
-  $('sideInfo').textContent=s?.active&&s.videoId
-    ? 'Transmisja: '+(s.title||L[activeLeague])
-    : 'Brak aktywnej transmisji dla tej ligi.';
+function selectLeague(k){
+  activeLeague=k;
+  renderLeagues();
+  renderStream();
+}
 
-  const oldBtn=$('placeholder').querySelector('.watch-btn');
-  if(oldBtn)oldBtn.remove();
-
-  if(!s?.active||!s.videoId){
-    removePlayer();
-    $('placeholder').style.display='block';
-    $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
-    $('placeholder').querySelector('p').textContent=s
-      ? 'Administrator nie ustawił jeszcze aktywnej transmisji.'
-      : 'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
-    return;
+function removePlayer(){
+  clearTimeout(hideTimer);
+  if(player){
+    try{ player.pause(); }catch(e){}
   }
+  const p=$('twitchplayer');
+  if(p) p.remove();
+  const l=$('streamLoader');
+  if(l) l.remove();
+  player=null;
+  playerReady=false;
+  streamPlaying=false;
+  $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+  $('muteIcon').className='fa-solid fa-volume-high';
+}
 
-  $('placeholder').style.display='none';
+function reveal(){
+  const l=$('streamLoader');
+  if(l){
+    l.classList.add('hide');
+    setTimeout(()=>l.remove(),300);
+  }
+}
 
-  // Na komputerze przełączamy kanał w istniejącym odtwarzaczu.
-  // Dzięki temu Twitch nie dostaje kolejnego iframe i przełączanie LIVE
-  // działa płynnie również podczas oglądania.
-  if(player && typeof player.setChannel === 'function'){
-    try{
-      player.setChannel(s.videoId);
-      streamPlaying=false;
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+function showControls(autoHide=true){
+  const v=$('video');
+  if(!v) return;
+  v.classList.add('show-controls');
+  clearTimeout(hideTimer);
+  if(autoHide){
+    hideTimer=setTimeout(()=>{
+      if(!v.matches(':hover') && !v.classList.contains('player-fs')){
+        v.classList.remove('show-controls');
+      }
+    },3000);
+  }
+}
+
+function setupControls(){
+  const v=$('video');
+  if(!v || v.dataset.controlsReady) return;
+  v.dataset.controlsReady='1';
+
+  v.addEventListener('mousemove',()=>showControls(true));
+  v.addEventListener('mouseenter',()=>showControls(false));
+  v.addEventListener('mouseleave',()=>{ if(!v.classList.contains('player-fs')) v.classList.remove('show-controls'); });
+
+  // On touch: one tap reveals controls. A second tap on the video enables audio/play.
+  v.addEventListener('pointerdown',e=>{
+    if(e.pointerType!=='touch') return;
+    if(e.target.closest('.controls')) return;
+    if(!v.classList.contains('show-controls')){
+      showControls(true);
       return;
-    }catch(e){
-      console.warn('setChannel failed, rebuilding player:',e);
     }
-  }
+    startStreamFromGesture(e);
+  },{passive:true});
 
-  createPlayer(s.videoId);
+  // Important: a real click/tap is used to unlock audio because browsers block
+  // autoplay with sound. This is the reliable way to get sound without Twitch UI.
+  v.addEventListener('click',e=>{
+    if(e.target.closest('.controls')) return;
+    startStreamFromGesture(e);
+  });
 }
 
 function createPlayer(channel){
@@ -377,7 +489,7 @@ function createPlayer(channel){
   const loader=document.createElement('div');
   loader.id='streamLoader';
   loader.className='stream-loader';
-  loader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Strefa Gola">';
+  loader.innerHTML='<div class="ring"></div><img src="logo.png" alt="Ładowanie">';
   $('video').appendChild(loader);
 
   const wrap=document.createElement('div');
@@ -385,39 +497,46 @@ function createPlayer(channel){
   wrap.className='yt-wrap';
   $('video').appendChild(wrap);
 
-  const parent=location.hostname||'localhost';
+  if(!window.Twitch || !Twitch.Player){
+    toast('Odtwarzacz Twitch nie został załadowany.');
+    loader.remove();
+    return;
+  }
+
+  const parent=location.hostname || 'localhost';
 
   try{
     player=new Twitch.Player('twitchplayer',{
-      channel:channel,
-      parent:[parent],
+      channel,
+      parent,
       autoplay:true,
-      muted:false,
+      muted:true,
       controls:false
     });
 
-    player.setVolume(1);
-    player.setMuted(false);
-
-    const reveal=()=>{
-      const l=$('streamLoader');
-      if(l){l.classList.add('hide');setTimeout(()=>l.remove(),350);}
-    };
-
     player.addEventListener(Twitch.Player.READY,()=>{
-      player.setVolume(1);
-      player.setMuted(true);
+      playerReady=true;
+      try{
+        player.setVolume(1);
+        player.setMuted(true);
+        player.play();
+      }catch(e){}
       $('muteIcon').className='fa-solid fa-volume-xmark';
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       reveal();
-      try{ player.play(); }catch(e){}
     });
 
     player.addEventListener(Twitch.Player.PLAY,()=>{
       streamPlaying=true;
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      reveal();
       playBusy=false;
+      reveal();
+    });
+
+    player.addEventListener(Twitch.Player.PLAYING,()=>{
+      streamPlaying=true;
+      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+      playBusy=false;
+      reveal();
     });
 
     player.addEventListener(Twitch.Player.PAUSE,()=>{
@@ -431,203 +550,165 @@ function createPlayer(channel){
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       playBusy=false;
       reveal();
-    });
-
-    player.addEventListener(Twitch.Player.PLAYING,()=>{
-      streamPlaying=true;
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      playBusy=false;
-      reveal();
+      showControls(false);
     });
 
     player.addEventListener(Twitch.Player.OFFLINE,()=>{
       streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+      toast('Transmisja jest obecnie offline.');
     });
 
-    setTimeout(reveal,7000);
+    setTimeout(reveal,8000);
   }catch(e){
-    console.error(e);
-    const l=$('streamLoader');
-    if(l)l.remove();
+    console.error('Twitch Player error:',e);
+    toast('Nie udało się uruchomić odtwarzacza.');
+    loader.remove();
   }
 }
 
-function setupYouTubeLikeControls(){
-  const v=$('video'), c=document.querySelector('.player-card > .controls');
-  if(!v || !c || c.parentElement===v)return;
-  v.appendChild(c);
+function renderStream(){
+  const s=streams[activeLeague];
 
-  let hideTimer=null;
-  const show=()=>{
-    v.classList.add('show-controls');
-    clearTimeout(hideTimer);
-    hideTimer=setTimeout(()=>{
-      v.classList.remove('show-controls');
-    },2500);
-  };
+  $('streamTitle').textContent=s?.title||L[activeLeague]||'Transmisja';
+  $('sideInfo').textContent=s?.active&&s.videoId
+    ? 'Transmisja: '+(s.title||L[activeLeague])
+    : 'Brak aktywnej transmisji dla tej ligi.';
 
-  // Desktop: movement over the player shows controls.
-  v.addEventListener('mousemove',()=>{ if(v.classList.contains('player-fs')) show(); else show(); });
+  if(!s?.active || !s.videoId){
+    removePlayer();
+    $('placeholder').style.display='grid';
+    $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
+    $('placeholder').querySelector('p').textContent=s
+      ? 'Administrator nie ustawił jeszcze aktywnej transmisji.'
+      : 'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
+    showControls(false);
+    return;
+  }
 
-  // Touch: first tap shows controls, next tap hides them.
-  v.addEventListener('touchstart',(e)=>{
-    if(e.target.closest('.controls')) return;
-    if(v.classList.contains('show-controls')){
-      v.classList.remove('show-controls');
-      clearTimeout(hideTimer);
-    }else{
-      show();
+  $('placeholder').style.display='none';
+
+  if(player && playerReady && typeof player.setChannel==='function'){
+    try{
+      player.setChannel(s.videoId);
+      playerReady=true;
+      streamPlaying=false;
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+      // New channel starts muted, then the user can unlock sound with one tap.
+      player.setMuted(true);
+      $('muteIcon').className='fa-solid fa-volume-xmark';
+      return;
+    }catch(e){
+      console.warn('setChannel failed, rebuilding:',e);
     }
-  },{passive:true});
+  }
+
+  createPlayer(s.videoId);
 }
 
-let playBusy=false;
-let streamPlaying=false;
+function startStreamFromGesture(e){
+  if(!player || !playerReady || playBusy) return;
+  if(e?.target?.closest?.('.control')) return;
 
-function startStreamFromTap(e){
-  if(!player || playBusy)return;
-  if(e.target && e.target.closest && e.target.closest('.control'))return;
+  playBusy=true;
   try{
-    playBusy=true;
-    // First tap is a real user gesture: enable audio and keep the stream playing.
-    if(player.getMuted && player.getMuted()){
-      player.setVolume(1);
-      player.setMuted(false);
-      player.play();
-      $('muteIcon').className='fa-solid fa-volume-high';
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-    }else if(!streamPlaying){
-      player.setVolume(1);
-      player.setMuted(false);
-      player.play();
-      $('muteIcon').className='fa-solid fa-volume-high';
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-    }
+    player.setVolume(1);
+    player.setMuted(false);
+    player.play();
+    streamPlaying=true;
+    $('muteIcon').className='fa-solid fa-volume-high';
+    $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+    showControls(true);
   }catch(err){
-    console.error(err);
-  }finally{
-    setTimeout(()=>playBusy=false,350);
+    console.error('Audio unlock/play error:',err);
   }
+  setTimeout(()=>playBusy=false,500);
 }
 
 function togglePlay(){
-  if(!player)return;
+  if(!player || !playerReady) return;
   try{
-    if(!streamPlaying){
+    if(streamPlaying){
+      player.pause();
+      streamPlaying=false;
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
+    }else{
       player.setVolume(1);
       player.setMuted(false);
       player.play();
       streamPlaying=true;
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       $('muteIcon').className='fa-solid fa-volume-high';
-    }else{
-      player.pause();
-      streamPlaying=false;
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
     }
-  }catch(e){
-    console.error('Twitch play error:',e);
-  }
+  }catch(e){ console.error(e); }
+  showControls(true);
 }
+
 function toggleMute(){
-  if(!player)return;
+  if(!player || !playerReady) return;
   try{
     const muted=player.getMuted();
     if(muted){
       player.setVolume(1);
       player.setMuted(false);
+      player.play();
       $('muteIcon').className='fa-solid fa-volume-high';
     }else{
       player.setMuted(true);
       $('muteIcon').className='fa-solid fa-volume-xmark';
     }
-  }catch(e){console.error(e);}
+  }catch(e){ console.error(e); }
+  showControls(true);
 }
+
 function setFullscreenIcon(active){
   const b=$('fullscreenBtn');
-  if(!b)return;
+  if(!b) return;
   b.title=active?'Pomniejsz ekran':'Pełny ekran';
-  b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
+  b.innerHTML=active
+    ? '<i class="fa-solid fa-compress"></i>'
+    : '<i class="fa-solid fa-expand"></i>';
 }
 
 async function fullscreen(){
   const el=$('video');
-  if(!el)return;
+  if(!el) return;
 
   try{
-    // Normalny fullscreen przeglądarki.
     if(document.fullscreenElement){
       await document.exitFullscreen();
       return;
     }
-
     if(el.requestFullscreen){
       await el.requestFullscreen({navigationUI:'hide'});
       return;
     }
-
-    // Safari / starsze WebKit.
-    if(el.webkitRequestFullscreen){
-      el.webkitRequestFullscreen();
-      return;
-    }
-
-    // Ostateczny fallback — działa także tam, gdzie Fullscreen API
-    // nie jest dostępne.
     el.classList.add('player-fs');
     document.body.classList.add('player-fullscreen');
-    document.body.style.overflow='hidden';
     setFullscreenIcon(true);
   }catch(e){
-    console.warn('Fullscreen API failed, using fallback:',e);
     el.classList.add('player-fs');
     document.body.classList.add('player-fullscreen');
-    document.body.style.overflow='hidden';
     setFullscreenIcon(true);
   }
-}
-
-async function exitPlayerFullscreen(){
-  const v=$('video');
-  if(!v)return;
-
-  try{
-    if(document.fullscreenElement && document.exitFullscreen){
-      await document.exitFullscreen();
-    }else if(document.webkitFullscreenElement && document.webkitExitFullscreen){
-      document.webkitExitFullscreen();
-    }
-  }catch(e){}
-
-  v.classList.remove('player-fs','landscape-player','show-controls','controls-hidden');
-  document.body.classList.remove('player-fullscreen');
-  document.body.style.overflow='';
-  setFullscreenIcon(false);
 }
 
 function syncFullscreenState(){
   const v=$('video');
-  if(!v)return;
-
-  const active=!!document.fullscreenElement || !!document.webkitFullscreenElement || v.classList.contains('player-fs');
-
+  if(!v) return;
+  const active=!!document.fullscreenElement || v.classList.contains('player-fs');
   v.classList.toggle('player-fs',active);
   document.body.classList.toggle('player-fullscreen',active);
   document.body.style.overflow=active?'hidden':'';
   setFullscreenIcon(active);
+  if(active) showControls(false);
 }
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape' && document.fullscreenElement){
-    // Let the browser exit fullscreen; fullscreenchange will restore the GUI.
-    return;
-  }
-});
+document.addEventListener('fullscreenchange',syncFullscreenState);
 
 async function loadStreams(){
   try{
-    if(!window.db)throw new Error('Firebase DB unavailable');
+    if(!window.db) throw new Error('Firebase DB unavailable');
     const snap=await window.db.collection('streams').get();
     streams={};
     snap.forEach(d=>streams[d.id]=d.data());
@@ -636,28 +717,29 @@ async function loadStreams(){
     toast('Nie udało się pobrać transmisji.');
   }
 
-  // Zawsze wybierz automatycznie pierwszą aktywną transmisję LIVE.
-  const autoLive=Object.keys(L).find(k=>streams[k]?.active && streams[k]?.videoId);
-  if(autoLive) activeLeague=autoLive;
-  else if(!activeLeague) activeLeague=Object.keys(L)[0];
+  const autoLive=Object.keys(L).find(k=>streams[k]?.active&&streams[k]?.videoId);
+  activeLeague=autoLive || activeLeague || Object.keys(L)[0];
 
   renderLeagues();
   renderStream();
 
-  if(document.querySelector('#adminContent').style.display==='block')renderAdmin();
+  if($('adminContent').style.display==='block') renderAdmin();
 }
+
 function openAdmin(){
   const panel=$('adminPanel');
-  if(!panel)return;
+  if(!panel) return;
   panel.classList.add('open');
   document.body.style.overflow='hidden';
   if(window.auth && window.auth.currentUser) showAdmin();
 }
+
 function closeAdmin(){
   const panel=$('adminPanel');
-  if(panel)panel.classList.remove('open');
-  document.body.style.overflow='';
+  if(panel) panel.classList.remove('open');
+  if(!$('video').classList.contains('player-fs')) document.body.style.overflow='';
 }
+
 async function login(){
   const e=$('email').value.trim();
   const p=$('password').value;
@@ -665,11 +747,8 @@ async function login(){
   msg.style.color='#ff6b6b';
   msg.textContent='';
 
-  if(!e || !p){
-    msg.textContent='Wpisz email i hasło.';
-    return;
-  }
-  if(!window.firebase || !window.auth){
+  if(!e||!p){ msg.textContent='Wpisz email i hasło.'; return; }
+  if(!window.firebase||!window.auth){
     msg.textContent='Firebase nie został załadowany. Sprawdź firebase-config.js.';
     return;
   }
@@ -679,8 +758,8 @@ async function login(){
     msg.textContent='';
     showAdmin();
   }catch(err){
-    console.error('Firebase login error:',err);
-    const code=err && err.code ? err.code : '';
+    console.error(err);
+    const code=err?.code||'';
     const messages={
       'auth/invalid-credential':'Nieprawidłowy email lub hasło.',
       'auth/invalid-email':'Podany email ma nieprawidłowy format.',
@@ -691,54 +770,85 @@ async function login(){
       'auth/too-many-requests':'Za dużo prób logowania. Spróbuj ponownie później.',
       'auth/network-request-failed':'Błąd połączenia z Firebase.'
     };
-    msg.textContent=messages[code] || ('Błąd logowania: '+(code || 'nieznany błąd'));
+    msg.textContent=messages[code]||('Błąd logowania: '+(code||'nieznany błąd'));
   }
 }
+
 function showAdmin(){
   $('loginBox').style.display='none';
   $('adminContent').style.display='block';
   renderAdmin();
 }
+
 function renderAdmin(){
   $('adminGrid').innerHTML=Object.entries(L).map(([k,v])=>{
     const s=streams[k]||{};
-    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link transmisji</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://twitch.tv/nazwa_kanalu"><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
+    return `<div class="admin-card">
+      <h3>${v}</h3>
+      <label class="field">Nazwa transmisji</label>
+      <input id="t_${k}" value="${esc(s.title||v)}">
+      <label class="field">Link transmisji</label>
+      <input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://twitch.tv/nazwa_kanalu">
+      <label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label>
+      <button class="save" onclick="save('${k}')">Zapisz</button>
+    </div>`;
   }).join('');
 }
+
 async function save(k){
-  if(!window.auth || !window.auth.currentUser)return toast('Najpierw się zaloguj.');
-  if(!window.db)return toast('Firebase nie jest skonfigurowany.');
-  const url=$('u_'+k).value.trim(),id=getChannel(url),active=$('a_'+k).checked;
-  if(active&&!id)return toast('Podaj poprawny link transmisji.');
+  if(!window.auth||!window.auth.currentUser) return toast('Najpierw się zaloguj.');
+  if(!window.db) return toast('Firebase nie jest skonfigurowany.');
+
+  const url=$('u_'+k).value.trim();
+  const id=getChannel(url);
+  const active=$('a_'+k).checked;
+
+  if(active&&!id) return toast('Podaj poprawny link transmisji Twitch.');
+
   try{
-    await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    await window.db.collection('streams').doc(k).set({
+      league:k,
+      title:$('t_'+k).value.trim()||L[k],
+      url,
+      videoId:id,
+      active,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+
     streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
     toast('Transmisja zapisana.');
-    if(activeLeague===k)renderStream();
-  }catch(e){console.error(e);toast('Błąd zapisu. Sprawdź reguły Firebase.')}
+    if(activeLeague===k) renderStream();
+  }catch(e){
+    console.error(e);
+    toast('Błąd zapisu. Sprawdź reguły Firebase.');
+  }
 }
-function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[m]))}
-if(window.auth) window.auth.onAuthStateChanged(u=>{
-  if(u && $('adminPanel').classList.contains('open'))showAdmin();
-});
+
+function esc(x){
+  return String(x).replace(/[&<>"']/g,m=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+
 function handleAdminShortcut(e){
   const key=(e.key||'').toLowerCase();
-  const isModifier=e.ctrlKey||e.metaKey;
-  const isM=key==='m'||e.code==='KeyM';
-  if(isModifier && isM){
+  if((e.ctrlKey||e.metaKey)&&key==='m'){
     e.preventDefault();
     e.stopImmediatePropagation();
     openAdmin();
-    return false;
   }
 }
+
 document.addEventListener('keydown',handleAdminShortcut,true);
+
 document.addEventListener('click',e=>{
   const picker=$('mobilePicker');
-  if(picker && !picker.contains(e.target))picker.classList.remove('open');
+  if(picker&&!picker.contains(e.target)) picker.classList.remove('open');
 });
+
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter' && document.activeElement && (document.activeElement.id==='email'||document.activeElement.id==='password')){
+  if(e.key==='Enter'&&document.activeElement&&
+    (document.activeElement.id==='email'||document.activeElement.id==='password')){
     e.preventDefault();
     login();
   }
@@ -751,6 +861,7 @@ mobileTrigger.setAttribute('aria-hidden','true');
 mobileTrigger.setAttribute('tabindex','-1');
 mobileTrigger.style.cssText='position:fixed;right:0;bottom:0;width:76px;height:76px;z-index:9999;background:transparent;border:0;padding:0;opacity:0;';
 document.body.appendChild(mobileTrigger);
+
 mobileTrigger.addEventListener('click',()=>{
   mobileAdminTaps++;
   clearTimeout(mobileAdminTimer);
@@ -761,37 +872,11 @@ mobileTrigger.addEventListener('click',()=>{
   mobileAdminTimer=setTimeout(()=>mobileAdminTaps=0,1500);
 });
 
-activeLeague=null;
-setupYouTubeLikeControls();
-loadStreams();
-/* MOBILE ROTATION — fullscreen follows landscape orientation */
-(function(){
-  function vbox(){ return document.getElementById('video'); }
-
-  function syncRotation(){
-    const v = vbox();
-    if(!v) return;
-    const landscape = window.innerWidth > window.innerHeight;
-    const active = !!document.fullscreenElement || v.classList.contains('player-fs');
-
-    if(active && landscape){
-      v.classList.add('landscape-player');
-    }else{
-      v.classList.remove('landscape-player');
-    }
-  }
-
-  window.addEventListener('orientationchange', function(){
-    setTimeout(syncRotation, 150);
-  }, {passive:true});
-
-  window.addEventListener('resize', function(){
-    setTimeout(syncRotation, 50);
-  }, {passive:true});
-
-  document.addEventListener('fullscreenchange', syncRotation);
-  document.addEventListener('DOMContentLoaded', syncRotation);
-})();
+document.addEventListener('DOMContentLoaded',()=>{
+  setupControls();
+  loadStreams();
+});
 </script>
+
 </body>
 </html>
