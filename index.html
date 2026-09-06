@@ -335,45 +335,22 @@ function getChannel(url){
 function renderStream(){
   const s=streams[activeLeague];
   $('streamTitle').textContent=s?.title||L[activeLeague]||'Transmisja';
-  $('sideInfo').textContent=s?.active&&s.videoId
-    ? 'Transmisja: '+(s.title||L[activeLeague])
-    : 'Brak aktywnej transmisji dla tej ligi.';
-
+  $('sideInfo').textContent=s?.active&&s.videoId?'Transmisja: '+(s.title||L[activeLeague]):'Brak aktywnej transmisji dla tej ligi.';
+  removePlayer();
+  $('placeholder').style.display='block';
   const oldBtn=$('placeholder').querySelector('.watch-btn');
   if(oldBtn)oldBtn.remove();
-
   if(!s?.active||!s.videoId){
-    removePlayer();
-    $('placeholder').style.display='block';
     $('placeholder').querySelector('h2').textContent=s?'Transmisja niedostępna':'Wybierz ligę';
-    $('placeholder').querySelector('p').textContent=s
-      ? 'Administrator nie ustawił jeszcze aktywnej transmisji.'
-      : 'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
+    $('placeholder').querySelector('p').textContent=s?'Administrator nie ustawił jeszcze aktywnej transmisji.':'Wybierz transmisję powyżej, aby rozpocząć oglądanie.';
     return;
   }
-
   $('placeholder').style.display='none';
-
-  // Na komputerze przełączamy kanał w istniejącym odtwarzaczu.
-  // Dzięki temu Twitch nie dostaje kolejnego iframe i przełączanie LIVE
-  // działa płynnie również podczas oglądania.
-  if(player && typeof player.setChannel === 'function'){
-    try{
-      player.setChannel(s.videoId);
-      streamPlaying=false;
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-      return;
-    }catch(e){
-      console.warn('setChannel failed, rebuilding player:',e);
-    }
-  }
-
   createPlayer(s.videoId);
 }
 
 function createPlayer(channel){
   removePlayer();
-
   const loader=document.createElement('div');
   loader.id='streamLoader';
   loader.className='stream-loader';
@@ -392,7 +369,7 @@ function createPlayer(channel){
       channel:channel,
       parent:[parent],
       autoplay:true,
-      muted:false,
+      muted:true,
       controls:false
     });
 
@@ -408,44 +385,36 @@ function createPlayer(channel){
       player.setVolume(1);
       player.setMuted(false);
       $('muteIcon').className='fa-solid fa-volume-high';
+      streamPlaying=false;
+      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       reveal();
-      // Próba automatycznego startu. Jeżeli przeglądarka zablokuje audio,
-      // przycisk Odtwórz nadal pozwoli uruchomić LIVE po kliknięciu.
-      try{ player.play(); }catch(e){}
     });
-
     player.addEventListener(Twitch.Player.PLAY,()=>{
       streamPlaying=true;
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       reveal();
       playBusy=false;
     });
-
     player.addEventListener(Twitch.Player.PAUSE,()=>{
       streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       playBusy=false;
     });
-
     player.addEventListener(Twitch.Player.PLAYBACK_BLOCKED,()=>{
       streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
       playBusy=false;
-      reveal();
+      console.warn('Twitch blocked playback by browser policy');
     });
-
     player.addEventListener(Twitch.Player.PLAYING,()=>{
       streamPlaying=true;
       $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
       playBusy=false;
-      reveal();
     });
-
     player.addEventListener(Twitch.Player.OFFLINE,()=>{
       streamPlaying=false;
       $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
     });
-
     setTimeout(reveal,7000);
   }catch(e){
     console.error(e);
@@ -555,33 +524,25 @@ function setFullscreenIcon(active){
 async function fullscreen(){
   const el=$('video');
   if(!el)return;
-
   try{
-    // Normalny fullscreen przeglądarki.
     if(document.fullscreenElement){
       await document.exitFullscreen();
       return;
     }
-
     if(el.requestFullscreen){
       await el.requestFullscreen({navigationUI:'hide'});
       return;
     }
-
-    // Safari / starsze WebKit.
     if(el.webkitRequestFullscreen){
       el.webkitRequestFullscreen();
       return;
     }
-
-    // Ostateczny fallback — działa także tam, gdzie Fullscreen API
-    // nie jest dostępne.
     el.classList.add('player-fs');
     document.body.classList.add('player-fullscreen');
     document.body.style.overflow='hidden';
     setFullscreenIcon(true);
   }catch(e){
-    console.warn('Fullscreen API failed, using fallback:',e);
+    console.error(e);
     el.classList.add('player-fs');
     document.body.classList.add('player-fullscreen');
     document.body.style.overflow='hidden';
@@ -596,28 +557,31 @@ async function exitPlayerFullscreen(){
   try{
     if(document.fullscreenElement && document.exitFullscreen){
       await document.exitFullscreen();
-    }else if(document.webkitFullscreenElement && document.webkitExitFullscreen){
-      document.webkitExitFullscreen();
     }
   }catch(e){}
 
   v.classList.remove('player-fs','landscape-player','show-controls','controls-hidden');
   document.body.classList.remove('player-fullscreen');
   document.body.style.overflow='';
+
+  try{
+    if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  }catch(e){}
+
   setFullscreenIcon(false);
 }
 
 function syncFullscreenState(){
   const v=$('video');
   if(!v)return;
-
-  const active=!!document.fullscreenElement || !!document.webkitFullscreenElement || v.classList.contains('player-fs');
-
+  const active=!!document.fullscreenElement;
   v.classList.toggle('player-fs',active);
   document.body.classList.toggle('player-fullscreen',active);
   document.body.style.overflow=active?'hidden':'';
   setFullscreenIcon(active);
 }
+
+document.addEventListener('fullscreenchange',syncFullscreenState);
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape' && document.fullscreenElement){
@@ -644,6 +608,14 @@ async function loadStreams(){
 
   renderLeagues();
   renderStream();
+
+  // Aktywne LIVE uruchamia createPlayer() z renderStream().
+  // Nie twórz drugiego playera — zapobiega to konfliktom z play/fullscreen.
+  const s=streams[activeLeague];
+  if(s?.active && s.videoId && !player){
+    $('placeholder').style.display='none';
+    createPlayer(s.videoId);
+  }
 
   if(document.querySelector('#adminContent').style.display==='block')renderAdmin();
 }
