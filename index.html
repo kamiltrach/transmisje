@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://player.twitch.tv/js/embed/v1.js"></script>
 <style>
 :root {
   --navy: #0b162c;
@@ -74,64 +73,79 @@ main { max-width: 1220px; margin: 0 auto; padding: 100px 20px 50px; }
 .league:hover { color: #fff; background: rgba(255,255,255,.08); }
 .league.active { background: var(--green); border-color: var(--green); color: var(--navy); box-shadow: 0 0 20px var(--glow); }
 
-/* SEKCJA ODTWARZACZA */
+/* SEKCJA ODTWARZACZA I MASKOWANIA TWITCHA */
 .player-card {
-  position: relative; background: #000; border: 1px solid var(--border);
-  border-radius: 20px; overflow: hidden; box-shadow: 0 25px 70px #0008; margin-top: 10px;
+  position: relative;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 70px #0008;
+  margin-top: 10px;
 }
 
 .video-container {
-  position: relative; width: 100%; aspect-ratio: 16/9; min-height: 320px;
-  background: #050b14; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  min-height: 320px;
+  background: #050b14;
+  overflow: hidden;
 }
 
-/* Przycięcie ramek Twitcha (maskowanie nagłówków i logo) */
-.player-frame-wrapper {
+/* Przycięcie górnego paska i ramek Twitcha */
+.twitch-crop-wrapper {
   position: absolute;
-  inset: -6.5% -1.5% -6.5% -1.5%;
-  width: 103%; height: 113%;
+  inset: -8.5% -1.5% -8.5% -1.5%;
+  width: 103%;
+  height: 117%;
 }
 
-.player-frame-wrapper iframe { width: 100%; height: 100%; border: 0; }
+.twitch-crop-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
 
+/* Przeźroczysta nakładka blokująca klikanie w logo Twitcha w lewym górnym rogu */
+.twitch-shield-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14%;
+  z-index: 10;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* Własny znak wodny serwisu */
 .watermark {
-  position: absolute; right: 20px; top: 18px; z-index: 10;
-  background: rgba(11,22,44,.85); padding: 8px 12px; border-radius: 10px;
-  border: 1px solid var(--border); pointer-events: none;
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  z-index: 12;
+  background: rgba(11,22,44,.85);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  pointer-events: none;
 }
 .watermark img { height: 30px; display: block; }
 
-/* Nakładka aktywacji dźwięku (Autoplay fix) */
-.unmute-overlay {
-  position: absolute; inset: 0; z-index: 15;
-  background: rgba(5, 11, 20, 0.6); backdrop-filter: blur(4px);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-  transition: opacity .3s ease, visibility .3s;
+.placeholder {
+  text-align: center;
+  color: var(--muted);
+  z-index: 2;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
-.unmute-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.unmute-btn {
-  padding: 14px 28px; border-radius: 50px; background: var(--green);
-  color: var(--navy); font-weight: 800; font-size: .85rem; text-transform: uppercase;
-  box-shadow: 0 8px 25px rgba(126,211,33,.4); display: flex; align-items: center; gap: 10px;
-  transition: transform .2s ease;
-}
-.unmute-btn:hover { transform: scale(1.05); }
-
-.placeholder { text-align: center; color: var(--muted); z-index: 2; padding: 20px; }
 .placeholder i { font-size: 2.5rem; color: var(--green); margin-bottom: 12px; }
-
-/* Pasek sterowania */
-.controls-bar {
-  height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 16px;
-  background: rgba(8,16,31,.98); border-top: 1px solid var(--border); position: relative; z-index: 20;
-}
-.btn-ctrl {
-  width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.05);
-  color: #c9d2df; display: grid; place-items: center; transition: .2s;
-}
-.btn-ctrl:hover { background: rgba(126,211,33,.15); color: var(--green); }
-.stream-title { font-size: .8rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.spacer { flex: 1; }
 
 /* Panel Admina */
 .admin-panel {
@@ -157,7 +171,7 @@ main { max-width: 1220px; margin: 0 auto; padding: 100px 20px 50px; }
 
 @media(max-width: 700px) {
   .hero h1 { font-size: 1.8rem; }
-  .stream-title { max-width: 130px; }
+  .twitch-crop-wrapper { inset: -11% -3% -11% -3%; width: 106%; height: 122%; }
 }
 </style>
 </head>
@@ -184,39 +198,26 @@ main { max-width: 1220px; margin: 0 auto; padding: 100px 20px 50px; }
   <section class="player-card">
     <div id="videoContainer" class="video-container">
       
-      <!-- Placeholder kiedy transmisja nie działa -->
+      <!-- Placeholder w przypadku braku aktywnej transmisji -->
       <div id="placeholder" class="placeholder">
         <i class="fa-solid fa-tower-broadcast"></i>
         <h2>Wybierz mecz z listy</h2>
-        <p>Wybierz ligę powyżej, aby uruchomić odtwarzacz.</p>
+        <p>Wybierz ligę powyżej, aby uruchomić transmisję.</p>
       </div>
 
-      <!-- Przycisk odblokowania audio (pojawia się po załadowaniu) -->
-      <div id="unmuteOverlay" class="unmute-overlay hidden">
-        <button class="unmute-btn" onclick="unmuteStream()">
-          <i class="fa-solid fa-volume-high"></i> Kliknij, aby włączyć dźwięk
-        </button>
-      </div>
+      <!-- Maska zabezpieczająca góra Twitcha -->
+      <div class="twitch-shield-top"></div>
 
-      <!-- Znak wodny -->
+      <!-- Logotyp serwisu -->
       <div class="watermark"><img src="logo.png" alt="Strefa Gola"></div>
-    </div>
-
-    <!-- Pasek sterowania -->
-    <div class="controls-bar">
-      <button class="btn-ctrl" id="playBtn" onclick="togglePlay()" title="Odtwórz / Pauza"><i class="fa-solid fa-play"></i></button>
-      <button class="btn-ctrl" id="muteBtn" onclick="toggleMute()" title="Wycisz / Włącz dźwięk"><i id="muteIcon" class="fa-solid fa-volume-xmark"></i></button>
-      <div class="stream-title" id="streamTitle">Brak transmisji</div>
-      <div class="spacer"></div>
-      <button class="btn-ctrl" onclick="toggleFullscreen()" title="Pełny ekran"><i class="fa-solid fa-expand"></i></button>
     </div>
   </section>
 
-  <!-- Panel Zarządzania -->
+  <!-- Panel Redakcyjny -->
   <section id="adminPanel" class="admin-panel">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h3>Zarządzanie Linkami Transmisji</h3>
-      <button class="btn-ctrl" onclick="closeAdmin()"><i class="fa-solid fa-xmark"></i></button>
+      <button onclick="closeAdmin()"><i class="fa-solid fa-xmark" style="font-size:1.2rem;"></i></button>
     </div>
     <div id="adminGrid" class="admin-grid"></div>
   </section>
@@ -242,7 +243,7 @@ const L = {
   b_przeworsk: 'B Klasa Przeworsk'
 };
 
-let streams = {}, activeLeague = null, twitchPlayer = null;
+let streams = {}, activeLeague = null;
 
 function toast(m) {
   const t = document.getElementById('toast');
@@ -276,109 +277,36 @@ function selectLeague(key) {
 function destroyPlayer() {
   const oldFrame = document.getElementById('twitchWrapper');
   if (oldFrame) oldFrame.remove();
-  twitchPlayer = null;
-  document.getElementById('unmuteOverlay').classList.add('hidden');
 }
 
 function loadStream() {
   destroyPlayer();
   const data = streams[activeLeague];
-  const titleEl = document.getElementById('streamTitle');
   const placeholder = document.getElementById('placeholder');
 
-  titleEl.textContent = data?.title || L[activeLeague] || 'Transmisja';
-
   if (!data?.active || !data?.videoId) {
-    placeholder.style.display = 'block';
+    placeholder.style.display = 'flex';
     return;
   }
 
   placeholder.style.display = 'none';
 
-  // Tworzenie kontenera dla podglądu Twitch
   const container = document.getElementById('videoContainer');
   const wrapper = document.createElement('div');
   wrapper.id = 'twitchWrapper';
-  wrapper.className = 'player-frame-wrapper';
-  
-  const playerDiv = document.createElement('div');
-  playerDiv.id = 'twitchEmbedTarget';
-  playerDiv.style.width = '100%';
-  playerDiv.style.height = '100%';
-  
-  wrapper.appendChild(playerDiv);
+  wrapper.className = 'twitch-crop-wrapper';
+
+  const channel = extractChannelName(data.videoId);
+  const parentDomain = getHostDomain();
+
+  // Użycie natywnej ramki iframe z wyłączonym czatem oraz automatycznym ukrywaniem kontrolek
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://player.twitch.tv/?channel=${channel}&parent=${parentDomain}&autoplay=true&muted=false`;
+  iframe.allowFullscreen = true;
+  iframe.scrolling = 'no';
+
+  wrapper.appendChild(iframe);
   container.appendChild(wrapper);
-
-  // Inicjalizacja Twitch JS Embed
-  try {
-    twitchPlayer = new Twitch.Player('twitchEmbedTarget', {
-      channel: extractChannelName(data.videoId),
-      parent: [getHostDomain()],
-      autoplay: true,
-      muted: true // Autoplay wymusza start z wyciszeniem
-    });
-
-    twitchPlayer.addEventListener(Twitch.Player.READY, () => {
-      twitchPlayer.play();
-      twitchPlayer.setMuted(true);
-      
-      // Pokaż przycisk włączenia dźwięku
-      document.getElementById('unmuteOverlay').classList.remove('hidden');
-      updateUIState(true, true);
-    });
-
-    twitchPlayer.addEventListener(Twitch.Player.PLAY, () => updateUIState(false, twitchPlayer.getMuted()));
-    twitchPlayer.addEventListener(Twitch.Player.PAUSE, () => updateUIState(true, twitchPlayer.getMuted()));
-
-  } catch(e) {
-    console.error("Błąd tworzenia odtwarzacza:", e);
-  }
-}
-
-function unmuteStream() {
-  if (!twitchPlayer) return;
-  twitchPlayer.setMuted(false);
-  twitchPlayer.setVolume(1.0);
-  document.getElementById('unmuteOverlay').classList.add('hidden');
-  updateUIState(false, false);
-}
-
-function togglePlay() {
-  if (!twitchPlayer) return;
-  if (twitchPlayer.isPaused()) {
-    twitchPlayer.play();
-  } else {
-    twitchPlayer.pause();
-  }
-}
-
-function toggleMute() {
-  if (!twitchPlayer) return;
-  const isMuted = twitchPlayer.getMuted();
-  twitchPlayer.setMuted(!isMuted);
-  if (isMuted) twitchPlayer.setVolume(1.0);
-  document.getElementById('unmuteOverlay').classList.add('hidden');
-  updateUIState(twitchPlayer.isPaused(), !isMuted);
-}
-
-function updateUIState(isPaused, isMuted) {
-  document.getElementById('playBtn').innerHTML = isPaused 
-    ? '<i class="fa-solid fa-play"></i>' 
-    : '<i class="fa-solid fa-pause"></i>';
-    
-  document.getElementById('muteIcon').className = isMuted 
-    ? 'fa-solid fa-volume-xmark' 
-    : 'fa-solid fa-volume-high';
-}
-
-function toggleFullscreen() {
-  const el = document.getElementById('videoContainer');
-  if (!document.fullscreenElement) {
-    if (el.requestFullscreen) el.requestFullscreen();
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  } else {
-    if (document.exitFullscreen) document.exitFullscreen();
-  }
 }
 
 async function fetchStreams() {
@@ -389,7 +317,7 @@ async function fetchStreams() {
       snap.forEach(doc => streams[doc.id] = doc.data());
     }
   } catch (e) {
-    console.warn("Błąd Firebase:", e);
+    console.warn("Błąd bazy danych Firebase:", e);
   }
 
   const activeKey = Object.keys(L).find(k => streams[k]?.active && streams[k]?.videoId);
@@ -408,9 +336,9 @@ function renderAdmin() {
     return `
       <div class="admin-card">
         <strong>${v}</strong>
-        <input type="text" id="t_${k}" value="${s.title || v}" placeholder="Tytuł transmisji">
+        <input type="text" id="t_${k}" value="${s.title || v}" placeholder="Nazwa meczu">
         <input type="text" id="u_${k}" value="${s.url || s.videoId || ''}" placeholder="Link do Twitcha">
-        <label><input type="checkbox" id="a_${k}" ${s.active ? 'checked' : ''}> Aktywna</label>
+        <label><input type="checkbox" id="a_${k}" ${s.active ? 'checked' : ''}> Transmisja aktywna</label>
         <button class="save-btn" style="margin-top:8px" onclick="saveStream('${k}')">Zapisz</button>
       </div>`;
   }).join('');
@@ -430,10 +358,10 @@ async function saveStream(k) {
   try {
     if (window.db) await window.db.collection('streams').doc(k).set(data, { merge: true });
     streams[k] = data;
-    toast('Zapisano pomyślnie!');
+    toast('Zapisano zmiany!');
     if (activeLeague === k) loadStream();
   } catch (e) {
-    toast('Błąd zapisu bazy danych.');
+    toast('Błąd zapisu danych.');
   }
 }
 
