@@ -7,13 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://player.twitch.tv/js/embed/v1.js"></script>
 <style>
 :root{--navy:#0b162c;--green:#7ed321;--gold:#f5a623;--white:#fff;--muted:#8b9bb4;--border:rgba(255,255,255,.08);--glass:rgba(19,34,64,.72);--radius:18px;--glow:rgba(126,211,33,.25)}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--navy);color:#fff;font-family:Inter,sans-serif;background-image:radial-gradient(circle at 8% 8%,rgba(126,211,33,.08),transparent 34%),radial-gradient(circle at 92% 92%,rgba(245,166,35,.06),transparent 34%),repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(255,255,255,.012) 120px,rgba(255,255,255,.012) 240px)}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}h1,h2,h3{font-family:Outfit,sans-serif}
 .topbar{height:76px;position:fixed;inset:0 0 auto;z-index:20;background:rgba(11,22,44,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:0 4%}
 .brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.brand:visited,.brand:hover,.brand:active{color:#fff;text-decoration:none}.brand img{height:46px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}.brand-title{font:800 1.1rem Outfit;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}.brand-title .gola{color:var(--green)}.brand-sub{font:700 .55rem Outfit;color:var(--muted);letter-spacing:2.4px;font-weight:700;margin-top:4px;line-height:1;text-transform:uppercase}
-.admin-btn{height:40px;width:40px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);color:var(--muted);transition:.2s}.admin-btn:hover{color:var(--green);border-color:rgba(126,211,33,.35)}
 main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:center;padding:2.6rem 0 2.2rem}.eyebrow{color:var(--green);font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}.hero h1{font-size:2.8rem;line-height:1;text-transform:uppercase;letter-spacing:1.2px}.hero p{color:var(--muted);max-width:520px;margin:10px auto 0;font-size:.95rem}.live-dot{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.68rem;font-weight:700;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);margin-top:14px}.live-dot i{color:var(--green);font-size:.5rem;box-shadow:0 0 12px var(--green)}
 
 /* Ładne, nowoczesne zakładki lig */
@@ -25,14 +23,12 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 
 .player-card{position:relative;background:#07101f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 25px 70px #0006}
 .video{position:relative;aspect-ratio:16/9;min-height:330px;background:radial-gradient(circle at 50% 40%,#182a49,#050b15 65%);display:flex;align-items:center;justify-content:center}
-.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
 .watermark{position:absolute;right:20px;top:18px;z-index:4;background:rgba(11,22,44,.75);padding:8px 10px;border-radius:11px;backdrop-filter:blur(8px)}
 .watermark img{height:34px;width:auto;display:block}
-.video-placeholder{text-align:center;color:var(--muted);z-index:1}
+.video-placeholder{text-align:center;color:var(--muted);z-index:3}
 .video-placeholder .icon{width:68px;height:68px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;background:rgba(126,211,33,.1);color:var(--green);font-size:1.4rem}
 .video-placeholder h2{color:#fff;font-size:1.25rem}
 .video-placeholder p{font-size:.78rem;margin-top:5px}
-.loading{color:var(--green)}
 .controls{height:62px;display:flex;align-items:center;gap:9px;padding:0 15px;background:rgba(8,16,31,.98);border-top:1px solid var(--border)}
 .video .controls{position:absolute;left:0;right:0;bottom:0;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s ease}
 .video.show-controls .controls{opacity:1;pointer-events:auto}
@@ -54,9 +50,6 @@ main{max-width:1220px;margin:0 auto;padding:112px 20px 50px}.hero{text-align:cen
 .schedule-empty p{font-size:.74rem}
 .admin-panel{display:none;position:fixed;left:50%;top:96px;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));max-height:calc(100vh - 112px);overflow:auto;z-index:100;background:rgba(11,22,44,.98);box-shadow:0 24px 70px rgba(0,0,0,.55);margin:0}
 .admin-panel.open{display:block}
-.admin-box{max-width:720px;margin:0 auto}
-.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:10px}
-.admin-head h3{font-size:.9rem;text-transform:uppercase;letter-spacing:1.2px}
 .admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
 .admin-card{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:15px}
 .admin-card h3{font-size:.88rem;margin-bottom:12px}
@@ -79,7 +72,7 @@ footer{text-align:center;color:#60718d;font-size:.65rem;padding:15px 20px 28px}
 .stream-loader .ring{position:absolute;width:118px;height:118px;border:2px solid rgba(126,211,33,.12);border-top-color:var(--green);border-radius:50%;animation:sgSpin .9s linear infinite}
 @keyframes sgSpin{to{transform:rotate(360deg)}}
 .yt-wrap{position:absolute;inset:0;z-index:2;background:#000;overflow:hidden}
-.yt-wrap iframe{width:100%;height:100%;border:0;display:block;pointer-events:none!important}
+.yt-wrap iframe{width:100%;height:100%;border:0;display:block}
 
 .video.player-fs{position:fixed!important;left:0!important;top:0!important;width:100vw!important;height:100dvh!important;z-index:2147483646!important;max-width:none!important;min-height:0!important;aspect-ratio:auto!important;border-radius:0!important;background:#000}
 .video.player-fs .yt-wrap{inset:0}
@@ -155,11 +148,11 @@ body.player-fullscreen{overflow:hidden!important;width:100%!important;height:100
       <p id="loginMsg" style="margin-top:1.1rem;font-size:.76rem;color:#ff6b6b;"></p>
     </div>
     <div id="adminContent" style="display:none">
-      <div class="admin-head">
+      <div class="admin-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
         <h3>Zarządzanie transmisjami</h3>
         <button class="control" onclick="closeAdmin()" title="Zamknij"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1.2rem">Ustaw link transmisji dla każdej ligi. Zmiany są zapisywane w Firebase.</p>
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:1.2rem">Wklej link YouTube (np. <i>https://www.youtube.com/watch?v=XYZ</i> lub <i>https://youtu.be/XYZ</i>) dla wybranej ligi.</p>
       <div id="adminGrid" class="admin-grid"></div>
     </div>
   </section>
@@ -174,7 +167,7 @@ body.player-fullscreen{overflow:hidden!important;width:100%!important;height:100
 <script src="firebase-config.js"></script>
 <script>
 const L={iv_liga:'IV Liga Podkarpacka',okr_jaroslaw:'Klasa Okręgowa Jarosław',okr_krosno:'Klasa Okręgowa Krosno',okr_rzeszow:'Klasa Okręgowa Rzeszów',okr_debica:'Klasa Okręgowa Dębica',okr_stalowa:'Klasa Okręgowa Stalowa Wola',a_przeworsk:'A Klasa Przeworsk',b_przeworsk:'B Klasa Przeworsk',a_jaroslaw:'A Klasa Jarosław',b_jaroslaw:'B Klasa Jarosław',a_rzeszow:'A Klasa Rzeszów',b_rzeszow:'B Klasa Rzeszów'};
-let streams={},activeLeague=null,player=null;
+let streams={},activeLeague=null,ytPlayer=null;
 const $=id=>document.getElementById(id);
 
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
@@ -195,20 +188,29 @@ function selectLeague(k){
 }
 
 function removePlayer(){
-  const p=$('twitchplayer'); if(p)p.remove();
+  const p=$('ytplayerwrap'); if(p)p.remove();
   const l=$('streamLoader'); if(l)l.remove();
-  player=null;
+  ytPlayer=null;
 }
 
-function getChannel(url){
+function getYouTubeId(url){
+  if(!url) return '';
+  url = url.trim();
+  // Jeśli wpisano samo ID filmu (np. 11 znaków)
+  if(/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
   try{
-    const u=new URL(url);
-    if(!/twitch\.tv$/i.test(u.hostname) && !/\.twitch\.tv$/i.test(u.hostname))return '';
-    return u.pathname.split('/').filter(Boolean)[0]||'';
+    const u = new URL(url);
+    if(u.hostname.includes('youtu.be')) return u.pathname.slice(1);
+    if(u.hostname.includes('youtube.com')){
+      if(u.pathname.startsWith('/embed/') || u.pathname.startsWith('/live/')) return u.pathname.split('/')[2];
+      return u.searchParams.get('v') || '';
+    }
   }catch(e){
-    const m=String(url||'').match(/twitch\.tv\/([^/?#]+)/i);
-    return m?m[1]:'';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|live\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '';
   }
+  return '';
 }
 
 function renderStream(){
@@ -217,9 +219,6 @@ function renderStream(){
   $('sideInfo').textContent=s?.active&&s.videoId
     ? 'Transmisja: '+(s.title||L[activeLeague])
     : 'Brak aktywnej transmisji dla tej ligi.';
-
-  const oldBtn=$('placeholder').querySelector('.watch-btn');
-  if(oldBtn)oldBtn.remove();
 
   if(!s?.active||!s.videoId){
     removePlayer();
@@ -232,22 +231,10 @@ function renderStream(){
   }
 
   $('placeholder').style.display='none';
-
-  if(player && typeof player.setChannel === 'function'){
-    try{
-      player.setChannel(s.videoId);
-      streamPlaying=false;
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-      return;
-    }catch(e){
-      console.warn('setChannel failed, rebuilding player:',e);
-    }
-  }
-
   createPlayer(s.videoId);
 }
 
-function createPlayer(channel){
+function createPlayer(videoId){
   removePlayer();
 
   const loader=document.createElement('div');
@@ -257,96 +244,28 @@ function createPlayer(channel){
   $('video').appendChild(loader);
 
   const wrap=document.createElement('div');
-  wrap.id='twitchplayer';
+  wrap.id='ytplayerwrap';
   wrap.className='yt-wrap';
+  // Używamy bezpiecznego osadzania iframe YouTube z autoplay
+  wrap.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   $('video').appendChild(wrap);
 
-  const parent=location.hostname||'localhost';
-
-  try{
-    player=new Twitch.Player('twitchplayer',{
-      channel:channel,
-      parent:[parent],
-      autoplay:true,
-      muted:false,
-      controls:false
-    });
-
-    const reveal=()=>{
-      const l=$('streamLoader');
-      if(l){l.classList.add('hide');setTimeout(()=>l.remove(),350);}
-    };
-
-    player.addEventListener(Twitch.Player.READY,()=>{
-      player.setVolume(1);
-      player.setMuted(true);
-      $('muteIcon').className='fa-solid fa-volume-xmark';
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-      reveal();
-      try{ player.play(); }catch(e){}
-    });
-
-    player.addEventListener(Twitch.Player.PLAY,()=>{
-      streamPlaying=true;
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      reveal();
-    });
-
-    player.addEventListener(Twitch.Player.PAUSE,()=>{
-      streamPlaying=false;
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-    });
-
-    setTimeout(reveal,7000);
-  }catch(e){
-    console.error(e);
+  setTimeout(()=>{
     const l=$('streamLoader');
-    if(l)l.remove();
-  }
+    if(l){ l.classList.add('hide'); setTimeout(()=>l.remove(),350); }
+  }, 1200);
 }
 
-let streamPlaying=false;
-
+let isMuted=false;
 function togglePlay(){
-  if(!player)return;
-  try{
-    if(!streamPlaying){
-      player.setVolume(1);
-      player.setMuted(false);
-      player.play();
-      streamPlaying=true;
-      $('playBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-      $('muteIcon').className='fa-solid fa-volume-high';
-    }else{
-      player.pause();
-      streamPlaying=false;
-      $('playBtn').innerHTML='<i class="fa-solid fa-play"></i>';
-    }
-  }catch(e){
-    console.error('Twitch play error:',e);
-  }
+  toast('Sterowanie odtwarzaczem bezpośrednio z poziomu YouTube.');
 }
 
 function toggleMute(){
-  if(!player)return;
-  try{
-    const muted=player.getMuted();
-    if(muted){
-      player.setVolume(1);
-      player.setMuted(false);
-      $('muteIcon').className='fa-solid fa-volume-high';
-    }else{
-      player.setMuted(true);
-      $('muteIcon').className='fa-solid fa-volume-xmark';
-    }
-  }catch(e){console.error(e);}
-}
-
-function setFullscreenIcon(active){
-  const b=$('fullscreenBtn');
-  if(!b)return;
-  b.title=active?'Pomniejsz ekran':'Pełny ekran';
-  b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
+  const icon = $('muteIcon');
+  isMuted = !isMuted;
+  icon.className = isMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+  toast(isMuted ? 'Wyciszono' : 'Włączono dźwięk');
 }
 
 async function fullscreen(){
@@ -369,6 +288,13 @@ async function fullscreen(){
     document.body.classList.add('player-fullscreen');
     setFullscreenIcon(true);
   }
+}
+
+function setFullscreenIcon(active){
+  const b=$('fullscreenBtn');
+  if(!b)return;
+  b.title=active?'Pomniejsz ekran':'Pełny ekran';
+  b.innerHTML=active?'<i class="fa-solid fa-compress"></i>':'<i class="fa-solid fa-expand"></i>';
 }
 
 async function loadStreams(){
@@ -425,14 +351,14 @@ function showAdmin(){
 function renderAdmin(){
   $('adminGrid').innerHTML=Object.entries(L).map(([k,v])=>{
     const s=streams[k]||{};
-    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link transmisji</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://twitch.tv/nazwa_kanalu"><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
+    return `<div class="admin-card"><h3>${v}</h3><label class="field">Nazwa transmisji</label><input id="t_${k}" value="${esc(s.title||v)}"><label class="field">Link YouTube</label><input id="u_${k}" value="${esc(s.url||'')}" placeholder="https://youtube.com/watch?v=..."><label class="check"><input type="checkbox" id="a_${k}" ${s.active?'checked':''}> aktywna transmisja</label><button class="save" onclick="save('${k}')">Zapisz</button></div>`
   }).join('');
 }
 
 async function save(k){
   if(!window.auth || !window.auth.currentUser)return toast('Najpierw się zaloguj.');
-  const url=$('u_'+k).value.trim(),id=getChannel(url),active=$('a_'+k).checked;
-  if(active&&!id)return toast('Podaj poprawny link Twitch.');
+  const url=$('u_'+k).value.trim(),id=getYouTubeId(url),active=$('a_'+k).checked;
+  if(active&&!id)return toast('Podaj poprawny link YouTube.');
   try{
     await window.db.collection('streams').doc(k).set({league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     streams[k]={...(streams[k]||{}),league:k,title:$('t_'+k).value.trim()||L[k],url,videoId:id,active};
