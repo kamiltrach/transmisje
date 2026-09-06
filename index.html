@@ -3,145 +3,396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strefa Gola — Odtwarzacz</title>
+<title>Strefa Gola — Transmisje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Biblioteka do obsługi strumieni HLS (.m3u8) w natywnym HTML5 -->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0b162c; font-family: sans-serif; display: grid; place-items: center; min-height: 100vh; }
+:root {
+  --navy: #0b162c;
+  --green: #7ed321;
+  --gold: #f5a623;
+  --white: #fff;
+  --muted: #8b9bb4;
+  --border: rgba(255,255,255,.08);
+  --glass: rgba(19,34,64,.72);
+  --glow: rgba(126,211,33,.25);
+}
 
-  /* Autorski kontener odtwarzacza */
-  .custom-player {
-    position: relative;
-    width: 100%;
-    max-width: 900px;
-    aspect-ratio: 16/9;
-    background: #000;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.1);
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh;
+  background: var(--navy);
+  color: #fff;
+  font-family: Inter, sans-serif;
+  background-image: 
+    radial-gradient(circle at 8% 8%, rgba(126,211,33,.08), transparent 34%),
+    radial-gradient(circle at 92% 92%, rgba(245,166,35,.06), transparent 34%);
+}
 
-  video { width: 100%; height: 100%; object-fit: cover; display: block; }
+button, input { font: inherit; }
+button { cursor: pointer; color: inherit; border: 0; }
+h1, h2, h3 { font-family: Outfit, sans-serif; }
 
-  /* Znak wodny Twojej marki */
-  .brand-badge {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    z-index: 10;
-    background: rgba(11, 22, 44, 0.8);
-    backdrop-filter: blur(8px);
-    padding: 6px 12px;
-    border-radius: 8px;
-    color: #7ed321;
-    font-weight: bold;
-    font-size: 0.8rem;
-    pointer-events: none;
-  }
+.topbar {
+  height: 76px;
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  background: rgba(11,22,44,.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4%;
+}
 
-  /* Autorski pasek sterowania w HTML/CSS */
-  .controls-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 10;
-  }
+.brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; }
+.brand img { height: 46px; width: auto; }
+.brand-title { font: 800 1.1rem Outfit; text-transform: uppercase; color: #fff; line-height: 1; }
+.brand-title .gola { color: var(--green); }
+.brand-sub { font: 700 .55rem Outfit; color: var(--muted); letter-spacing: 2.4px; margin-top: 4px; text-transform: uppercase; }
 
-  .custom-player:hover .controls-overlay { opacity: 1; }
+main { max-width: 1220px; margin: 0 auto; padding: 100px 20px 50px; }
+.hero { text-align: center; padding: 2rem 0 1.5rem; }
+.hero h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 1.2px; }
+.live-dot {
+  display: inline-flex; align-items: center; gap: 7px; color: #fff; font-size: .68rem;
+  font-weight: 700; padding: 7px 11px; border: 1px solid var(--border); border-radius: 999px;
+  background: rgba(255,255,255,.04); margin-top: 10px;
+}
+.live-dot i { color: var(--green); font-size: .5rem; }
 
-  .btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  .btn:hover { color: #7ed321; }
+.leagues { display: flex; gap: 8px; overflow: auto; padding: 10px 0; scrollbar-width: none; }
+.leagues::-webkit-scrollbar { display: none; }
+.league {
+  white-space: nowrap; padding: 10px 16px; border-radius: 10px; background: rgba(255,255,255,.04);
+  border: 1px solid var(--border); color: var(--muted); font-size: .75rem; font-weight: 700; transition: .2s;
+}
+.league:hover { color: #fff; background: rgba(255,255,255,.08); }
+.league.active { background: var(--green); border-color: var(--green); color: var(--navy); box-shadow: 0 0 20px var(--glow); }
 
-  .volume-slider {
-    width: 80px;
-    accent-color: #7ed321;
-    cursor: pointer;
-  }
+/* SEKCJA ODTWARZACZA (Czysty autorski wygląd) */
+.player-card {
+  position: relative;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 70px #0008;
+  margin-top: 10px;
+}
 
-  .spacer { flex: 1; }
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  min-height: 320px;
+  background: #050b14;
+  overflow: hidden;
+}
+
+/* Ukrycie pasków i elementów YouTube poprzez powiększenie ramki wewnątrz kontenera */
+.yt-crop-wrapper {
+  position: absolute;
+  top: -15%;
+  bottom: -15%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 130%;
+}
+
+.yt-crop-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Blokada kliknięć, żeby nikt nie klikał w ukryte logo YouTube */
+.interaction-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: transparent;
+  pointer-events: none; /* Pozwala na interakcję z odtwarzaczem, ale zabezpiecza górę/dół */
+}
+
+/* Własny znak wodny serwisu */
+.watermark {
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  z-index: 10;
+  background: rgba(11,22,44,.85);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  pointer-events: none;
+}
+.watermark img { height: 30px; display: block; }
+
+.placeholder {
+  text-align: center;
+  color: var(--muted);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #050b14;
+  z-index: 12;
+}
+.placeholder i { font-size: 2.5rem; color: var(--green); margin-bottom: 12px; }
+
+/* Pasek informacji o meczu na dole */
+.controls-bar {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  background: rgba(8,16,31,.98);
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 20;
+}
+.stream-title { font-size: .85rem; font-weight: 700; color: #fff; }
+.spacer { flex: 1; }
+.live-badge-bar { color: var(--green); font-size: .75rem; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+
+/* Panel Admina */
+.admin-panel {
+  display: none; position: fixed; left: 50%; top: 85px; transform: translateX(-50%);
+  width: min(1100px, calc(100% - 24px)); max-height: calc(100vh - 100px); overflow: auto;
+  z-index: 100; background: rgba(11,22,44,.98); border: 1px solid var(--border);
+  border-radius: 18px; padding: 24px; box-shadow: 0 20px 60px #0008;
+}
+.admin-panel.open { display: block; }
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 15px; }
+.admin-card { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.admin-card input[type="text"] {
+  width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: rgba(0,0,0,.4); color: #fff; margin-top: 4px; margin-bottom: 8px; font-size: .8rem;
+}
+.save-btn {
+  width: 100%; padding: 10px; border-radius: 8px; background: var(--green);
+  color: var(--navy); font-weight: 800; text-transform: uppercase; font-size: .7rem;
+}
+.btn-ctrl {
+  background: none; border: 0; color: #fff; cursor: pointer; font-size: 1rem;
+}
+
+.toast { position: fixed; right: 20px; bottom: 20px; z-index: 200; padding: 12px 18px; border-radius: 10px; background: #132240; border: 1px solid var(--border); font-size: .75rem; display: none; }
+.toast.show { display: block; }
+
+@media(max-width: 700px) {
+  .hero h1 { font-size: 1.8rem; }
+}
 </style>
 </head>
 <body>
 
-<div class="custom-player">
-  <div class="brand-badge"><i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> STREFA GOLA LIVE</div>
-  
-  <video id="video" autoplay muted playsinline></video>
+<header class="topbar">
+  <a class="brand" href="#">
+    <img src="logo.png" onerror="this.style.display='none'" alt="Logo">
+    <div>
+      <div class="brand-title">STREFA <span class="gola">GOLA</span></div>
+      <div class="brand-sub">PODKARPACIE</div>
+    </div>
+  </a>
+</header>
 
-  <!-- Twój własny interfejs, zero śladów stron trzecich -->
-  <div class="controls-overlay">
-    <button class="btn" id="playBtn" onclick="togglePlay()"><i class="fa-solid fa-pause"></i></button>
-    <button class="btn" id="muteBtn" onclick="toggleMute()"><i class="fa-solid fa-volume-xmark"></i></button>
-    <input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.1" value="0" oninput="changeVolume(this.value)">
-    <div class="spacer"></div>
-    <button class="btn" onclick="toggleFullscreen()"><i class="fa-solid fa-expand"></i></button>
-  </div>
-</div>
+<main>
+  <section class="hero">
+    <h1>Transmisje na żywo</h1>
+    <div class="live-dot"><i class="fa-solid fa-circle"></i> NA ŻYWO</div>
+  </section>
+
+  <div id="leagues" class="leagues"></div>
+
+  <section class="player-card">
+    <div id="videoContainer" class="video-container">
+      
+      <!-- Placeholder (gdy brak transmisji) -->
+      <div id="placeholder" class="placeholder">
+        <i class="fa-solid fa-tower-broadcast"></i>
+        <h2>Wybierz mecz z listy</h2>
+        <p>Brak aktywnego meczu w tej lidze.</p>
+      </div>
+
+      <!-- Tutaj JavaScript wstrzykuje ukryty odtwarzacz YT -->
+      <div id="playerWrapper"></div>
+
+      <!-- Znak wodny Twojego serwisu -->
+      <div class="watermark"><img src="logo.png" alt="Strefa Gola" onerror="this.style.display='none'"></div>
+    </div>
+
+    <!-- Pasek pod wideo -->
+    <div class="controls-bar">
+      <div class="live-badge-bar"><i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> LIVE</div>
+      <div class="stream-title" id="streamTitle">Brak transmisji</div>
+      <div class="spacer"></div>
+      <div style="color: var(--muted); font-size: 0.75rem;">Strefa Gola Player</div>
+    </div>
+  </section>
+
+  <!-- Panel Admina (Ctrl + M) -->
+  <section id="adminPanel" class="admin-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3>Zarządzanie Linkami Transmisji (YouTube)</h3>
+      <button class="btn-ctrl" onclick="closeAdmin()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="adminGrid" class="admin-grid"></div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 
 <script>
-  const video = document.getElementById('video');
-  const playBtn = document.getElementById('playBtn');
-  const muteBtn = document.getElementById('muteBtn');
+const L = {
+  iv_liga: 'IV Liga Podkarpacka',
+  okr_jaroslaw: 'Klasa Okręgowa Jarosław',
+  okr_krosno: 'Klasa Okręgowa Krosno',
+  okr_rzeszow: 'Klasa Okręgowa Rzeszów',
+  okr_debica: 'Klasa Okręgowa Dębica',
+  okr_stalowa: 'Klasa Okręgowa Stalowa Wola',
+  a_przeworsk: 'A Klasa Przeworsk',
+  b_przeworsk: 'B Klasa Przeworsk'
+};
 
-  // Podmień na bezpośredni link .m3u8 swojego streamu (np. z własnego serwera RTMP/HLS)
-  const streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+let streams = {}, activeLeague = null;
 
-  if (Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(streamUrl);
-    hls.attachMedia(video);
-  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = streamUrl;
+function toast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Wyciąganie ID filmu z linku YouTube (obsługuje pełne linki, shorty i /live/)
+function extractYouTubeId(url) {
+  if (!url) return '';
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|live\/)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : url.trim();
+}
+
+function renderLeagues() {
+  document.getElementById('leagues').innerHTML = Object.entries(L).map(([k, v]) => 
+    `<button class="league ${k === activeLeague ? 'active' : ''}" onclick="selectLeague('${k}')">${v}</button>`
+  ).join('');
+}
+
+function selectLeague(key) {
+  activeLeague = key;
+  renderLeagues();
+  loadStream();
+}
+
+function loadStream() {
+  const wrapper = document.getElementById('playerWrapper');
+  wrapper.innerHTML = '';
+  
+  const data = streams[activeLeague];
+  const titleEl = document.getElementById('streamTitle');
+  const placeholder = document.getElementById('placeholder');
+
+  titleEl.textContent = data?.title || L[activeLeague] || 'Transmisja';
+
+  if (!data?.active || !data?.url) {
+    placeholder.style.display = 'flex';
+    return;
   }
 
-  function togglePlay() {
-    if (video.paused) {
-      video.play();
-      playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-    } else {
-      video.pause();
-      playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+  placeholder.style.display = 'none';
+  const ytId = extractYouTubeId(data.url);
+
+  if (!ytId) return;
+
+  // Tworzenie czystego osadzenia z parametrami ukrywającymi interfejs YouTube
+  const cropDiv = document.createElement('div');
+  cropDiv.className = 'yt-crop-wrapper';
+
+  const iframe = document.createElement('iframe');
+  // Parametry: autoodtwarzanie, bez kontrolek, bez logo yt, bez powiązanych filmów na końcu
+  iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&iv_load_policy=3`;
+  iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+  iframe.allowFullscreen = true;
+
+  cropDiv.appendChild(iframe);
+  wrapper.appendChild(cropDiv);
+}
+
+async function fetchStreams() {
+  try {
+    if (window.db) {
+      const snap = await window.db.collection('streams').get();
+      streams = {};
+      snap.forEach(doc => streams[doc.id] = doc.data());
     }
+  } catch (e) {
+    console.warn("Błąd Firebase:", e);
   }
 
-  function toggleMute() {
-    video.muted = !video.muted;
-    muteBtn.innerHTML = video.muted 
-      ? '<i class="fa-solid fa-volume-xmark"></i>' 
-      : '<i class="fa-solid fa-volume-high"></i>';
-  }
+  const activeKey = Object.keys(L).find(k => streams[k]?.active && streams[k]?.url);
+  activeLeague = activeKey || Object.keys(L)[0];
 
-  function changeVolume(val) {
-    video.volume = val;
-    video.muted = val == 0;
-  }
+  renderLeagues();
+  loadStream();
+}
 
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      video.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
+function openAdmin() { document.getElementById('adminPanel').classList.add('open'); renderAdmin(); }
+function closeAdmin() { document.getElementById('adminPanel').classList.remove('open'); }
+
+function renderAdmin() {
+  document.getElementById('adminGrid').innerHTML = Object.entries(L).map(([k, v]) => {
+    const s = streams[k] || {};
+    return `
+      <div class="admin-card">
+        <strong>${v}</strong>
+        <input type="text" id="t_${k}" value="${s.title || v}" placeholder="Tytuł meczu">
+        <input type="text" id="u_${k}" value="${s.url || ''}" placeholder="Link do YouTube (np. https://youtu.be/...)">
+        <label><input type="checkbox" id="a_${k}" ${s.active ? 'checked' : ''}> Transmisja aktywna</label>
+        <button class="save-btn" style="margin-top:8px" onclick="saveStream('${k}')">Zapisz</button>
+      </div>`;
+  }).join('');
+}
+
+async function saveStream(k) {
+  const data = {
+    league: k,
+    title: document.getElementById('t_' + k).value.trim() || L[k],
+    url: document.getElementById('u_' + k).value.trim(),
+    active: document.getElementById('a_' + k).checked
+  };
+
+  try {
+    if (window.db) await window.db.collection('streams').doc(k).set(data, { merge: true });
+    streams[k] = data;
+    toast('Zapisano pomyślnie!');
+    if (activeLeague === k) loadStream();
+  } catch (e) {
+    toast('Błąd zapisu w bazie.');
   }
+}
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') {
+    e.preventDefault();
+    openAdmin();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', fetchStreams);
 </script>
-
 </body>
 </html>
